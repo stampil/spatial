@@ -21,6 +21,17 @@ class Tools {
         return  $tab[4];
     }
     
+    public static function print_pre($var){
+        echo '<pre>';
+        echo 'print_pre('.gettype($var).') : ';
+        if(is_array($var) || is_object($var)){
+            print_r($var);
+        }
+        else{
+            echo $var;
+        }
+        echo '</pre>';
+    }
     
-
+    
 }
