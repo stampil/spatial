@@ -1,5 +1,5 @@
 <?php
-$id_planet=1;
+$id_planet=2;
 $planet = new Planet($id_planet);
 for($id_planet=1; $id_planet<=26; $id_planet++){
     $bgz = 210;
