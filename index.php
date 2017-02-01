@@ -5,7 +5,7 @@ if(!empty($_GET['p'])){
     $p = $_GET['p'];
 }
 else{
-    $p = 'affichePlanete';
+    $p = 'listePlanete';
 }
 ?>
 <!DOCTYPE html>
