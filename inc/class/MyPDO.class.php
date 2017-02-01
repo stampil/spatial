@@ -12,7 +12,7 @@ class MyPDO extends PDO{
             }
             $DB_HOST= 'localhost';
             $DB_PORT='3306';
-            $DB_NAME='test';
+            $DB_NAME='systeme';
             $DB_USER='root';
             $DB_PASS='';
             
