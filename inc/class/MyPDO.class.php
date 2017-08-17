@@ -21,7 +21,13 @@ class MyPDO extends PDO {
 
         $path = 'mysql:host=' . $DB_HOST . ';port=' . $DB_PORT . ';dbname=' . $DB_NAME;
 
-        parent::__construct($path, $DB_USER, $DB_PASS, $options);
+        try{
+            parent::__construct($path, $DB_USER, $DB_PASS, $options);
+        }
+        catch(Exception $e){
+                var_dump($e);
+                exit();
+        }
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         $this->query("SET NAMES 'utf8'");
     }

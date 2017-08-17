@@ -6,11 +6,13 @@ else{
     exit('id_planete needed');
 }
 
-$p = new Planete();
-$p->load($id_planete);
-echo $p->nom.' revolté a '.$p->perc_revolte.' %';
+$p = new Planete($id_planete);
+$p->perc_revolte++;
+echo $p->nom.' du systeme '.$p->systeme->nom.' revolté a '.$p->perc_revolte.' %';
 
-    
+$p->save();   
+$p->systeme->nom='SOL';
+$p->systeme->save();
 ?>
 
 
