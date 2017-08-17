@@ -7,7 +7,7 @@ else{
 }
 
 $p = new Planete($id_planete);
-$p->perc_revolte++;
+//$p->perc_revolte++;
 echo $p->nom.' du systeme '.$p->systeme->nom.' revolté a '.$p->perc_revolte.' %';
 
 $p->save();   

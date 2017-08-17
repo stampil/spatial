@@ -8,7 +8,6 @@ if(!empty($_POST['nom']) && !empty($_POST['mdp']) && !empty($_POST['email'])){
             'email' =>$_POST['email'],
         )        
     );  
-    //TODO creer systeme pour joueur $id_joueur
-    echo 'joueur créé : '.$id_joueur;
+    header('Location: ?p=connection');
 }
 ?>

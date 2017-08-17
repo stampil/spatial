@@ -9,10 +9,9 @@ if(!empty($_POST['email']) && !empty($_POST['mdp'])){
     );  
     
     if($info && $info->id){
-        echo 'joueur trouvé: '.$info->id;
-        $j = new Joueur();
-        $j->load($info->id);
+        //$j = new Joueur($info->id);
         $_SESSION['Sid'] = $info->id;
+        header('Location: index.php?p=tableauBord');
     }
     else{
         echo 'joueur non trouvé';
