@@ -21,6 +21,21 @@ class Planete {
         $ret = MyPDO::getInstance()->query($query);
         return $ret;
     }
+    
+    public static function fillSysteme($id_systeme){
+        $nb_planetes = rand(3, 12);
+        for ($i=0; $i<$nb_planetes; $i++){
+            $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie)
+                VALUES (?,?,?,?,?,?,?,?,?,?);";
+            $gouverneur=0;
+            $slot =rand(1,16);
+            if($i==0){//premiere planete créer : base du joueur
+                $gouverneur = $id_systeme; // = $id_joueur
+                $slot = 8; //meme base de depart pour tout les joueurs et permettre une bonne expension
+            }
+            MyPDO::getInstance()->query($query, '',rand(0,25),$slot,$gouverneur,$id_systeme,0,0,0,0,0);
+        }
+    }
 
     /**
      * __construct

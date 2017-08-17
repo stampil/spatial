@@ -16,6 +16,7 @@ class Joueur {
         $id_joueur =  MyPDO::getInstance()->lastInsertId();
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom) VALUES(?) ";
         MyPDO::getInstance()->query($query,''); //nom vide a la charge du joueur de le renommer la premiere fois
+        Planete::fillSysteme($id_joueur);
         return $id_joueur;
     }
     
