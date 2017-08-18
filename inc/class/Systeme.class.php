@@ -5,6 +5,7 @@ class Systeme {
     private $bdd;
     public $id;
     public $nom;
+    public $planetes;
 
         
     public static function liste(){
@@ -33,6 +34,7 @@ class Systeme {
         
         $this->nom = $ret[0]->nom;
         $this->id = $ret[0]->id;
+        $this->planetes = Planete::liste($this->id);
         return $this;
     }
     

@@ -14,13 +14,19 @@ class Planete {
     public $nb_usine_ressource;
     public $nb_academie;
     public $systeme;
+    public static $min_slot = 1;
+    public static $max_slot = 16;
         
-    public static function liste(){
+    public static function liste($id_systeme=null){
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "planete ";
-        $ret = MyPDO::getInstance()->query($query);
+        if($id_systeme){
+            $query .= " WHERE id_systeme=?";
+        }
+        $ret = MyPDO::getInstance()->query($query,$id_systeme);
         return $ret;
     }
+    
     
     public static function fillSysteme($id_systeme){
         $nb_planetes = rand(3, 12);
@@ -28,7 +34,7 @@ class Planete {
             $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie)
                 VALUES (?,?,?,?,?,?,?,?,?,?);";
             $gouverneur=0;
-            $slot =rand(1,16);
+            $slot =rand(self::$min_slot,self::$max_slot);
             if($i==0){//premiere planete créer : base du joueur
                 $gouverneur = $id_systeme; // = $id_joueur
                 $slot = 8; //meme base de depart pour tout les joueurs et permettre une bonne expension

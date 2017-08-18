@@ -19,13 +19,13 @@ if(!$map_planete) $map_planete = 1;
 ?>
 <style>
   body {
-  background:black;
+  /*background:black;
   color:white;
-    background-size:3024px;
+    background-size:3024px;*/
 }
 
 #planet {
-  width: 100px;
+        width: 100px;
 	height: 100px;
 	background: url(img/planete/<?php echo $map_planete; ?>.jpg);
 	border-radius: 50%;
