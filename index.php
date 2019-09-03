@@ -7,6 +7,14 @@ if(!empty($_GET['p'])){
 else{
     $p = 'welcome';
 }
+
+if(!empty($_SESSION['Sid'])){
+        $Joueur= new Joueur($_SESSION['Sid']);
+        if($Joueur->etape_tuto<5){
+            $p = 'tuto_'.$Joueur->etape_tuto;
+        }
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -34,6 +42,7 @@ else{
     </head>
     <body>
     <?php
+
     if(is_file('model/'.$p.'.php')){
         require 'model/'.$p.'.php';
     }

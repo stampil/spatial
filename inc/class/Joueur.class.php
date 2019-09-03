@@ -3,15 +3,17 @@
 class Joueur {
 
     private $bdd;
-    public $id;
-    public $nom;
-    public $credits;
     private $email;
     private $mdp;
     
+    public $id;
+    public $nom;
+    public $credits;
+    public $etape_tuto;
+    
     public static function inscrire($infos){
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,mdp,creato) VALUES(?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],$infos['mdp']);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,creato) VALUES(?,?,?,?,now()) ";
+        MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(),$infos['mdp']);
         // pour chaque joueur crée on crée un systeme qui sera celui de départ ( id_joueur = id_systeme départ)
         $id_joueur =  MyPDO::getInstance()->lastInsertId();
         $joueur = new Joueur($id_joueur);
@@ -21,11 +23,7 @@ class Joueur {
         return $joueur;
     }
     
-    public function goToPlanete($Planete){
-        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur set sur_planete=?";
-        MyPDO::getInstance()->query($query,$Planete->id);
-    }
-    
+   
     
     public static function connecter($infos){
         $query = "select * from " . MyPDO::DB_FLAG . "joueur where email=? and mdp=? ";
@@ -56,30 +54,44 @@ class Joueur {
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
 
-        $this->nom = $ret[0]->nom;
+        
         $this->id = $ret[0]->id;
+        $this->nom = $ret[0]->nom;
         $this->email = $ret[0]->email;
-        $this->mdp = $ret[0]->mdp;
+        $this->IPs = $ret[0]->IPs;
+        $this->sur_planete= $ret[0]->sur_planete;  
         $this->credits = $ret[0]->credits;
+        $this->mdp = $ret[0]->mdp;
+        $this->etape_tuto= $ret[0]->etape_tuto;
+        $this->creato = $ret[0]->creato;
     }
     
         public function save(){     
         $query ="UPDATE " . MyPDO::DB_FLAG . "joueur 
             set
             nom = ?,
-            credits = ?,
             email =?,
-            mdp =?
+            IPs = ?,
+            sur_planete= ?,
+            credits = ?,
+            mdp =?,
+            etape_tuto = ?
             WHERE id =?";
         $ret = $this->bdd->query($query,          
                 $this->nom,
-                $this->credits,
                 $this->email,
-                $this->mdp,              
+                $this->IPs,
+                $this->sur_planete,
+                $this->credits,
+                $this->mdp,
+                $this->etape_tuto,
                 $this->id
                 );
     }
     
-    
+        public function goToPlanete($Planete){
+            $query = "UPDATE " . MyPDO::DB_FLAG . "joueur set sur_planete=?";
+            $this->bdd->query($query,$Planete->id);
+    }
     
 }
