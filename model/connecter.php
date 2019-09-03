@@ -14,7 +14,7 @@ if(!empty($_POST['email']) && !empty($_POST['mdp'])){
         header('Location: index.php?p=tableauBord');
     }
     else{
-        echo 'joueur non trouvé';
+        header('Location: index.php?p=connection&erreur=identifiants non reconnus');
     }
 }
 

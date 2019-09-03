@@ -1,3 +1,9 @@
+<?php
+    if(!empty($_GET['erreur'])){
+        Tools::show_error_html($_GET['erreur']);
+    }
+?>
+
 <h1>Connection</h1>
 
 <form method="POST" action="index.php?p=connecter">

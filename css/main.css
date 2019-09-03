@@ -1,4 +1,8 @@
-
+a{
+    text-decoration: none;
+    font-size:10px;
+    color:black;
+}
 
 .planet {
         width: 100px;

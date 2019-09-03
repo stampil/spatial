@@ -14,11 +14,18 @@ class Joueur {
         MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],$infos['mdp']);
         // pour chaque joueur crée on crée un systeme qui sera celui de départ ( id_joueur = id_systeme départ)
         $id_joueur =  MyPDO::getInstance()->lastInsertId();
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom) VALUES(?) ";
+        $joueur = new Joueur($id_joueur);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom,creato) VALUES(?,now()) ";
         MyPDO::getInstance()->query($query,''); //nom vide a la charge du joueur de le renommer la premiere fois
-        Planete::fillSysteme($id_joueur);
-        return $id_joueur;
+        Planete::fillSysteme($joueur);
+        return $joueur;
     }
+    
+    public function goToPlanete($Planete){
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur set sur_planete=?";
+        MyPDO::getInstance()->query($query,$Planete->id);
+    }
+    
     
     public static function connecter($infos){
         $query = "select * from " . MyPDO::DB_FLAG . "joueur where email=? and mdp=? ";
