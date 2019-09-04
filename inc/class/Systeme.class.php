@@ -6,6 +6,8 @@ class Systeme {
     public $id;
     public $nom;
     public $planetes;
+    private static $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lamdba","Mu","Nu","Ksi","Omicron","Pi",
+        "Rho","Sigma","Tau","Upsilon","Phi","Chi","Psi","Omega");
 
         
     public static function liste(){
@@ -49,4 +51,28 @@ class Systeme {
                 );
     }
     
+     public static function create(){
+        $systemes = self::liste();
+        
+        $Noms = array();
+        foreach ($systemes as $systeme){
+            
+            array_push($Noms,$systeme->nom);
+        }
+        do{
+            
+            $nom = self::$noms[rand(0,count(self::$noms)-1)].'-'.rand(1000,9999);
+        }while(in_array($nom, $Noms));
+         
+         $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom,visible,creato) VALUES(?,0,now()) ";
+        MyPDO::getInstance()->query($query,$nom); //nom vide a la charge du joueur de le renommer la premiere fois
+        
+        return MyPDO::getInstance()->lastInsertId();
+         
+     }
+     
+    public function getNom(){
+        return '<span class="nomSysteme">'.$this->nom.'</span>';
+    }     
+        
 }

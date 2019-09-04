@@ -1,6 +1,10 @@
 <?php
 require_once 'inc/header.php';
 
+if(!empty($_GET['d'])){
+    session_destroy();
+}
+
 if(!empty($_GET['p'])){
     $p = $_GET['p'];
 }
@@ -10,8 +14,15 @@ else{
 
 if(!empty($_SESSION['Sid'])){
         $Joueur= new Joueur($_SESSION['Sid']);
-        if($Joueur->etape_tuto<5){
+        $etape_tuto = $Joueur->etape_tuto;
+        if($etape_tuto==0 && $p=="listePerso"){
+            $etape_tuto=1;
+            $Joueur->etape_tuto=$etape_tuto;
+            $Joueur->save();
+        }
+        elseif($etape_tuto==0){
             $p = 'tuto_'.$Joueur->etape_tuto;
+            $Perso = new Perso(1);
         }
 }
 

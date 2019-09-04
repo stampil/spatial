@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.4
--- https://www.phpmyadmin.net/
+-- version 4.2.7.1
+-- http://www.phpmyadmin.net
 --
 -- Client :  127.0.0.1
--- Généré le :  Mer 01 Février 2017 à 16:49
--- Version du serveur :  5.7.14
--- Version de PHP :  5.6.25
+-- Généré le :  Mer 04 Septembre 2019 à 17:15
+-- Version du serveur :  5.5.39
+-- Version de PHP :  5.4.31
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -14,11 +14,13 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 
 --
 -- Base de données :  `systeme`
 --
+CREATE DATABASE IF NOT EXISTS `systeme` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `systeme`;
 
 -- --------------------------------------------------------
 
@@ -26,22 +28,35 @@ SET time_zone = "+00:00";
 -- Structure de la table `joueur`
 --
 
-CREATE TABLE `joueur` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `joueur`;
+CREATE TABLE IF NOT EXISTS `joueur` (
+`id` bigint(20) unsigned NOT NULL,
   `nom` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `sur_planete` bigint(20) UNSIGNED DEFAULT NULL,
+  `IPs` text NOT NULL,
+  `credits` int(11) NOT NULL,
   `mdp` varchar(255) NOT NULL,
+  `etape_tuto` tinyint(1) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
 
 --
--- Contenu de la table `joueur`
+-- Structure de la table `perso`
 --
 
-INSERT INTO `joueur` (`id`, `nom`, `email`, `sur_planete`, `mdp`, `creato`) VALUES
-(1, 'stampil', 'toto@gmail.com', 1, 'eHXnFV9Qwdj5Y8EntbFQ/GHcpjEPTz4fBde2ygK2V2P5XrtnxmOSR1uMX2g45rptzDpV4ErvAMDJ.a0xXbxGr0', '2017-02-01 17:09:14'),
-(2, 'detrios', 'titi@gmail.com', 1, 'eHXnFV9Qwdj5Y8EntbFQ/GHcpjEPTz4fBde2ygK2V2P5XrtnxmOSR1uMX2g45rptzDpV4ErvAMDJ.a0xXbxGr0', '2017-02-01 17:29:19');
+DROP TABLE IF EXISTS `perso`;
+CREATE TABLE IF NOT EXISTS `perso` (
+`id` int(11) NOT NULL,
+  `id_joueur` int(11) NOT NULL,
+  `nom` varchar(255) NOT NULL,
+  `PV` int(11) NOT NULL COMMENT 'Vie',
+  `FO` int(11) NOT NULL COMMENT 'FORCE',
+  `diplomatie` int(11) NOT NULL,
+  `sur_planete` int(11) NOT NULL,
+  `creato` datetime NOT NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -49,21 +64,21 @@ INSERT INTO `joueur` (`id`, `nom`, `email`, `sur_planete`, `mdp`, `creato`) VALU
 -- Structure de la table `planete`
 --
 
-CREATE TABLE `planete` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+DROP TABLE IF EXISTS `planete`;
+CREATE TABLE IF NOT EXISTS `planete` (
+`id` bigint(20) unsigned NOT NULL,
   `nom` varchar(255) NOT NULL,
   `perc_revolte` int(2) NOT NULL,
   `slot` int(2) NOT NULL,
-  `id_systeme` bigint(20) UNSIGNED DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Contenu de la table `planete`
---
-
-INSERT INTO `planete` (`id`, `nom`, `perc_revolte`, `slot`, `id_systeme`) VALUES
-(1, 'topi', 5, 8, 1),
-(2, 'tto', 35, 12, 1);
+  `gouverneur` int(11) NOT NULL,
+  `id_systeme` bigint(20) unsigned DEFAULT NULL,
+  `nb_usine_vaiss_leger` int(11) NOT NULL,
+  `nb_usine_vaiss_moyen` int(11) NOT NULL,
+  `nb_usine_vaiss_lourd` int(11) NOT NULL,
+  `nb_usine_ressource` int(11) NOT NULL,
+  `nb_academie` int(11) NOT NULL,
+  `creato` datetime NOT NULL
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
 
 -- --------------------------------------------------------
 
@@ -71,17 +86,13 @@ INSERT INTO `planete` (`id`, `nom`, `perc_revolte`, `slot`, `id_systeme`) VALUES
 -- Structure de la table `systeme`
 --
 
-CREATE TABLE `systeme` (
-  `id` int(11) NOT NULL,
-  `nom` varchar(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Contenu de la table `systeme`
---
-
-INSERT INTO `systeme` (`id`, `nom`) VALUES
-(1, 'demo');
+DROP TABLE IF EXISTS `systeme`;
+CREATE TABLE IF NOT EXISTS `systeme` (
+`id` int(11) NOT NULL,
+  `nom` varchar(255) NOT NULL,
+  `visible` tinyint(1) NOT NULL DEFAULT '0',
+  `creato` datetime NOT NULL
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
 -- Index pour les tables exportées
@@ -91,21 +102,25 @@ INSERT INTO `systeme` (`id`, `nom`) VALUES
 -- Index pour la table `joueur`
 --
 ALTER TABLE `joueur`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `nom` (`nom`);
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `email` (`email`), ADD UNIQUE KEY `nom` (`nom`);
+
+--
+-- Index pour la table `perso`
+--
+ALTER TABLE `perso`
+ ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `planete`
 --
 ALTER TABLE `planete`
-  ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `systeme`
 --
 ALTER TABLE `systeme`
-  ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `nom` (`nom`);
 
 --
 -- AUTO_INCREMENT pour les tables exportées
@@ -115,17 +130,22 @@ ALTER TABLE `systeme`
 -- AUTO_INCREMENT pour la table `joueur`
 --
 ALTER TABLE `joueur`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT pour la table `perso`
+--
+ALTER TABLE `perso`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT pour la table `planete`
 --
 ALTER TABLE `planete`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT pour la table `systeme`
 --
 ALTER TABLE `systeme`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -16,6 +16,7 @@ class Planete {
     public $systeme;
     public static $min_slot = 1;
     public static $max_slot = 16;
+    
         
     public static function liste($id_systeme=null){
         $query = "SELECT *
@@ -28,22 +29,25 @@ class Planete {
     }
     
     
-    public static function fillSysteme($Joueur){
+    public static function fillSysteme($Perso,$Systeme){
         $nb_planetes = rand(3, 12);
-        for ($i=0; $i<$nb_planetes; $i++){
+        
+        for ($i=1; $i<=$nb_planetes; $i++){
+            $nom_planete = preg_replace("/-[0-9]+/",' '.$i,$Systeme->nom);
+            
             $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,creato)
                 VALUES (?,?,?,?,?,?,?,?,?,?,now());";
             $gouverneur=0;
             $slot =rand(self::$min_slot,self::$max_slot);
-            if($i==0){//premiere planete créer : base du joueur
-                $gouverneur = $Joueur->id; // = $id_joueur
+            if($i==1){//premiere planete créer : base du joueur
+                //$gouverneur = $Joueur->id; // = $id_joueur pas encore : tuto fera devenir gouverneur
                 $slot = 8; //meme base de depart pour tout les joueurs et permettre une bonne expension
             }
-            MyPDO::getInstance()->query($query, '',rand(0,25),$slot,$gouverneur,$Joueur->id,0,0,0,0,0);
-            if($i==0){
+            MyPDO::getInstance()->query($query, $nom_planete,rand(0,25),$slot,$gouverneur,$Systeme->id,0,0,0,0,0);
+            if($i==1){
                 $id_planete =  MyPDO::getInstance()->lastInsertId();
                 $Planete = new Planete($id_planete);
-                $Joueur->goToPlanete($Planete);
+                $Perso->goToPlanete($Planete);
             }
             
         }
@@ -110,5 +114,9 @@ class Planete {
                 $this->id
                 );
     }
+
+public function getNom(){
+    return '<span class="nomPlanete">'.$this->nom.'</span>';
+}
     
 }

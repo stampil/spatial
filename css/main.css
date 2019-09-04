@@ -4,6 +4,22 @@ a{
     color:black;
 }
 
+.nomPlanete{
+    color:blue;
+}
+
+.nomSysteme{
+    color:purple;
+}
+
+.nomJoueur{
+    color:darkgreen;
+}
+
+.nomPerso{
+    color:green;
+}
+
 .planet {
         width: 100px;
 	height: 100px;
