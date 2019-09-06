@@ -17,8 +17,10 @@ if(!empty($_POST['email']) && !empty($_POST['mdp'])){
         array_push($ips, $ip);
         $ips = array_unique($ips);
         $ips = implode(' ', $ips);
-        $Joueurs->IPs = $ips; 
+        $Joueur->IPs = $ips; 
+        $Joueur->lastco = date("Y-m-d H:i:s");
         $Joueur->save();
+
         header('Location: index.php?p=tableauBord');
     }
     else{

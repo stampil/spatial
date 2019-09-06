@@ -99,4 +99,29 @@ class Perso {
         return '<span class="nomPerso">'.$this->nom.'</span>';
     }  
     
+    public function getDiplomatie(){
+        return $this->getStats($this->diplomatie);
+    }
+    
+    public function getFO(){
+        return $this->getStats($this->FO);
+    }
+    
+     public function getPV(){
+        return $this->getStats($this->PV);
+    }   
+    
+    
+    private function getStats($stat){
+        $ret = '<span class="star">';
+        for($i=0;$i<$stat;$i++){
+            $ret.='★';
+        }
+        for($i=$stat;$i<5;$i++){
+            $ret.='☆';
+        }
+        $ret.='</span>';
+        return $ret;
+    }
+    
 }

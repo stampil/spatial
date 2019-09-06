@@ -6,8 +6,8 @@ class Joueur {
     private $email;
     private $mdp;
     
-    private $creato;
-    
+    public $creato;
+    public $lastco;
     public $id;
     public $nom;
     public $credits;
@@ -72,6 +72,7 @@ class Joueur {
         $this->mdp = $ret[0]->mdp;
         $this->etape_tuto= $ret[0]->etape_tuto;
         $this->creato = $ret[0]->creato;
+        $this->lastco = $ret[0]->lastco;
 
     }
     
@@ -83,7 +84,8 @@ class Joueur {
             IPs = ?,
             credits = ?,
             mdp =?,
-            etape_tuto = ?
+            etape_tuto = ?,
+            lastco = ?
             WHERE id =?";
         $ret = $this->bdd->query($query,          
                 $this->nom,
@@ -92,6 +94,7 @@ class Joueur {
                 $this->credits,
                 $this->mdp,
                 $this->etape_tuto,
+                $this->lastco,
                 $this->id
                 );
     }
@@ -101,5 +104,5 @@ class Joueur {
     public function getNom(){
         return '<span class="nomJoueur">'.$this->nom.'</span>';
     }  
-    
+       
 }
