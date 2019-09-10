@@ -13,6 +13,11 @@ class Perso {
     public $PV;
     public $FO;
     public $diplomatie;
+    public $date;
+    public $fin_diplomatie;
+    public $fin_voyage_planetaire;
+
+    
 
     
 
@@ -45,6 +50,7 @@ class Perso {
     public function __construct($id) {
         $this->bdd = MyPDO::getInstance();
         $this->load($id);
+        $this->date = new DateTime('NOW');
     }
 
     public function load($id) {
@@ -53,6 +59,9 @@ class Perso {
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
         $planete = null;
+        if(empty($ret[0])){
+            exit("Perso n'existe pas");
+        }
         if($ret[0]->sur_planete){
             $planete = new Planete($ret[0]->sur_planete);
         }
@@ -65,6 +74,8 @@ class Perso {
         $this->FO = $ret[0]->FO;
         $this->diplomatie= $ret[0]->diplomatie;  
         $this->sur_planete = $planete;
+        $this->fin_diplomatie = $ret[0]->fin_diplomatie;  
+        $this->fin_voyage_planetaire = $ret[0]->fin_voyage_planetaire;  
         $this->creato = $ret[0]->creato;
         $this->sur_systeme = new Systeme($planete->id_systeme);
     }
@@ -74,10 +85,12 @@ class Perso {
             set
             id_joueur = ?,
             nom =?,
-            vie = ?,
-            force= ?,
+            PV = ?,
+            FO= ?,
             diplomatie = ?,
             sur_planete =?,
+            fin_diplomatie=?,
+            fin_voyage_planetaire=?
             WHERE id =?";
         $ret = $this->bdd->query($query,          
                 $this->joueur->id,
@@ -86,6 +99,8 @@ class Perso {
                 $this->FO,
                 $this->diplomatie,
                 $this->sur_planete->id,
+                $this->fin_diplomatie,
+                $this->fin_voyage_planetaire,
                 $this->id
                 );
     }
@@ -102,6 +117,14 @@ class Perso {
     public function getDiplomatie(){
         return $this->getStats($this->diplomatie);
     }
+    public function setDiplomatie(){
+        $diplomatie = $this->diplomatie;
+        $Planete = new Planete($this->sur_planete->id);
+        $dateValable = clone $this->date;
+        $dateValable->modify('+10 second');
+        $this->fin_diplomatie = $dateValable->format('Y-m-d H:i:s');
+        $this->save();
+    }
     
     public function getFO(){
         return $this->getStats($this->FO);
@@ -113,6 +136,7 @@ class Perso {
     
     
     private function getStats($stat){
+        return $stat; // desactive l'affichage pour le dev
         $ret = '<span class="star">';
         for($i=0;$i<$stat;$i++){
             $ret.='★';
@@ -123,5 +147,7 @@ class Perso {
         $ret.='</span>';
         return $ret;
     }
+    
+    
     
 }

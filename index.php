@@ -41,6 +41,7 @@ if(!empty($_SESSION['Sid'])){
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script src="js/jquery.countdown.min.js"></script>
         <script src="js/main.js"></script>
                 <?
         if(is_file('js/'.$p.'.js')){
@@ -61,10 +62,6 @@ if(!empty($_SESSION['Sid'])){
         require 'model/404.php';
     }
     ?>
-<script>
-  $(document).ready(function() {
-    console.info('Jquery ready');  
-  });
-</script>
+
     </body>
 </html>

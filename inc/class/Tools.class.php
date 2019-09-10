@@ -62,5 +62,16 @@ class Tools {
 <?
     }
     
+    public static function isFinCompteRebours($quand){
+        $now = new DateTime('NOW');
+        $fin = new DateTime($quand);
+        
+        $timout = $fin->getTimestamp() - $now->getTimestamp();
+        
+        return $timout<=0;
+        
+        
+    }
+    
     
 }

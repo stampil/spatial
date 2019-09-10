@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  127.0.0.1
--- Généré le :  Mer 04 Septembre 2019 à 17:15
+-- Généré le :  Mar 10 Septembre 2019 à 17:49
 -- Version du serveur :  5.5.39
 -- Version de PHP :  5.4.31
 
@@ -37,8 +37,9 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `credits` int(11) NOT NULL,
   `mdp` varchar(255) NOT NULL,
   `etape_tuto` tinyint(1) NOT NULL DEFAULT '0',
-  `creato` datetime NOT NULL
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `creato` datetime NOT NULL,
+  `lastco` datetime NOT NULL
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -55,8 +56,10 @@ CREATE TABLE IF NOT EXISTS `perso` (
   `FO` int(11) NOT NULL COMMENT 'FORCE',
   `diplomatie` int(11) NOT NULL,
   `sur_planete` int(11) NOT NULL,
+  `fin_diplomatie` datetime NOT NULL,
+  `fin_voyage_planetaire` datetime NOT NULL,
   `creato` datetime NOT NULL
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
@@ -78,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `nb_usine_ressource` int(11) NOT NULL,
   `nb_academie` int(11) NOT NULL,
   `creato` datetime NOT NULL
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 -- --------------------------------------------------------
 
@@ -92,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `systeme` (
   `nom` varchar(255) NOT NULL,
   `visible` tinyint(1) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Index pour les tables exportées
@@ -130,22 +133,22 @@ ALTER TABLE `systeme`
 -- AUTO_INCREMENT pour la table `joueur`
 --
 ALTER TABLE `joueur`
-MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `perso`
 --
 ALTER TABLE `perso`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pour la table `planete`
 --
 ALTER TABLE `planete`
-MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
+MODIFY `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT pour la table `systeme`
 --
 ALTER TABLE `systeme`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
