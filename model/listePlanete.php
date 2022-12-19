@@ -4,8 +4,9 @@
 $planetes = Planete::liste();
     
 foreach($planetes as $p){
+    $p = new Planete($p->id);
 ?>
-<p> <a href="?p=affichePlanete&id_planete=<?php echo $p->id ?>"><?php echo $p->nom? $p->nom:'planète sans nom' ?></a></p>
+<p> <?= $p->getNom() ?></p>
 
 <?php } ?>
 

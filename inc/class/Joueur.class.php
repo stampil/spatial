@@ -112,7 +112,7 @@ class Joueur {
     
     }
     public function getNom(){
-        return '<span class="nomJoueur">'.$this->nom.'</span>';
+        return '<a target="_blank" href="?p=afficheJoueur&id_joueur='.$this->id.'" class="nomJoueur">'.$this->nom.'</a>';
     }  
        
 }

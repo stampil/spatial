@@ -112,17 +112,17 @@ class Perso {
     }
     
     public function getNom(){
-        return '<span class="nomPerso">'.$this->nom.'</span>';
+        return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.$this->nom.'</a>';
     }  
     
     public function getDiplomatie(){
         return $this->getStats($this->diplomatie);
     }
     public function setDiplomatie(){
-        $diplomatie = $this->diplomatie;
+
         $Planete = new Planete($this->sur_planete->id);
         $dateValable = new DateTime('NOW');
-        $dateValable->modify('+10 second');
+        $dateValable->modify('+'.(2*60/$this->diplomatie).' second');
         $this->fin_diplomatie = $dateValable->format('Y-m-d H:i:s');
         $this->save();
     }

@@ -17,7 +17,7 @@ $persos = Perso::liste($Joueur);
 foreach($persos as $p){
     $perso = new Perso($p->id);
 ?>
-<p> <a href="?p=affichePerso&id=<?php echo $perso->id ?>"><?php echo $perso->getNom() ?></a></p>
+<p> <?= $perso->getNom() ?></p>
 
 <?php } ?>
 

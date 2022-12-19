@@ -4,8 +4,9 @@
 $joueurs = Joueur::liste();
     
 foreach($joueurs as $j){
+    $j = new Joueur($j->id);
 ?>
-<p> <a href="?p=afficheJoueur&id_joueur=<?php echo $j->id ?>"><?php echo $j->nom ?></a></p>
+<p> <?= $j->getNom() ?></p>
 
 <?php } ?>
 

@@ -4,8 +4,9 @@
 $systemes = Systeme::liste();
     
 foreach($systemes as $s){
+    $s = new Systeme($s->id);
 ?>
-<p> <a href="?p=afficheSysteme&id_systeme=<?php echo $s->id ?>"><?php echo $s->nom?$s->nom:'Systeme '.$s->id ?></a></p>
+<p> <?= $s->getNom() ?></p>
 
 <?php } ?>
 

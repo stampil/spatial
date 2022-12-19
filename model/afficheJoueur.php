@@ -7,11 +7,9 @@ else{
 }
 
 $j = new Joueur($id_joueur);
-$j->credits++;
+//$j->credits++;
 $j->save();
 echo '<p>'.$j->nom.' '.$j->credits.'$</p>';
 
-
 ?>
-
 
