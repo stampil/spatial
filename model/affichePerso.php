@@ -10,7 +10,7 @@ $o = new Perso($id);
 
 ?>
 
-<?
+<?php
 if($Joueur->etape_tuto==1){
 ?>
 Voici les caracteristiques de votre perso.<br>
@@ -19,7 +19,7 @@ Un perso avec une faible diplomatie mettra plus de temps, voir pourra se faire e
 Dans ce tuto, nous n'iront pas dans ces extremes.<br/>
 Les actions de votre perso s'affichent de maniere contextuels, par exemple, si vous avez un vaisseau sur la meme planete, une action "monter dans le vaisseau" apparaitra
 <br />
-<?   
+<?php   
 }
 ?>
 
@@ -33,9 +33,7 @@ Status:<br />
 <?php 
 if(!Tools::isFinCompteRebours($o->fin_diplomatie)){
     ?>
-Fin diplomatie <?
-
-?>: 
+Fin diplomatie :
 <span data-countdown="<?= $o->fin_diplomatie ?>"></span>
 <br>
 <? } ?>

@@ -15,11 +15,13 @@ class Joueur {
 
     public $IPs;
     
+    private static $credits_depart = 500;
+    
 
     
     public static function inscrire($infos){
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,creato) VALUES(?,?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(),$infos['mdp']);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,credits,creato,lastco) VALUES(?,?,?,?,?,now(),now()) ";
+        MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(), $infos['mdp'],self::$credits_depart);
         // pour chaque joueur crée on crée un systeme qui sera celui de départ ( id_joueur = id_systeme départ)
         $id_joueur =  MyPDO::getInstance()->lastInsertId();
         $joueur = new Joueur($id_joueur);
@@ -100,7 +102,15 @@ class Joueur {
     }
     
 
+    public function giveMainPerso(){
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "perso WHERE nom=? AND id_joueur=?";
+        $ret = $this->bdd->query($query,          
+                $this->nom,
+                $this->id
+        );
+        return new Perso($ret[0]->id);
     
+    }
     public function getNom(){
         return '<span class="nomJoueur">'.$this->nom.'</span>';
     }  

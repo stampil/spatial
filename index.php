@@ -22,7 +22,7 @@ if(!empty($_SESSION['Sid'])){
         }
         elseif($etape_tuto==0){
             $p = 'tuto_'.$Joueur->etape_tuto;
-            $Perso = new Perso(1);
+            $Perso = $Joueur->giveMainPerso();
         }
 }
 
@@ -32,22 +32,22 @@ if(!empty($_SESSION['Sid'])){
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="css/main.css" type="text/css">
-        <?
+        <?php
         if(is_file('css/'.$p.'.css')){
         ?>
             <link rel="stylesheet" href="css/<?=$p?>.css" type="text/css">
-        <? } ?>
+        <?php } ?>
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
         <script src="js/jquery.countdown.min.js"></script>
         <script src="js/main.js"></script>
-                <?
+                <?php
         if(is_file('js/'.$p.'.js')){
         ?>
             <script src="js/<?=$p?>.js"></script>
-        <? } ?>
+        <?php } ?>
         <title>
             <?php echo $p; ?>
         </title> 

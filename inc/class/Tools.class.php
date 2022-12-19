@@ -59,7 +59,7 @@ class Tools {
 		<strong>Attention:</strong> <?=$err?></p>
 	</div>
         </div>
-<?
+<?php
     }
     
     public static function isFinCompteRebours($quand){

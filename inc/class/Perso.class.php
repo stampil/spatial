@@ -13,7 +13,6 @@ class Perso {
     public $PV;
     public $FO;
     public $diplomatie;
-    public $date;
     public $fin_diplomatie;
     public $fin_voyage_planetaire;
 
@@ -64,6 +63,8 @@ class Perso {
         }
         if($ret[0]->sur_planete){
             $planete = new Planete($ret[0]->sur_planete);
+             $this->sur_planete = $planete;
+             $this->sur_systeme = new Systeme($planete->id_systeme);
         }
         $joueur = new Joueur($ret[0]->id_joueur);
         
@@ -73,11 +74,11 @@ class Perso {
         $this->PV = $ret[0]->PV;
         $this->FO = $ret[0]->FO;
         $this->diplomatie= $ret[0]->diplomatie;  
-        $this->sur_planete = $planete;
+       
         $this->fin_diplomatie = $ret[0]->fin_diplomatie;  
         $this->fin_voyage_planetaire = $ret[0]->fin_voyage_planetaire;  
         $this->creato = $ret[0]->creato;
-        $this->sur_systeme = new Systeme($planete->id_systeme);
+        
     }
     
         public function save(){     
@@ -120,7 +121,7 @@ class Perso {
     public function setDiplomatie(){
         $diplomatie = $this->diplomatie;
         $Planete = new Planete($this->sur_planete->id);
-        $dateValable = clone $this->date;
+        $dateValable = new DateTime('NOW');
         $dateValable->modify('+10 second');
         $this->fin_diplomatie = $dateValable->format('Y-m-d H:i:s');
         $this->save();
