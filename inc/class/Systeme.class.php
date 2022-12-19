@@ -72,7 +72,7 @@ class Systeme {
      }
      
     public function getNom(){
-        return '<span class="nomSysteme">'.$this->nom.'</span>';
+        return '<a target="_blank" href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.$this->nom.'</a>';
     }     
         
 }

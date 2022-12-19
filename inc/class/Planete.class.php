@@ -116,7 +116,7 @@ class Planete {
     }
 
 public function getNom(){
-    return '<span class="nomPlanete">'.$this->nom.'</span>';
+    return '<a target="_blank" href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.$this->nom.'</a>';
 }
     
 }

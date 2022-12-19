@@ -36,7 +36,7 @@ if(!Tools::isFinCompteRebours($o->fin_diplomatie)){
 Fin diplomatie :
 <span data-countdown="<?= $o->fin_diplomatie ?>"></span>
 <br>
-<? } ?>
+<?php } ?>
 <br />
 Action :<br />
 <?php
