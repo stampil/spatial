@@ -2,7 +2,10 @@
 # Elements de gameplay
 ## mot d'ordre simplification pour faire un noyau dur et fonctionnel
 
-pas de faction joueur, conquete solo, aliance en metagame ( faction pirate pnj )
+faction empire : ressources unités coutes moins cher, mais tjrs visible sur la carte
+faction rebellion: invisible si pas de ouverte
+faction pirate : peut se battre entre eux, chaque combat doit etre validé, pas auto, invisible si pas decouvert.
+peut detourner des ressource sans conquerir les planetes
 
 3 type de vaisseaux de combat :
  
