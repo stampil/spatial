@@ -20,12 +20,9 @@ Ensuite, peuple l'univers une seule fois : `php database/peupler.php` (16 systè
 
 Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait. ». Compris : règle pour tout le travail à venir. Le code garde la structure d'origine : une classe par objet (`Joueur`, `Perso`, `Planete`, `Systeme`), `MyPDO::getInstance()->query()` avec `MyPDO::DB_FLAG`, pages dans `model/`, pas de framework. Les idées de gameplay du `Readme.md` (empire, rébellion, pirate, combats en 3 phases, usines à slots) restent la référence : je ne les remplace pas par les miennes.
 
-### 4. Publication sur InfinityFree : code envoyé, reste la base (23/11)
+### 4. Publication sur InfinityFree : base installée par le site (23/11)
 
-Le code est en ligne (run du 23/11 : 78 fichiers envoyés dans `htdocs/` du compte `if0_43514686`) ; chaque push de `revival` renvoie les fichiers changés. Il reste à toi :
-
-1. Importer `/home/sgd/Téléchargements/spatial-infinityfree/base-production.sql` dans phpMyAdmin, base `if0_43464490_xxxx` (sans elle le site affiche « Erreur de connexion à la BDD » ou des tables manquantes).
-2. Ouvrir le site. Si « Erreur de connexion à la BDD » : le compte `if0_43514686` n'a pas accès à la base de `if0_43464490`, il faudra créer la base depuis `if0_43514686`.
+Le code est en ligne et le site installe lui-même sa base à la première visite (tables, 3 camps, 16 systèmes) : plus d'import dans phpMyAdmin. Seul le premier chargement le confirmera sur InfinityFree ; je le regarde dès que tu me donnes l'adresse du site.
 
 ### 5. Serveurs de test (23/11)
 

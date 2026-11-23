@@ -8,11 +8,12 @@ DB_PORT=3306
 rm -rf "$ROOT/build"
 mkdir -p "$SITE"
 git -C "$ROOT" archive HEAD | tar -x -C "$SITE"
-rm -rf "$SITE/.github" "$SITE/tools" "$SITE/database" "$SITE/SUIVI.md" "$SITE/Readme.md" "$SITE/.gitignore"
+rm -rf "$SITE/.github" "$SITE/tools" "$SITE/SUIVI.md" "$SITE/Readme.md" "$SITE/.gitignore"
+find "$SITE/database" -type f ! -name installation.sql -delete
 cat > "$SITE/.htaccess" <<'RULES'
 # The sources are only included by index.php, never served; the state of the FTP upload stays on the server.
 RewriteEngine On
-RewriteRule ^(inc|model)(/|$) - [F,L]
+RewriteRule ^(inc|model|database)(/|$) - [F,L]
 <FilesMatch "^\.ftp-deploy-sync-state\.json$">
 	Require all denied
 </FilesMatch>

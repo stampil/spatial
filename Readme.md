@@ -2,10 +2,10 @@
 # Installation
 
 - PHP 8.2 minimum, avec l'extension `pdo_mysql`.
-- Créer la base `systeme` et y importer `database/systeme.sql`.
+- Créer la base `systeme` : le jeu y installe lui-même ses tables et peuple l'univers à la première visite (`database/installation.sql`). On peut aussi y importer `database/systeme.sql`, avec ses données d'exemple.
 - Sur une base déjà existante, importer `database/migration_revival.sql` (nouvelles colonnes et tables).
 - Copier `inc/config.example.php` en `inc/config.php` et y renseigner les identifiants de la base.
-- Peupler l'univers une seule fois (systèmes d'Empire, de Pirates, disputés et sans camp) : `php database/peupler.php`.
+- Sur une base importée à la main, peupler l'univers une seule fois (systèmes d'Empire, de Pirates, disputés et sans camp) : `php database/peupler.php`.
 - Lancer en local depuis la racine du projet : `php -S localhost:8000`.
 
 # Elements de gameplay

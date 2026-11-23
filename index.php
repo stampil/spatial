@@ -1,5 +1,6 @@
 <?php
 require_once 'inc/header.php';
+Installation::verifier();
 
 if(!empty($_GET['d'])){
     session_destroy();

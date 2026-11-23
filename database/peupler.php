@@ -9,23 +9,10 @@ chdir(__DIR__ . '/..');
 require 'inc/const.php';
 require 'inc/functions.php';
 
-$plan = array(
-    array('nombre' => 6, 'camps' => array(Camp::EMPIRE)),
-    array('nombre' => 3, 'camps' => array(Camp::PIRATES)),
-    array('nombre' => 3, 'camps' => array(Camp::EMPIRE, Camp::PIRATES, null)),
-    array('nombre' => 4, 'camps' => array(null)),
-);
-
-$query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "planete WHERE id_camp IS NOT NULL AND gouverneur=0";
-$ret = MyPDO::getInstance()->query($query);
-if(!empty($ret) && $ret[0]->nombre > 0){
+if(Univers::estPeuple()){
     exit("Le jeu est déjà peuplé.\n");
 }
 
-foreach($plan as $etape){
-    for($i=0; $i<$etape['nombre']; $i++){
-        $Systeme = new Systeme(Systeme::create());
-        Planete::fillSystemeIA($Systeme, $etape['camps']);
-        echo 'Système '.$Systeme->nom." créé\n";
-    }
+foreach(Univers::peupler() as $nom){
+    echo 'Système '.$nom." créé\n";
 }
