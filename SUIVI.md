@@ -20,16 +20,12 @@ Ensuite, peuple l'univers une seule fois : `php database/peupler.php` (16 systè
 
 Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait. ». Compris : règle pour tout le travail à venir. Le code garde la structure d'origine : une classe par objet (`Joueur`, `Perso`, `Planete`, `Systeme`), `MyPDO::getInstance()->query()` avec `MyPDO::DB_FLAG`, pages dans `model/`, pas de framework. Les idées de gameplay du `Readme.md` (empire, rébellion, pirate, combats en 3 phases, usines à slots) restent la référence : je ne les remplace pas par les miennes.
 
-### 4. Envoi sur InfinityFree : à faire par toi (23/11)
+### 4. Publication sur InfinityFree : code envoyé, reste la base (23/11)
 
-Tes mots : « envoi le code sur ce serveur : et la db sr lui if0_43464490_xxxx ». Le paquet est prêt dans `/home/sgd/Téléchargements/spatial-infinityfree/` : `site/` (le code, aussi en `spatial-site.zip`) et `base-production.sql` (structure, 3 camps, 16 systèmes peuplés, aucun joueur). Je ne saisis pas de mot de passe : à toi de faire :
+Le code est en ligne (run du 23/11 : 78 fichiers envoyés dans `htdocs/` du compte `if0_43514686`) ; chaque push de `revival` renvoie les fichiers changés. Il reste à toi :
 
-1. Importer `base-production.sql` dans phpMyAdmin, base `if0_43464490_xxxx`.
-2. Renseigner le mot de passe MySQL dans `site/inc/config.php` (champ `pass`).
-3. Envoyer le contenu de `site/` par FTP dans le dossier `htdocs` du site (FileZilla : hôte `ftpupload.net` selon le forum d'InfinityFree, à vérifier dans « FTP Details » du panneau ; identifiant `if0_43514686`).
-4. Choisir PHP 8.2 ou plus pour le site, si le panneau le propose.
-
-Si la base est refusée au premier chargement (message « Erreur de connexion à la BDD »), les deux comptes (`if0_43514686` et `if0_43464490`) ne sont pas liés : il faut alors créer la base depuis le compte `if0_43514686`.
+1. Importer `/home/sgd/Téléchargements/spatial-infinityfree/base-production.sql` dans phpMyAdmin, base `if0_43464490_xxxx` (sans elle le site affiche « Erreur de connexion à la BDD » ou des tables manquantes).
+2. Ouvrir le site. Si « Erreur de connexion à la BDD » : le compte `if0_43514686` n'a pas accès à la base de `if0_43464490`, il faudra créer la base depuis `if0_43514686`.
 
 ### 5. Serveurs de test (23/11)
 

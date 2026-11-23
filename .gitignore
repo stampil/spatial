@@ -2,3 +2,4 @@ nbproject/*
 .idea/*
 doc/
 inc/config.php
+build/
