@@ -9,7 +9,7 @@
 
 <form method="POST" action="index.php?p=connecter">
 
-<div>Email  : <input type="email" name="email" /></div>
-<div>Mot de passe* : <input type="password" name="mdp" required minlength="6"/></div>
-<input type="submit" value="submit" name="go" />
+<div class="md3-field"><label for="email">Email</label><input type="email" id="email" name="email" required /></div>
+<div class="md3-field"><label for="mdp">Mot de passe</label><input type="password" id="mdp" name="mdp" required minlength="<?= PASSWORD_MIN_LENGTH ?>"/></div>
+<input type="submit" value="Se connecter" name="go" />
 </form>

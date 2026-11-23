@@ -10,8 +10,8 @@
 <form method="POST" action="index.php?p=inscrire">
 
 
-<div>Email * : <input type="email" name="email" required /></div>
-<div>Nom du joueur* : <input type="text" name="nom" required /></div>
-<div>Mot de passe* : <input type="password" name="mdp" required minlength="<?= PASSWORD_MIN_LENGTH ?>"/></div>
-<input type="submit" value="submit" name="go" />
+<div class="md3-field"><label for="email">Email *</label><input type="email" id="email" name="email" required /></div>
+<div class="md3-field"><label for="nom">Nom du joueur *</label><input type="text" id="nom" name="nom" required /></div>
+<div class="md3-field"><label for="mdp">Mot de passe *</label><input type="password" id="mdp" name="mdp" required minlength="<?= PASSWORD_MIN_LENGTH ?>"/></div>
+<input type="submit" value="S'inscrire" name="go" />
 </form>

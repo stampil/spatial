@@ -1,2 +1,2 @@
 
-<div style="font-size:50pt">404 - Page <?= $p ?> non trouvée</div>
+<h1>404 - Page <?= $p ?> non trouvée</h1>

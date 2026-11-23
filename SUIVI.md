@@ -31,40 +31,35 @@ Compris : tu constates qu'il n'y a aucune action de jeu ni aucune navigation (d�
 - Seule action de jeu : « Faire de la diplomatie ». Elle ne fait que poser une date de fin (`Perso::setDiplomatie`, 120 s divisées par la diplomatie) : à la fin du compte à rebours, rien ne se passe, la planète n'est pas conquise.
 - `gouverneur`, `nb_usine_*`, `nb_academie`, `fin_voyage_planetaire` ne sont lus par aucune page. La base n'a que 4 tables (`joueur`, `perso`, `planete`, `systeme`) : ni vaisseau, ni flotte, ni combat. Le `Readme.md` décrit bien plus que ce qui existe.
 
-### 4. Q16 : menu, diplomatie, actions de planète, dans cet ordre (23/11)
+### 4. Option 2 puis option 3 de Q16 (23/11)
 
-Instruction exacte : « fait le Q16 dans cette ordre 1, 2 3 »
+Ta phrase : « go pour tout mais complet pas de "pour l'instant" ». L'option 1 (menu Material Design 3) est faite. Tes réponses aux choix de design : « Oui, ces règles », « Oui, ces valeurs », « Bâtiments + persos + vaisseaux stockés ».
 
-Compris : faire les trois options de Q16 l'une après l'autre : (1) menu de navigation, (2) diplomatie qui aboutit, (3) premières actions sur une planète. Un commit par option sur `revival`, poussés avec `--force-with-lease` à la fin. J'ai besoin de décisions de design avant de coder : elles sont en Q17 à Q22, avec une recommandation chacune.
+**Option 2. Diplomatie complète :**
+- Durée : 120 s divisées par la diplomatie.
+- Tutoriel (`etape_tuto` inférieur à 2) : succès garanti. La première conquête passe `etape_tuto` à 2 et affiche « Vous gouvernez maintenant X. Le tutoriel est terminé. »
+- Ensuite : succès = 50 % + 10 % × diplomatie. Échec : 75 % emprisonné 10 minutes, 25 % tué.
+- Perso tué : un perso gratuit réapparaît sur ta première planète après 30 minutes.
+- Résolution à la prochaine requête du joueur (le compte à rebours recharge déjà la page), sans tâche planifiée.
+- Le bouton n'apparaît que sur une planète sans gouverneur.
+- Révolte : +1 point par heure sur chaque planète gouvernée. Action « Apaiser » : −5 × diplomatie points, même compte à rebours. À 100 % la planète devient indépendante (gouverneur retiré, bâtiments perdus).
+- `affichePlanete` affiche le gouverneur ou « Aucun », et la révolte.
 
-**Option 1. Menu de navigation** (Material Design 3, barre d'app supérieure), dans `index.php`, commun à toutes les pages :
+**Option 3. Économie, bâtiments, persos, vaisseaux :**
+- Revenu de base 10 cr/h par planète gouvernée ; ferme +25 cr/h. Maintenance par heure : usine légère 2, moyenne 4, lourde 8, ferme 3, académie 5.
+- Prix : usine légère 100, moyenne 200, lourde 400, ferme 150, académie 250. Construction instantanée ; démolition rend 50 %. Total de bâtiments limité à `slot`.
+- Crédits calculés à la volée depuis la dernière mise à jour (nouvelle colonne `joueur.credits_maj`). Revenu net négatif : crédits plafonnés à 0 et construction bloquée.
+- Académie : forme des diplomates (nouveaux persos utilisables en diplomatie, 100 cr, diplomatie 1 à 5).
+- Usines : produisent chasseur, reconnaissance, transport perso (légère) ; frégate, barge (moyenne) ; vaisseau capital (lourde), avec coût et durée, listés par planète. Les prix et durées de ces vaisseaux restent à proposer : je te les soumets avec le code.
+- Hors Q16, fonctionnalités à part : assassin, héros, troupes, déplacement, combat, exploration.
+- Schéma : nouvelles colonnes et tables, avec un fichier de migration SQL pour ta base et `database/systeme.sql` mis à jour.
 
-- Connecté : titre qui renvoie au tableau de bord, puis `Systèmes`, `Planètes`, `Persos`, `Joueurs` (`listeJoueur` existe mais n'est liée nulle part), `Déconnexion`. Déconnecté : `Accueil`, `Inscription`, `Connexion`.
-- Sur les pages de détail (`affichePerso`, `afficheSysteme`, `affichePlanete`, `afficheJoueur`) : un lien « Retour » vers la liste correspondante, via une table page → page parente dans `inc/const.php`.
-- Feuille de style `css/md3.css` avec les valeurs de la spec m3.material.io, que je relis avec le skill `material-3` avant d'écrire.
+### 5. Feuille de style sobre (23/11)
 
-**Option 2. Diplomatie qui aboutit.** Relevé dans la source : `js/main.js` recharge déjà la page quand le compte à rebours atteint `00:00:00`, et le commentaire de `Planete::fillSysteme` dit « tuto fera devenir gouverneur ». Je prévois, sans changement de schéma ni tâche planifiée :
+Instruction exacte : « fait un css simple et sobre, mais stylé qd meme »
 
-- `Perso::resolveDiplomatie()` appelé par `index.php` au chargement du joueur : si `fin_diplomatie` est passée, la planète du perso n'a pas de gouverneur, alors `gouverneur` devient le joueur, puis `fin_diplomatie` repasse à `NULL`.
-- Le bouton « Faire de la diplomatie » n'apparaît que sur une planète sans gouverneur.
-- `affichePlanete` affiche le gouverneur, ou « Aucun ».
-- La première conquête fait passer `etape_tuto` à 2 (fin du tutoriel). Le texte de fin de tutoriel est à écrire (Q20).
-
-**Option 3. Premières actions sur une planète.** Sur une planète dont tu es gouverneur, `affichePlanete` liste les 5 bâtiments (colonnes existantes : `nb_usine_vaiss_leger`, `nb_usine_vaiss_moyen`, `nb_usine_vaiss_lourd`, `nb_usine_ressource`, `nb_academie`) avec un bouton « Construire » : coût en crédits retiré à `joueur.credits`, total limité à `slot`, formulaire POST avec jeton CSRF. Hors de cette étape, faute de table de vaisseaux et de règle chiffrée : production, revenu, coût de maintenance.
-
-Ta phrase : « go pour tout mais complet pas de "pour l'instant" ». Compris :
-
-- Go sur le plan ci-dessus avec mes recommandations Q17, Q18, Q19 et Q22 (Material Design 3 de base, titre `Spatial`, menu réduit à `Déconnexion` à l'étape 0, MD3 seulement sur les nouveaux éléments).
-- « Complet » annule les limites que j'avais écrites : plus de « pas d'assassinat pour l'instant » (option 2) ni de « hors de cette étape : production, revenu, maintenance » (option 3). Chaque option est livrée entière, sans moignon.
-- Il me faut alors des valeurs d'équilibrage que le `Readme.md` ne donne pas (chance de réussite, risque d'emprisonnement ou de mort, revenu, maintenance, coût et durée des unités). Je ne les invente pas : je te les propose en bloc avant l'option 2, et je continue dès ta réponse.
-
-Ordre : option 1 (menu, entièrement spécifiée), puis option 2, puis option 3.
+Compris et fait : une feuille `css/md3.css` unique en Material Design 3, valeurs de base de la spec : fond clair violet très pâle, barre d'app, titres, liens, champs de formulaire avec étiquettes, boutons pleins et tonaux, alerte d'erreur, contenu centré sur 720 px. Thème clair seulement, couleurs des noms (planète, système, joueur, perso) conservées. Pour que ça tienne : étiquettes `<label>` dans les formulaires de connexion et d'inscription, boutons `Se connecter` et `S'inscrire` à la place de `submit`, alerte d'erreur sans jQuery UI (qui n'est plus utilisé nulle part), page d'accueil avec titre et 2 boutons.
 
 ## Questions en suspens
 
-- **Q17.** Couleurs de la barre : palette de base de la spec Material Design 3, relue sur m3.material.io. **Recommandé.** Ou une couleur de toi.
-- **Q18.** Titre affiché dans la barre : `Spatial` (nom du dépôt), car le jeu n'a pas de nom dans le code. **Recommandé.** Ou ton nom.
-- **Q19.** Pendant l'étape 0 du tutoriel, toutes les pages sauf la liste des persos renvoient au tutoriel : menu réduit à `Déconnexion`. **Recommandé.**
-- **Q20.** Diplomatie : résolution déterministe (pas de chance, pas d'assassinat du diplomate pour l'instant), planète sans gouverneur seulement. **Recommandé : « noyau dur » du `Readme.md`.** Si oui, texte de fin de tutoriel à écrire par moi : « Vous gouvernez maintenant X. Le tutoriel est terminé. »
-- **Q21.** Prix en crédits (tu pars avec 500), valeurs de **proposition** à valider ou corriger : usine de vaisseaux légers 100, moyens 200, lourds 400, ferme 150, académie 250.
-- **Q22.** Style : Material Design 3 seulement sur les nouveaux éléments (barre, boutons des nouvelles actions), les pages existantes ne changent pas. **Recommandé.** Ou refonte de toutes les pages.
+Aucune.
