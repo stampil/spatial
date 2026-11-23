@@ -24,12 +24,6 @@ Compris : ouvrir l'appli dans le navigateur intégré. Ta base (port 3306) refus
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». Ils restent lancés : PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872`.
 
-### 4. Piste r13 : bibliothèques jQuery (23/11)
-
-Ta phrase : « je vois pas ton Q14 ». Reformulé ici.
-
-`index.php:56-58` charge jQuery 3.2.1 et jQuery UI 1.12.1 depuis le CDN Google. Ce sont de vieilles versions dont les suivantes corrigent des failles XSS (à confirmer). Vérifié par requête sur le CDN : jQuery 3.7.1 et jQuery UI 1.13.3 (script et thème `smoothness`) existent. Risque : `js/main.js` et le plugin `js/jquery.countdown.min.js` (compte à rebours de la diplomatie) pourraient ne plus marcher. Je les testerais dans le navigateur intégré, et je reviendrais en arrière s'ils cassent.
-
 ## Questions en suspens
 
-- **Q14.** Je passe jQuery à 3.7.1 et jQuery UI à 1.13.3, avec test du compte à rebours ? Je ne le fais que si tu dis oui.
+Aucune.
