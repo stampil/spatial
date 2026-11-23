@@ -10,11 +10,15 @@ Ta phrase : « si si tu push with lease et si tu doit reprendree, tu amend ». T
 
 ### 2. Tester avec ta base (23/11)
 
-Avant de tester sur ta base : exécuter `database/migration_revival.sql`. Il ajoute 7 colonnes (`perso` : `action_diplomatie`, `fin_prison`, `fin_mort` ; `planete` : `revolte_maj` ; `joueur` : `credits_maj`) et crée les tables `production` et `vaisseau`. Testé sur l'ancien schéma : le résultat est identique au nouveau `database/systeme.sql`.
+Avant de tester sur ta base : exécuter `database/migration_revival.sql`. Il ajoute 8 colonnes (`perso` : `action_diplomatie`, `fin_prison`, `fin_mort` ; `planete` : `revolte_maj` ; `joueur` : `credits_maj`, `id_camp`) et crée les tables `production`, `vaisseau` et `camp` (3 camps : Pirates, Empire, Rébellion). Testé sur l'ancien schéma : le résultat est identique au nouveau `database/systeme.sql`.
 
-Vide aussi la table `joueur` (anciens hash `crypt()`) et renseigne `inc/config.php`.
+Vide aussi la table `joueur` (anciens hash `crypt()`, et aucun camp pour les anciens joueurs) et renseigne `inc/config.php`.
 
-### 3. Serveurs de test (23/11)
+### 3. Garder l'essence du développeur d'origine (23/11)
+
+Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait. ». Compris : règle pour tout le travail à venir. Le code garde la structure d'origine : une classe par objet (`Joueur`, `Perso`, `Planete`, `Systeme`), `MyPDO::getInstance()->query()` avec `MyPDO::DB_FLAG`, pages dans `model/`, pas de framework. Les idées de gameplay du `Readme.md` (empire, rébellion, pirate, combats en 3 phases, usines à slots) restent la référence : je ne les remplace pas par les miennes.
+
+### 4. Serveurs de test (23/11)
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872` restent lancés jusqu'à ta demande.
 

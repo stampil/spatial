@@ -18,5 +18,5 @@ const HOME_PAGE = 'tableauBord';
 const GUEST_HOME_PAGE = 'welcome';
 const LOGOUT_LABEL = 'Déconnexion';
 const MENU_GUEST = array('welcome' => 'Accueil', 'inscription' => 'Inscription', 'connection' => 'Connexion');
-const MENU_PLAYER = array('listeSysteme' => 'Systèmes', 'listePlanete' => 'Planètes', 'listePerso' => 'Persos', 'listeJoueur' => 'Joueurs');
+const MENU_PLAYER = array('listeSysteme' => 'Systèmes', 'listePlanete' => 'Planètes', 'listePerso' => 'Persos', 'listeJoueur' => 'Joueurs', 'listeCamp' => 'Camps');
 const PAGE_PARENTS = array('affichePerso' => 'listePerso', 'afficheSysteme' => 'listeSysteme', 'affichePlanete' => 'listePlanete', 'afficheJoueur' => 'listeJoueur');

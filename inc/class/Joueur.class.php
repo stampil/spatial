@@ -13,6 +13,7 @@ class Joueur {
     public int $credits;
     public ?string $credits_maj;
     public int $etape_tuto;
+    public int $id_camp;
 
     public string $IPs;
     
@@ -23,8 +24,8 @@ class Joueur {
 
     
     public static function inscrire(array $infos): ?Joueur{
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,credits,creato,lastco) VALUES(?,?,?,?,?,now(),now()) ";
-        $ret = MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(), $infos['mdp'],self::$credits_depart);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,credits,id_camp,creato,lastco) VALUES(?,?,?,?,?,?,now(),now()) ";
+        $ret = MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(), $infos['mdp'],self::$credits_depart,$infos['id_camp']);
         if($ret === MyPDO::QUERY_FAILED){
             return null;
         }
@@ -86,6 +87,7 @@ class Joueur {
         $this->credits_maj = $ret[0]->credits_maj;
         $this->mdp = $ret[0]->mdp;
         $this->etape_tuto= $ret[0]->etape_tuto;
+        $this->id_camp = $ret[0]->id_camp;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 
@@ -178,6 +180,10 @@ class Joueur {
         return new Perso($ret[0]->id);
     
     }
+    public function getCamp(): Camp {
+        return new Camp($this->id_camp);
+    }
+
     public function getNom(): string {
         return '<a target="_blank" href="?p=afficheJoueur&id_joueur='.$this->id.'" class="nomJoueur">'.htmlspecialchars($this->nom).'</a>';
     }  

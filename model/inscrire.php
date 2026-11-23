@@ -3,6 +3,7 @@
 $email = giveInputString($_POST, 'email');
 $nom = giveInputString($_POST, 'nom');
 $mdp = giveInputString($_POST, 'mdp');
+$id_camp = (int) giveInputString($_POST, 'camp');
 
 $erreur = '';
 if($email === '' || $nom === '' || $mdp === ''){
@@ -14,12 +15,16 @@ elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
 elseif(strlen($mdp) < PASSWORD_MIN_LENGTH){
     $erreur = 'Mot de passe trop court';
 }
+elseif(!Camp::estJouable($id_camp)){
+    $erreur = 'Camp invalide';
+}
 else{
     $Joueur = Joueur::inscrire(
         array(
             'nom' =>$nom,
             'mdp' =>Tools::crypte($mdp),
             'email' =>$email,
+            'id_camp' =>$id_camp,
         )        
     );  
     if($Joueur === null){
