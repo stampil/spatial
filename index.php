@@ -57,8 +57,6 @@ if(!empty($_SESSION['Sid'])){
         <?php } ?>
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.3/themes/smoothness/jquery-ui.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.3/jquery-ui.min.js"></script>
         <script src="js/jquery.countdown.min.js"></script>
         <script src="js/main.js"></script>
                 <?php
