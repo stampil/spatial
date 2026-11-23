@@ -2,15 +2,15 @@
 
 class Systeme {
 
-    private $bdd;
-    public $id;
-    public $nom;
-    public $planetes;
-    private static $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lamdba","Mu","Nu","Ksi","Omicron","Pi",
+    private MyPDO $bdd;
+    public int $id;
+    public string $nom;
+    public array $planetes;
+    private static array $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lamdba","Mu","Nu","Ksi","Omicron","Pi",
         "Rho","Sigma","Tau","Upsilon","Phi","Chi","Psi","Omega");
 
         
-    public static function liste(){
+    public static function liste(): array {
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "systeme ";
         $ret = MyPDO::getInstance()->query($query);
@@ -19,20 +19,23 @@ class Systeme {
 
     /**
      * __construct
-     * @param type $id
+     * @param int $id
      * @throws UnexpectedValueException
      */
-    public function __construct($id) {
+    public function __construct(int $id) {
         $this->bdd = MyPDO::getInstance();
         $this->load($id);
     }
 
-    private function load($id) {
+    private function load(int $id): static {
         
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "systeme
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
+        if(empty($ret)){
+            throw new UnexpectedValueException("Systeme n'existe pas");
+        }
         
         $this->nom = $ret[0]->nom;
         $this->id = $ret[0]->id;
@@ -40,7 +43,7 @@ class Systeme {
         return $this;
     }
     
-    public function save(){     
+    public function save(): void {     
         $query ="UPDATE " . MyPDO::DB_FLAG . "systeme 
             set
             nom = ?           
@@ -51,7 +54,7 @@ class Systeme {
                 );
     }
     
-     public static function create(){
+     public static function create(): int {
         $systemes = self::liste();
         
         $Noms = array();
@@ -71,8 +74,8 @@ class Systeme {
          
      }
      
-    public function getNom(){
-        return '<a target="_blank" href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.$this->nom.'</a>';
+    public function getNom(): string {
+        return '<a target="_blank" href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a>';
     }     
         
 }

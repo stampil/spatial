@@ -11,16 +11,31 @@ if(!empty($_GET['p'])){
 else{
     $p = 'welcome';
 }
+if(!is_string($p) || !preg_match(PAGE_NAME_PATTERN, $p)){
+    $p = '404';
+}
+
+if(empty($_SESSION['Sid']) && !in_array($p, PUBLIC_PAGES, true)){
+    header('Location: ?p=connection');
+    exit();
+}
 
 if(!empty($_SESSION['Sid'])){
-        $Joueur= new Joueur($_SESSION['Sid']);
+        try{
+            $Joueur= new Joueur($_SESSION['Sid']);
+        }
+        catch(UnexpectedValueException $exception){
+            session_destroy();
+            header('Location: ?p=connection');
+            exit();
+        }
         $etape_tuto = $Joueur->etape_tuto;
         if($etape_tuto==0 && $p=="listePerso"){
             $etape_tuto=1;
             $Joueur->etape_tuto=$etape_tuto;
             $Joueur->save();
         }
-        elseif($etape_tuto==0){
+        elseif($etape_tuto==0 && $p!=LOGOUT_PAGE){
             $p = 'tuto_'.$Joueur->etape_tuto;
             $Perso = $Joueur->giveMainPerso();
         }
@@ -55,11 +70,16 @@ if(!empty($_SESSION['Sid'])){
     <body>
     <?php
 
-    if(is_file('model/'.$p.'.php')){
-        require 'model/'.$p.'.php';
+    try{
+        if(is_file('model/'.$p.'.php')){
+            require 'model/'.$p.'.php';
+        }
+        else{
+            require 'model/404.php';
+        }
     }
-    else{
-        require 'model/404.php';
+    catch(UnexpectedValueException $exception){
+        echo $exception->getMessage();
     }
     ?>
 

@@ -2,34 +2,35 @@
 
 class Planete {
 
-    private $bdd;
-    public $id;
-    public $nom;
-    public $slot;
-    public $perc_revolte;
-    public $id_systeme;
-    public $nb_usine_vaiss_leger;
-    public $nb_usine_vaiss_moyen;
-    public $nb_usine_vaiss_lourd;
-    public $nb_usine_ressource;
-    public $nb_academie;
-    public $systeme;
-    public static $min_slot = 1;
-    public static $max_slot = 16;
+    private MyPDO $bdd;
+    public int $id;
+    public string $nom;
+    public int $slot;
+    public int $perc_revolte;
+    public int $gouverneur;
+    public int $id_systeme;
+    public int $nb_usine_vaiss_leger;
+    public int $nb_usine_vaiss_moyen;
+    public int $nb_usine_vaiss_lourd;
+    public int $nb_usine_ressource;
+    public int $nb_academie;
+    public Systeme $systeme;
+    public static int $min_slot = 1;
+    public static int $max_slot = 16;
     
         
-    public static function liste($id_systeme=null){
+    public static function liste(?int $id_systeme=null): array{
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "planete ";
         if($id_systeme){
             $query .= " WHERE id_systeme=?";
+            return MyPDO::getInstance()->query($query,$id_systeme);
         }
-        $ret = MyPDO::getInstance()->query($query,$id_systeme);
-        return $ret;
+        return MyPDO::getInstance()->query($query);
     }
     
     
-    public static function fillSysteme($Perso,$Systeme){
+    public static function fillSysteme(Perso $Perso,Systeme $Systeme): void{
         $nb_planetes = rand(3, 12);
         
         for ($i=1; $i<=$nb_planetes; $i++){
@@ -55,20 +56,23 @@ class Planete {
 
     /**
      * __construct
-     * @param type $id_planet
+     * @param int $id
      * @throws UnexpectedValueException
      */
-    public function __construct($id) {
+    public function __construct(int $id) {
         $this->bdd = MyPDO::getInstance();
         $this->load($id);
     }
 
-    private function load($id) {
+    private function load(int $id): static {
 
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "planete
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
+        if(empty($ret)){
+            throw new UnexpectedValueException("Planete n'existe pas");
+        }
         
         $this->nom = $ret[0]->nom;
         $this->id = $ret[0]->id;
@@ -86,7 +90,7 @@ class Planete {
 
     }
     
-    public function save(){     
+    public function save(): void {     
         $query ="UPDATE " . MyPDO::DB_FLAG . "planete 
             set
             nom = ?,
@@ -115,8 +119,8 @@ class Planete {
                 );
     }
 
-public function getNom(){
-    return '<a target="_blank" href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.$this->nom.'</a>';
+public function getNom(): string {
+    return '<a target="_blank" href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.htmlspecialchars($this->nom).'</a>';
 }
     
 }

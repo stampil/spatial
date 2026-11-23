@@ -8,6 +8,12 @@ if(!empty($_POST['nom']) && !empty($_POST['mdp']) && !empty($_POST['email'])){
             'email' =>$_POST['email'],
         )        
     );  
-    header('Location: ?p=connection');
+    if($Joueur === null){
+        header('Location: ?p=inscription&erreur='.urlencode('email ou nom deja utilise'));
+    }
+    else{
+        header('Location: ?p=connection');
+    }
+    exit();
 }
 ?>

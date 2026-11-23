@@ -3,13 +3,14 @@
 if(!empty($_POST['email']) && !empty($_POST['mdp'])){
     $info = Joueur::connecter(
         array(
-            'mdp' =>Tools::crypte($_POST['mdp']),
+            'mdp' =>$_POST['mdp'],
             'email' =>$_POST['email'],
         )        
     );  
     
-    if($info && $info->id){
+    if($info){
         //$j = new Joueur($info->id);
+        session_regenerate_id(true);
         $_SESSION['Sid'] = $info->id;
         $Joueur = new Joueur($info->id);
         $ip = giveIP();
@@ -22,9 +23,11 @@ if(!empty($_POST['email']) && !empty($_POST['mdp'])){
         $Joueur->save();
 
         header('Location: index.php?p=tableauBord');
+        exit();
     }
     else{
         header('Location: index.php?p=connection&erreur=identifiants non reconnus');
+        exit();
     }
 }
 

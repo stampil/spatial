@@ -1,6 +1,6 @@
 <?php
 if(!empty($_GET['id'])){
-    $id = $_GET['id'];
+    $id = (int) $_GET['id'];
 }
 else{
     exit('id needed');
@@ -34,7 +34,7 @@ Status:<br />
 if(!Tools::isFinCompteRebours($o->fin_diplomatie)){
     ?>
 Fin diplomatie :
-<span data-countdown="<?= $o->fin_diplomatie ?>"></span>
+<span data-countdown="<?= htmlspecialchars($o->fin_diplomatie) ?>"></span>
 <br>
 <?php } ?>
 <br />
@@ -42,7 +42,11 @@ Action :<br />
 <?php
 if(Tools::isFinCompteRebours($o->fin_diplomatie)){
 ?>
-<a href="?p=faireDiplomatie&perso=<?= $o->id ?>" >Faire de la diplomatie sur <?= $o->sur_planete->getNom() ?></a>
+<form method="POST" action="?p=faireDiplomatie">
+    <input type="hidden" name="perso" value="<?= $o->id ?>" />
+    <input type="hidden" name="<?= CSRF_KEY ?>" value="<?= $_SESSION[CSRF_KEY] ?>" />
+    <input type="submit" value="Faire de la diplomatie" /> sur <?= $o->sur_planete->getNom() ?>
+</form>
 <?php
 }
 ?>

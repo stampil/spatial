@@ -1,6 +1,6 @@
 <?php
 if(!empty($_GET['id_planete'])){
-    $id_planete = $_GET['id_planete'];
+    $id_planete = (int) $_GET['id_planete'];
 }
 else{
     exit('id_planete needed');
@@ -10,7 +10,6 @@ $p = new Planete($id_planete);
 //$p->perc_revolte++;
 echo ($p->nom?$p->getNom():'planète sans nom').' du systeme '.($p->systeme->nom?$p->systeme->getNom():'sans nom').' revolté a '.$p->perc_revolte.' %  slot : '.$p->slot;
 
-$p->save();   
 /*$p->systeme->nom='SOL';
 $p->systeme->save();*/
 

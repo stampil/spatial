@@ -12,5 +12,5 @@ Votre puissance de frappe etant reduit a vous et vous seul pour l'instant, opton
 Cliquer sur "Liste perso" pour voir Votre (premier) personnage.<br>
 
 
-<a href="?p=listePerso" />Liste perso</a>
+<a href="?p=listePerso">Liste perso</a>
 

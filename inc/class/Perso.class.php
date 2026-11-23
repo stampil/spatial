@@ -2,26 +2,28 @@
 
 class Perso {
 
-    private $bdd;   
+    const MAX_STARS = 5;
+
+    private MyPDO $bdd;   
     
-    public $creato;  
-    public $id;
-    public $nom;
-    public $sur_planete; 
-    public $sur_systeme;
-    public $joueur;
-    public $PV;
-    public $FO;
-    public $diplomatie;
-    public $fin_diplomatie;
-    public $fin_voyage_planetaire;
+    public string $creato;  
+    public int $id;
+    public string $nom;
+    public ?Planete $sur_planete = null; 
+    public ?Systeme $sur_systeme = null;
+    public Joueur $joueur;
+    public int $PV;
+    public int $FO;
+    public int $diplomatie;
+    public ?string $fin_diplomatie;
+    public ?string $fin_voyage_planetaire;
 
     
 
     
 
     
-    public static function create($Joueur){
+    public static function create(Joueur $Joueur): int {
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,now()) ";
         MyPDO::getInstance()->query($query,$Joueur->id,$Joueur->nom,rand(1,5),rand(1,5),rand(1,5),0);
 
@@ -34,7 +36,7 @@ class Perso {
     
 
         
-    public static function liste($Joueur){
+    public static function liste(Joueur $Joueur): array {
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "perso where id_joueur=? ";
         $ret = MyPDO::getInstance()->query($query,$Joueur->id);
@@ -43,23 +45,22 @@ class Perso {
 
     /**
      * __construct
-     * @param type $id_planet
+     * @param int $id
      * @throws UnexpectedValueException
      */
-    public function __construct($id) {
+    public function __construct(int $id) {
         $this->bdd = MyPDO::getInstance();
         $this->load($id);
-        $this->date = new DateTime('NOW');
     }
 
-    public function load($id) {
+    public function load(int $id): void {
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "perso
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
         $planete = null;
         if(empty($ret[0])){
-            exit("Perso n'existe pas");
+            throw new UnexpectedValueException("Perso n'existe pas");
         }
         if($ret[0]->sur_planete){
             $planete = new Planete($ret[0]->sur_planete);
@@ -81,7 +82,7 @@ class Perso {
         
     }
     
-        public function save(){     
+        public function save(): void {     
         $query ="UPDATE " . MyPDO::DB_FLAG . "perso 
             set
             id_joueur = ?,
@@ -106,43 +107,41 @@ class Perso {
                 );
     }
     
-        public function goToPlanete($Planete){
-            $query = "UPDATE " . MyPDO::DB_FLAG . "perso set sur_planete=?";
-            $this->bdd->query($query,$Planete->id);
+        public function goToPlanete(Planete $Planete): void {
+            $query = "UPDATE " . MyPDO::DB_FLAG . "perso set sur_planete=? WHERE id=?";
+            $this->bdd->query($query,$Planete->id,$this->id);
     }
     
-    public function getNom(){
-        return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.$this->nom.'</a>';
+    public function getNom(): string {
+        return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a>';
     }  
     
-    public function getDiplomatie(){
+    public function getDiplomatie(): string {
         return $this->getStats($this->diplomatie);
     }
-    public function setDiplomatie(){
+    public function setDiplomatie(): void {
 
-        $Planete = new Planete($this->sur_planete->id);
         $dateValable = new DateTime('NOW');
         $dateValable->modify('+'.(2*60/$this->diplomatie).' second');
         $this->fin_diplomatie = $dateValable->format('Y-m-d H:i:s');
         $this->save();
     }
     
-    public function getFO(){
+    public function getFO(): string {
         return $this->getStats($this->FO);
     }
     
-     public function getPV(){
+     public function getPV(): string {
         return $this->getStats($this->PV);
     }   
     
     
-    private function getStats($stat){
-        return $stat; // desactive l'affichage pour le dev
+    private function getStats(int $stat): string {
         $ret = '<span class="star">';
         for($i=0;$i<$stat;$i++){
             $ret.='★';
         }
-        for($i=$stat;$i<5;$i++){
+        for($i=$stat;$i<self::MAX_STARS;$i++){
             $ret.='☆';
         }
         $ret.='</span>';

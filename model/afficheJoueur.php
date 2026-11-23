@@ -1,6 +1,6 @@
 <?php
 if(!empty($_GET['id_joueur'])){
-    $id_joueur = $_GET['id_joueur'];
+    $id_joueur = (int) $_GET['id_joueur'];
 }
 else{
     exit('id_joueur needed');
@@ -8,8 +8,7 @@ else{
 
 $j = new Joueur($id_joueur);
 //$j->credits++;
-$j->save();
-echo '<p>'.$j->nom.' '.$j->credits.'$</p>';
+echo '<p>'.htmlspecialchars($j->nom).' '.$j->credits.'$</p>';
 
 ?>
 

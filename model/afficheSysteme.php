@@ -1,6 +1,6 @@
 <?php
 if(!empty($_GET['id_systeme'])){
-    $id_systeme = $_GET['id_systeme'];
+    $id_systeme = (int) $_GET['id_systeme'];
 }
 else{
     exit('id_systeme needed');
