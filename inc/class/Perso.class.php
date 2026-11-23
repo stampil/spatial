@@ -3,6 +3,17 @@
 class Perso {
 
     const MAX_STARS = 5;
+    const DIPLOMATIE_SECONDS = 120;
+    const ACTION_CONQUETE = 1;
+    const ACTION_APAISER = 2;
+    const MAX_PERCENT = 100;
+    const SUCCESS_BASE_PERCENT = 50;
+    const SUCCESS_PER_DIPLOMATIE_PERCENT = 10;
+    const PRISON_SHARE_PERCENT = 75;
+    const PRISON_SECONDS = 600;
+    const RESPAWN_SECONDS = 1800;
+    const APAISER_PER_DIPLOMATIE = 5;
+    const SECONDS_PER_MINUTE = 60;
 
     private MyPDO $bdd;   
     
@@ -17,6 +28,9 @@ class Perso {
     public int $diplomatie;
     public ?string $fin_diplomatie;
     public ?string $fin_voyage_planetaire;
+    public ?string $fin_prison;
+    public ?string $fin_mort;
+    public ?int $action_diplomatie;
 
     
 
@@ -78,33 +92,11 @@ class Perso {
        
         $this->fin_diplomatie = $ret[0]->fin_diplomatie;  
         $this->fin_voyage_planetaire = $ret[0]->fin_voyage_planetaire;  
+        $this->fin_prison = $ret[0]->fin_prison;
+        $this->fin_mort = $ret[0]->fin_mort;
+        $this->action_diplomatie = $ret[0]->action_diplomatie;
         $this->creato = $ret[0]->creato;
         
-    }
-    
-        public function save(): void {     
-        $query ="UPDATE " . MyPDO::DB_FLAG . "perso 
-            set
-            id_joueur = ?,
-            nom =?,
-            PV = ?,
-            FO= ?,
-            diplomatie = ?,
-            sur_planete =?,
-            fin_diplomatie=?,
-            fin_voyage_planetaire=?
-            WHERE id =?";
-        $ret = $this->bdd->query($query,          
-                $this->joueur->id,
-                $this->nom,
-                $this->PV,
-                $this->FO,
-                $this->diplomatie,
-                $this->sur_planete->id,
-                $this->fin_diplomatie,
-                $this->fin_voyage_planetaire,
-                $this->id
-                );
     }
     
         public function goToPlanete(Planete $Planete): void {
@@ -119,12 +111,106 @@ class Perso {
     public function getDiplomatie(): string {
         return $this->getStats($this->diplomatie);
     }
-    public function setDiplomatie(): void {
+    public function isImprisoned(): bool {
+        return !Tools::isFinCompteRebours($this->fin_prison);
+    }
 
-        $dateValable = new DateTime('NOW');
-        $dateValable->modify('+'.(2*60/$this->diplomatie).' second');
-        $this->fin_diplomatie = $dateValable->format('Y-m-d H:i:s');
-        $this->save();
+    public function canAct(): bool {
+        return $this->fin_mort === null && !$this->isImprisoned() && $this->action_diplomatie === null;
+    }
+
+    public function dureeDiplomatie(): int {
+        return intdiv(self::DIPLOMATIE_SECONDS, $this->diplomatie);
+    }
+
+    public function chanceDeSucces(Joueur $joueur): int {
+        if($joueur->etape_tuto < Joueur::TUTO_END_STEP){
+            return self::MAX_PERCENT;
+        }
+        return self::SUCCESS_BASE_PERCENT + self::SUCCESS_PER_DIPLOMATIE_PERCENT * $this->diplomatie;
+    }
+
+    public function startDiplomatie(int $action): ?string {
+        if($action !== self::ACTION_CONQUETE && $action !== self::ACTION_APAISER){
+            return 'Action de diplomatie inconnue.';
+        }
+        if($this->fin_mort !== null){
+            return 'Ce perso est mort.';
+        }
+        if($this->isImprisoned()){
+            return 'Ce perso est emprisonné.';
+        }
+        if($action === self::ACTION_CONQUETE && $this->sur_planete->gouverneur !== 0){
+            return 'Cette planète a déjà un gouverneur.';
+        }
+        if($action === self::ACTION_APAISER && ($this->sur_planete->gouverneur !== $this->joueur->id || $this->sur_planete->perc_revolte === 0)){
+            return "Cette planète n'a pas besoin d'être apaisée.";
+        }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET action_diplomatie=?, fin_diplomatie=? WHERE id=? AND action_diplomatie IS NULL";
+        $this->bdd->query($query,$action,Tools::nowPlus($this->dureeDiplomatie()),$this->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Une diplomatie est déjà en cours.';
+        }
+        return null;
+    }
+
+    public function resolve(Joueur $joueur): void {
+        if($this->fin_mort !== null && Tools::isFinCompteRebours($this->fin_mort)){
+            $this->respawn();
+        }
+        elseif($this->action_diplomatie !== null && Tools::isFinCompteRebours($this->fin_diplomatie)){
+            $this->finishDiplomatie($joueur);
+        }
+    }
+
+    private function finishDiplomatie(Joueur $joueur): void {
+        $action = $this->action_diplomatie;
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET action_diplomatie=NULL, fin_diplomatie=NULL WHERE id=? AND action_diplomatie IS NOT NULL";
+        $this->bdd->query($query,$this->id);
+        if($this->bdd->lastRowCount !== 1){
+            return;
+        }
+        $planete = $this->sur_planete;
+        if($action === self::ACTION_APAISER){
+            $planete->apaiser($this->diplomatie * self::APAISER_PER_DIPLOMATIE);
+            Tools::addMessage($this->nom.' a apaisé la révolte sur '.$planete->nom.'.');
+            return;
+        }
+        if(random_int(1, self::MAX_PERCENT) > $this->chanceDeSucces($joueur)){
+            $this->fail();
+            return;
+        }
+        if(!$planete->gouverner($joueur)){
+            Tools::addMessage($planete->nom.' a déjà un gouverneur : la diplomatie de '.$this->nom.' est annulée.');
+            return;
+        }
+        Tools::addMessage('Vous gouvernez maintenant '.$planete->nom.'.');
+        if($joueur->etape_tuto < Joueur::TUTO_END_STEP){
+            $joueur->etape_tuto = Joueur::TUTO_END_STEP;
+            $joueur->save();
+            Tools::addMessage('Le tutoriel est terminé.');
+        }
+    }
+
+    private function fail(): void {
+        if(random_int(1, self::MAX_PERCENT) <= self::PRISON_SHARE_PERCENT){
+            $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_prison=? WHERE id=?";
+            $this->bdd->query($query,Tools::nowPlus(self::PRISON_SECONDS),$this->id);
+            Tools::addMessage($this->nom.' a échoué et a été emprisonné pendant '.intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE).' minutes.');
+            return;
+        }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=? WHERE id=?";
+        $this->bdd->query($query,Tools::nowPlus(self::RESPAWN_SECONDS),$this->id);
+        Tools::addMessage($this->nom.' a échoué et a été tué. Un nouveau perso arrivera dans '.intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE).' minutes.');
+    }
+
+    private function respawn(): void {
+        $planeteId = Planete::premiereGouvernee($this->joueur->id) ?? $this->sur_planete->id;
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=NULL, fin_prison=NULL, PV=?, FO=?, diplomatie=?, sur_planete=? WHERE id=? AND fin_mort IS NOT NULL";
+        $this->bdd->query($query,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$planeteId,$this->id);
+        if($this->bdd->lastRowCount === 1){
+            Tools::addMessage('Un nouveau perso, '.$this->nom.', est arrivé.');
+        }
     }
     
     public function getFO(): string {

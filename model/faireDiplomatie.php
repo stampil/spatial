@@ -12,7 +12,10 @@ if($Joueur->id != $o->joueur->id){//verification que le perso nous appartient bi
  exit("Ce perso ne vous appartient pas");
 }
 
-$o->setDiplomatie();
+$erreur = $o->startDiplomatie((int) ($_POST['action'] ?? 0));
+if($erreur !== null){
+    Tools::addMessage($erreur);
+}
 ?>
 
 <script>

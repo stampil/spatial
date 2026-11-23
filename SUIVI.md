@@ -33,17 +33,7 @@ Compris : tu constates qu'il n'y a aucune action de jeu ni aucune navigation (d�
 
 ### 4. Option 2 puis option 3 de Q16 (23/11)
 
-Ta phrase : « go pour tout mais complet pas de "pour l'instant" ». L'option 1 (menu Material Design 3) est faite. Tes réponses aux choix de design : « Oui, ces règles », « Oui, ces valeurs », « Bâtiments + persos + vaisseaux stockés ».
-
-**Option 2. Diplomatie complète :**
-- Durée : 120 s divisées par la diplomatie.
-- Tutoriel (`etape_tuto` inférieur à 2) : succès garanti. La première conquête passe `etape_tuto` à 2 et affiche « Vous gouvernez maintenant X. Le tutoriel est terminé. »
-- Ensuite : succès = 50 % + 10 % × diplomatie. Échec : 75 % emprisonné 10 minutes, 25 % tué.
-- Perso tué : un perso gratuit réapparaît sur ta première planète après 30 minutes.
-- Résolution à la prochaine requête du joueur (le compte à rebours recharge déjà la page), sans tâche planifiée.
-- Le bouton n'apparaît que sur une planète sans gouverneur.
-- Révolte : +1 point par heure sur chaque planète gouvernée. Action « Apaiser » : −5 × diplomatie points, même compte à rebours. À 100 % la planète devient indépendante (gouverneur retiré, bâtiments perdus).
-- `affichePlanete` affiche le gouverneur ou « Aucun », et la révolte.
+Ta phrase : « go pour tout mais complet pas de "pour l'instant" ». Les options 1 (menu Material Design 3) et 2 (diplomatie complète) sont faites. Avant de tester l'option 2 sur ta base : exécuter `database/migration_revival.sql` (4 colonnes ajoutées, testé sur l'ancien schéma : identique au nouveau `database/systeme.sql`). Tes réponses aux choix de design : « Oui, ces règles », « Oui, ces valeurs », « Bâtiments + persos + vaisseaux stockés ».
 
 **Option 3. Économie, bâtiments, persos, vaisseaux :**
 - Revenu de base 10 cr/h par planète gouvernée ; ferme +25 cr/h. Maintenance par heure : usine légère 2, moyenne 4, lourde 8, ferme 3, académie 5.

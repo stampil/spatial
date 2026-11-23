@@ -15,6 +15,8 @@ class Joueur {
 
     public string $IPs;
     
+    const TUTO_END_STEP = 2;
+
     private static int $credits_depart = 500;
     
 
@@ -110,6 +112,15 @@ class Joueur {
                 );
     }
     
+
+    public function resolveEvents(): void {
+        foreach(Planete::listeGouvernees($this->id) as $ligne){
+            (new Planete($ligne->id))->updateRevolte();
+        }
+        foreach(Perso::liste($this) as $ligne){
+            (new Perso($ligne->id))->resolve($this);
+        }
+    }
 
     public function giveMainPerso(): Perso {
         $query = "SELECT id FROM " . MyPDO::DB_FLAG . "perso WHERE nom=? AND id_joueur=?";

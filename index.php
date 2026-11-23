@@ -29,6 +29,7 @@ if(!empty($_SESSION['Sid'])){
             header('Location: ?p=connection');
             exit();
         }
+        $Joueur->resolveEvents();
         $etape_tuto = $Joueur->etape_tuto;
         if($etape_tuto==0 && $p=="listePerso"){
             $etape_tuto=1;
@@ -73,6 +74,9 @@ if(!empty($_SESSION['Sid'])){
     <?php require 'inc/menu.php'; ?>
     <main class="md3-page">
     <?php
+    foreach(Tools::takeMessages() as $message){
+        Tools::show_info_html($message);
+    }
 
     try{
         if(is_file('model/'.$p.'.php')){

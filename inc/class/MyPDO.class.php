@@ -6,6 +6,7 @@ class MyPDO extends PDO {
     const QUERY_FAILED = -1;
 
     public static array $cache = array();
+    public int $lastRowCount = 0;
     private static ?MyPDO $_instance = null;
 
     private function __construct() {
@@ -51,6 +52,7 @@ class MyPDO extends PDO {
 
         $reponse = parent::prepare($query);
         $reponse->execute($args);
+        $this->lastRowCount = $reponse->rowCount();
         $err = $reponse->errorInfo();
         if (@$err[2]) {
             if (preg_match("/Duplicate entry/", $err[2])) {

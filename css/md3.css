@@ -224,7 +224,7 @@ body {
     outline-offset: 2px;
 }
 
-.md3-page .md3-button--tonal {
+.md3-page .md3-button.md3-button--tonal {
     background-color: var(--md-sys-color-secondary-container);
     color: var(--md-sys-color-on-secondary-container);
 }
@@ -243,6 +243,11 @@ body {
     margin-bottom: 16px;
     padding: 12px 16px;
     border-radius: var(--md-sys-shape-corner-medium);
+}
+
+.md3-alert--info {
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
 }
 
 .md3-alert--error {

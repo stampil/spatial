@@ -17,6 +17,24 @@ class Tools {
         return password_hash($clair, PASSWORD_DEFAULT);
     }
     
+    public static function now(): string{
+        return date('Y-m-d H:i:s');
+    }
+    
+    public static function nowPlus(int $seconds): string{
+        return date('Y-m-d H:i:s', time() + $seconds);
+    }
+    
+    public static function addMessage(string $message): void{
+        $_SESSION[MESSAGES_KEY][] = $message;
+    }
+    
+    public static function takeMessages(): array{
+        $messages = $_SESSION[MESSAGES_KEY] ?? array();
+        unset($_SESSION[MESSAGES_KEY]);
+        return $messages;
+    }
+    
     public static function isValidCsrfToken(mixed $token): bool{
         return is_string($token) && hash_equals($_SESSION[CSRF_KEY], $token);
     }
@@ -25,6 +43,12 @@ class Tools {
         
     ?>
         <div class="md3-alert md3-alert--error" role="alert"><strong>Attention :</strong> <?=htmlspecialchars($err)?></div>
+<?php
+    }
+    
+    public static function show_info_html(string $message): void{
+    ?>
+        <div class="md3-alert md3-alert--info" role="status"><?=htmlspecialchars($message)?></div>
 <?php
     }
     

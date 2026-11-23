@@ -67,6 +67,9 @@ CREATE TABLE IF NOT EXISTS `perso` (
   `sur_planete` int(11) NOT NULL,
   `fin_diplomatie` datetime DEFAULT NULL,
   `fin_voyage_planetaire` datetime DEFAULT NULL,
+  `action_diplomatie` tinyint(1) DEFAULT NULL,
+  `fin_prison` datetime DEFAULT NULL,
+  `fin_mort` datetime DEFAULT NULL,
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
@@ -97,6 +100,7 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `nb_usine_vaiss_lourd` int(11) NOT NULL,
   `nb_usine_ressource` int(11) NOT NULL,
   `nb_academie` int(11) NOT NULL,
+  `revolte_maj` datetime DEFAULT NULL,
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
