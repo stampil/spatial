@@ -52,6 +52,14 @@ Compris : faire les trois options de Q16 l'une après l'autre : (1) menu de navi
 
 **Option 3. Premières actions sur une planète.** Sur une planète dont tu es gouverneur, `affichePlanete` liste les 5 bâtiments (colonnes existantes : `nb_usine_vaiss_leger`, `nb_usine_vaiss_moyen`, `nb_usine_vaiss_lourd`, `nb_usine_ressource`, `nb_academie`) avec un bouton « Construire » : coût en crédits retiré à `joueur.credits`, total limité à `slot`, formulaire POST avec jeton CSRF. Hors de cette étape, faute de table de vaisseaux et de règle chiffrée : production, revenu, coût de maintenance.
 
+Ta phrase : « go pour tout mais complet pas de "pour l'instant" ». Compris :
+
+- Go sur le plan ci-dessus avec mes recommandations Q17, Q18, Q19 et Q22 (Material Design 3 de base, titre `Spatial`, menu réduit à `Déconnexion` à l'étape 0, MD3 seulement sur les nouveaux éléments).
+- « Complet » annule les limites que j'avais écrites : plus de « pas d'assassinat pour l'instant » (option 2) ni de « hors de cette étape : production, revenu, maintenance » (option 3). Chaque option est livrée entière, sans moignon.
+- Il me faut alors des valeurs d'équilibrage que le `Readme.md` ne donne pas (chance de réussite, risque d'emprisonnement ou de mort, revenu, maintenance, coût et durée des unités). Je ne les invente pas : je te les propose en bloc avant l'option 2, et je continue dès ta réponse.
+
+Ordre : option 1 (menu, entièrement spécifiée), puis option 2, puis option 3.
+
 ## Questions en suspens
 
 - **Q17.** Couleurs de la barre : palette de base de la spec Material Design 3, relue sur m3.material.io. **Recommandé.** Ou une couleur de toi.

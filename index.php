@@ -46,7 +46,9 @@ if(!empty($_SESSION['Sid'])){
 <html>
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500&display=swap">
         <link rel="stylesheet" href="css/main.css" type="text/css">
+        <link rel="stylesheet" href="css/md3.css" type="text/css">
         <?php
         if(is_file('css/'.$p.'.css')){
         ?>
@@ -68,6 +70,8 @@ if(!empty($_SESSION['Sid'])){
         </title> 
     </head>
     <body>
+    <?php require 'inc/menu.php'; ?>
+    <main class="md3-page">
     <?php
 
     try{
@@ -82,6 +86,7 @@ if(!empty($_SESSION['Sid'])){
         echo $exception->getMessage();
     }
     ?>
+    </main>
 
     </body>
 </html>

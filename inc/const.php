@@ -12,3 +12,10 @@ const PUBLIC_PAGES = array('welcome', 'connection', 'connecter', 'inscription', 
 const PASSWORD_MIN_LENGTH = 6;
 const CSRF_KEY = 'csrf_token';
 const CSRF_TOKEN_BYTES = 32;
+const APP_TITLE = 'Spatial';
+const HOME_PAGE = 'tableauBord';
+const GUEST_HOME_PAGE = 'welcome';
+const LOGOUT_LABEL = 'Déconnexion';
+const MENU_GUEST = array('welcome' => 'Accueil', 'inscription' => 'Inscription', 'connection' => 'Connexion');
+const MENU_PLAYER = array('listeSysteme' => 'Systèmes', 'listePlanete' => 'Planètes', 'listePerso' => 'Persos', 'listeJoueur' => 'Joueurs');
+const PAGE_PARENTS = array('affichePerso' => 'listePerso', 'afficheSysteme' => 'listeSysteme', 'affichePlanete' => 'listePlanete', 'afficheJoueur' => 'listeJoueur');
