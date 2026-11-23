@@ -10,11 +10,17 @@
     --md-sys-color-on-surface-variant: #49454F;
     --md-sys-color-surface-container: #F3EDF7;
     --md-sys-color-outline: #79747E;
+    --md-sys-color-outline-variant: #CAC4D0;
 
     --md-sys-typescale-headline-medium-size: 1.75rem;
     --md-sys-typescale-headline-medium-line-height: 2.25rem;
     --md-sys-typescale-title-large-size: 1.375rem;
     --md-sys-typescale-title-large-line-height: 1.75rem;
+    --md-sys-typescale-title-medium-size: 1rem;
+    --md-sys-typescale-title-medium-line-height: 1.5rem;
+    --md-sys-typescale-title-medium-tracking: 0.009375rem;
+    --md-sys-typescale-body-medium-size: 0.875rem;
+    --md-sys-typescale-body-medium-line-height: 1.25rem;
     --md-sys-typescale-body-large-size: 1rem;
     --md-sys-typescale-body-large-line-height: 1.5rem;
     --md-sys-typescale-body-large-tracking: 0.03125rem;
@@ -231,6 +237,70 @@ body {
 
 .md3-button--tonal:hover {
     background-image: linear-gradient(color-mix(in srgb, var(--md-sys-color-on-secondary-container) 8%, transparent), color-mix(in srgb, var(--md-sys-color-on-secondary-container) 8%, transparent));
+}
+
+.md3-page .md3-button.md3-button--outlined {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px var(--md-sys-color-outline);
+    color: var(--md-sys-color-primary);
+}
+
+.md3-button--outlined:hover {
+    background-image: linear-gradient(color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent), color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent));
+}
+
+.md3-page .md3-button:disabled,
+.md3-page input[type="submit"]:disabled {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    background-image: none;
+    box-shadow: none;
+    color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    cursor: not-allowed;
+}
+
+.md3-card {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+}
+
+.md3-page .md3-card h2 {
+    margin: 0 0 8px;
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    font-weight: 500;
+    letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+}
+
+.md3-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 12px 0;
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.md3-secondary {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+}
+
+.md3-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    box-sizing: border-box;
+    padding: 0 12px;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: var(--md-sys-shape-corner-small);
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: 500;
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
 }
 
 .md3-actions {

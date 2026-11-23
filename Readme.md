@@ -3,6 +3,7 @@
 
 - PHP 8.2 minimum, avec l'extension `pdo_mysql`.
 - Créer la base `systeme` et y importer `database/systeme.sql`.
+- Sur une base déjà existante, importer `database/migration_revival.sql` (nouvelles colonnes et tables).
 - Copier `inc/config.example.php` en `inc/config.php` et y renseigner les identifiants de la base.
 - Lancer en local depuis la racine du projet : `php -S localhost:8000`.
 

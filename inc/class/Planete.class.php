@@ -6,6 +6,8 @@ class Planete {
     const MAX_REVOLTE = 100;
     const REVOLTE_PER_HOUR = 1;
     const SECONDS_PER_HOUR = 3600;
+    const OPERATION_CONSTRUIRE = 'construire';
+    const OPERATION_DEMOLIR = 'demolir';
 
     private MyPDO $bdd;
     public int $id;
@@ -147,6 +149,83 @@ class Planete {
         return (new Joueur($this->gouverneur))->getNom();
     }
 
+    public function nombre(string $batiment): int {
+        return $this->$batiment;
+    }
+
+    public function batimentsTotal(): int {
+        $total = 0;
+        foreach(array_keys(Batiment::CATALOGUE) as $batiment){
+            $total += $this->nombre($batiment);
+        }
+        return $total;
+    }
+
+    public function revenuNet(): int {
+        $revenu = Batiment::BASE_INCOME + $this->nombre(Batiment::FERME) * Batiment::FERME_INCOME;
+        foreach(Batiment::CATALOGUE as $batiment => $infos){
+            $revenu -= $this->nombre($batiment) * $infos['maintenance'];
+        }
+        return $revenu;
+    }
+
+    public function construire(Joueur $joueur, string $batiment): ?string {
+        if(!isset(Batiment::CATALOGUE[$batiment])){
+            return 'Bâtiment inconnu.';
+        }
+        if($this->gouverneur !== $joueur->id){
+            return 'Vous ne gouvernez pas cette planète.';
+        }
+        if($joueur->revenuNet() < 0){
+            return 'Votre revenu est négatif : plus de construction possible.';
+        }
+        $total = implode('+', array_keys(Batiment::CATALOGUE));
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment+1 WHERE id=? AND gouverneur=? AND ($total)<slot";
+        $this->bdd->query($query,$this->id,$joueur->id);
+        if($this->bdd->lastRowCount !== 1){
+            return "Il n'y a plus d'emplacement libre sur cette planète.";
+        }
+        if(!$joueur->payer(Batiment::CATALOGUE[$batiment]['prix'])){
+            $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment-1 WHERE id=?",$this->id);
+            return 'Crédits insuffisants.';
+        }
+        return null;
+    }
+
+    public function demolir(Joueur $joueur, string $batiment): ?string {
+        if(!isset(Batiment::CATALOGUE[$batiment])){
+            return 'Bâtiment inconnu.';
+        }
+        if($this->gouverneur !== $joueur->id){
+            return 'Vous ne gouvernez pas cette planète.';
+        }
+        $enProduction = Vaisseau::nombreEnProduction($this->id, $batiment);
+        if($enProduction > 0 && $enProduction >= $this->nombre($batiment)){
+            return 'Une production est en cours dans cette usine.';
+        }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment-1 WHERE id=? AND gouverneur=? AND $batiment>0";
+        $this->bdd->query($query,$this->id,$joueur->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Aucun bâtiment de ce type à démolir.';
+        }
+        $joueur->crediter(Batiment::remboursement($batiment));
+        return null;
+    }
+
+    public function recruter(Joueur $joueur): ?string {
+        if($this->gouverneur !== $joueur->id){
+            return 'Vous ne gouvernez pas cette planète.';
+        }
+        if($this->nombre(Batiment::ACADEMIE) < 1){
+            return "Cette planète n'a pas d'académie.";
+        }
+        if(!$joueur->payer(Batiment::DIPLOMATE_PRIX)){
+            return 'Crédits insuffisants.';
+        }
+        Perso::recruter($joueur, $this);
+        return null;
+    }
+
     public function gouverner(Joueur $joueur): bool {
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, revolte_maj=? WHERE id=? AND gouverneur=0";
         $this->bdd->query($query,$joueur->id,Tools::now(),$this->id);
@@ -173,7 +252,7 @@ class Planete {
             return;
         }
         $revolte = min($this->perc_revolte + $heures * self::REVOLTE_PER_HOUR, self::MAX_REVOLTE);
-        $nouvelleMaj = date('Y-m-d H:i:s', $depuis + $heures * self::SECONDS_PER_HOUR);
+        $nouvelleMaj = Tools::formatDate($depuis + $heures * self::SECONDS_PER_HOUR);
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=?, revolte_maj=? WHERE id=? AND revolte_maj=?";
         $this->bdd->query($query,$revolte,$nouvelleMaj,$this->id,$this->revolte_maj);
         if($this->bdd->lastRowCount !== 1 || $revolte < self::MAX_REVOLTE){
@@ -181,6 +260,7 @@ class Planete {
         }
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=0, perc_revolte=?, revolte_maj=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0 WHERE id=?";
         $this->bdd->query($query,rand(0,self::INITIAL_REVOLTE_MAX),$this->id);
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
         Tools::addMessage($this->nom.' est devenue indépendante : sa révolte a atteint '.self::MAX_REVOLTE.' %.');
     }
 

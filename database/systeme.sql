@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `etape_tuto` tinyint(1) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL,
   `lastco` datetime NOT NULL,
+  `credits_maj` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `nom` (`nom`)
@@ -162,6 +163,27 @@ INSERT INTO `systeme` (`id`, `nom`, `visible`, `creato`) VALUES
 (8, 'Ksi-4361', 0, '2022-12-19 09:58:42'),
 (9, 'Nu-2343', 0, '2022-12-19 10:02:32'),
 (10, 'Sigma-9547', 0, '2022-12-19 10:21:18');
+CREATE TABLE IF NOT EXISTS `production` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `fin` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `vaisseau` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -22,7 +22,7 @@ if($email !== '' && $mdp !== ''){
         $ips = array_unique($ips);
         $ips = implode(' ', $ips);
         $Joueur->IPs = $ips; 
-        $Joueur->lastco = date("Y-m-d H:i:s");
+        $Joueur->lastco = Tools::now();
         $Joueur->save();
 
         header('Location: index.php?p=tableauBord');

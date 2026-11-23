@@ -23,6 +23,9 @@ $activePage = PAGE_PARENTS[$p] ?? $p;
         <?php foreach($menuPages as $page => $label){ ?>
         <a class="md3-nav-link<?= $page === $activePage ? ' md3-nav-link--active' : '' ?>" href="?p=<?= $page ?>"<?= $page === $activePage ? ' aria-current="page"' : '' ?>><?= $label ?></a>
         <?php } ?>
+        <?php if(isset($Joueur) && $Joueur->etape_tuto >= Joueur::TUTO_END_STEP){ ?>
+        <span class="md3-chip"><?= number_format($Joueur->credits, 0, ',', ' ') ?> cr</span>
+        <?php } ?>
         <?php if(isset($Joueur)){ ?>
         <a class="md3-nav-link" href="?p=<?= LOGOUT_PAGE ?>"><?= LOGOUT_LABEL ?></a>
         <?php } ?>

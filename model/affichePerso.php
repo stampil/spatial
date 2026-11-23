@@ -62,7 +62,7 @@ if($o->canAct()){
 <form method="POST" action="?p=faireDiplomatie">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="<?= Perso::ACTION_CONQUETE ?>" />
-    <input type="hidden" name="<?= CSRF_KEY ?>" value="<?= $_SESSION[CSRF_KEY] ?>" />
+    <?= csrfField() ?>
     <input type="submit" value="Faire de la diplomatie" /> sur <?= $planete->getNom() ?> (durée <?= gmdate('i:s', $o->dureeDiplomatie()) ?>, chance de réussite <?= $o->chanceDeSucces($Joueur) ?> %)
 </form>
 <?php
@@ -72,7 +72,7 @@ if($o->canAct()){
 <form method="POST" action="?p=faireDiplomatie">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="<?= Perso::ACTION_APAISER ?>" />
-    <input type="hidden" name="<?= CSRF_KEY ?>" value="<?= $_SESSION[CSRF_KEY] ?>" />
+    <?= csrfField() ?>
     <input type="submit" class="md3-button md3-button--tonal" value="Apaiser la révolte" /> sur <?= $planete->getNom() ?> (durée <?= gmdate('i:s', $o->dureeDiplomatie()) ?>)
 </form>
 <?php

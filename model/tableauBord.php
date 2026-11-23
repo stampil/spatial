@@ -15,6 +15,22 @@ switch($etape){
 
 ?>
 
+<?php
+if($Joueur->etape_tuto >= Joueur::TUTO_END_STEP){
+    $revenu = $Joueur->revenuNet();
+?>
+<p>Crédits : <?= $Joueur->credits ?> (revenu net : <?= sprintf('%+d', $revenu) ?> cr/h)</p>
+<p>Vos planètes :
+<?php
+    foreach(Planete::listeGouvernees($Joueur->id) as $ligne){
+        echo (new Planete($ligne->id))->getNom().' ';
+    }
+?>
+</p>
+<?php
+}
+?>
+
 <br>  Actions :
 
 <p><a href="?p=listeSysteme" >Lister les systèmes</a></p>

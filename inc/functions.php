@@ -15,6 +15,10 @@ function giveInputString(array $source, string $key): string{
     return '';
 }
 
+function csrfField(): string{
+    return '<input type="hidden" name="'.CSRF_KEY.'" value="'.$_SESSION[CSRF_KEY].'" />';
+}
+
 function giveIP(): string{
     return $_SERVER['REMOTE_ADDR'];
 }

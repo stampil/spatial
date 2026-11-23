@@ -17,12 +17,18 @@ class Tools {
         return password_hash($clair, PASSWORD_DEFAULT);
     }
     
+    const DATE_FORMAT = 'Y-m-d H:i:s';
+
+    public static function formatDate(int $timestamp): string{
+        return date(self::DATE_FORMAT, $timestamp);
+    }
+    
     public static function now(): string{
-        return date('Y-m-d H:i:s');
+        return self::formatDate(time());
     }
     
     public static function nowPlus(int $seconds): string{
-        return date('Y-m-d H:i:s', time() + $seconds);
+        return self::formatDate(time() + $seconds);
     }
     
     public static function addMessage(string $message): void{

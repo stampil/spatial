@@ -11,6 +11,7 @@ class Joueur {
     public int $id;
     public string $nom;
     public int $credits;
+    public ?string $credits_maj;
     public int $etape_tuto;
 
     public string $IPs;
@@ -82,6 +83,7 @@ class Joueur {
         $this->IPs = $ret[0]->IPs;
 
         $this->credits = $ret[0]->credits;
+        $this->credits_maj = $ret[0]->credits_maj;
         $this->mdp = $ret[0]->mdp;
         $this->etape_tuto= $ret[0]->etape_tuto;
         $this->creato = $ret[0]->creato;
@@ -95,7 +97,6 @@ class Joueur {
             nom = ?,
             email =?,
             IPs = ?,
-            credits = ?,
             mdp =?,
             etape_tuto = ?,
             lastco = ?
@@ -104,7 +105,6 @@ class Joueur {
                 $this->nom,
                 $this->email,
                 $this->IPs,
-                $this->credits,
                 $this->mdp,
                 $this->etape_tuto,
                 $this->lastco,
@@ -113,10 +113,57 @@ class Joueur {
     }
     
 
+    public function revenuNet(): int {
+        $revenu = 0;
+        foreach(Planete::listeGouvernees($this->id) as $ligne){
+            $revenu += (new Planete($ligne->id))->revenuNet();
+        }
+        return $revenu;
+    }
+
+    public function payer(int $montant): bool {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=credits-? WHERE id=? AND credits>=?";
+        $this->bdd->query($query,$montant,$this->id,$montant);
+        if($this->bdd->lastRowCount !== 1){
+            return false;
+        }
+        $this->credits -= $montant;
+        return true;
+    }
+
+    public function crediter(int $montant): void {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=credits+? WHERE id=?";
+        $this->bdd->query($query,$montant,$this->id);
+        $this->credits += $montant;
+    }
+
+    public function updateCredits(): void {
+        if($this->credits_maj === null){
+            $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits_maj=? WHERE id=? AND credits_maj IS NULL";
+            $this->bdd->query($query,Tools::now(),$this->id);
+            return;
+        }
+        $depuis = strtotime($this->credits_maj);
+        $heures = intdiv(time() - $depuis, Planete::SECONDS_PER_HOUR);
+        if($heures < 1){
+            return;
+        }
+        $gain = $heures * $this->revenuNet();
+        $nouvelleMaj = Tools::formatDate($depuis + $heures * Planete::SECONDS_PER_HOUR);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=GREATEST(credits+?,0), credits_maj=? WHERE id=? AND credits_maj=?";
+        $this->bdd->query($query,$gain,$nouvelleMaj,$this->id,$this->credits_maj);
+        if($this->bdd->lastRowCount === 1){
+            $this->credits = max($this->credits + $gain, 0);
+            $this->credits_maj = $nouvelleMaj;
+        }
+    }
+
     public function resolveEvents(): void {
+        $this->updateCredits();
         foreach(Planete::listeGouvernees($this->id) as $ligne){
             (new Planete($ligne->id))->updateRevolte();
         }
+        Vaisseau::resolveProduction($this);
         foreach(Perso::liste($this) as $ligne){
             (new Perso($ligne->id))->resolve($this);
         }

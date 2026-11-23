@@ -44,5 +44,11 @@ if(!$map_planete) $map_planete = 1;
 }
 </style>
 <div id="planet"></div>
+<?php
+if($p->gouverneur === $Joueur->id){
+    $planete = $p;
+    require 'inc/planeteGestion.php';
+}
+?>
 
 

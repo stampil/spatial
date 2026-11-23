@@ -14,6 +14,7 @@ class Perso {
     const RESPAWN_SECONDS = 1800;
     const APAISER_PER_DIPLOMATIE = 5;
     const SECONDS_PER_MINUTE = 60;
+    const DIPLOMATE_NOM = 'Diplomate';
 
     private MyPDO $bdd;   
     
@@ -50,6 +51,13 @@ class Perso {
     
 
         
+    public static function recruter(Joueur $Joueur, Planete $Planete): int {
+        $nom = self::DIPLOMATE_NOM.' '.(count(self::liste($Joueur)) + 1);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,now()) ";
+        MyPDO::getInstance()->query($query,$Joueur->id,$nom,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$Planete->id);
+        return MyPDO::getInstance()->lastInsertId();
+    }
+
     public static function liste(Joueur $Joueur): array {
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "perso where id_joueur=? ";
