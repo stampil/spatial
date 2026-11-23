@@ -1,19 +1,37 @@
 <?php
 
-if(!empty($_POST['nom']) && !empty($_POST['mdp']) && !empty($_POST['email'])){
+$email = giveInputString($_POST, 'email');
+$nom = giveInputString($_POST, 'nom');
+$mdp = giveInputString($_POST, 'mdp');
+
+$erreur = '';
+if($email === '' || $nom === '' || $mdp === ''){
+    $erreur = 'tous les champs sont obligatoires';
+}
+elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+    $erreur = 'email invalide';
+}
+elseif(strlen($mdp) < PASSWORD_MIN_LENGTH){
+    $erreur = 'mot de passe trop court';
+}
+else{
     $Joueur = Joueur::inscrire(
         array(
-            'nom' =>$_POST['nom'],
-            'mdp' =>Tools::crypte($_POST['mdp']),
-            'email' =>$_POST['email'],
+            'nom' =>$nom,
+            'mdp' =>Tools::crypte($mdp),
+            'email' =>$email,
         )        
     );  
     if($Joueur === null){
-        header('Location: ?p=inscription&erreur='.urlencode('email ou nom deja utilise'));
+        $erreur = 'email ou nom deja utilise';
     }
-    else{
-        header('Location: ?p=connection');
-    }
-    exit();
 }
+
+if($erreur !== ''){
+    header('Location: ?p=inscription&erreur='.urlencode($erreur));
+}
+else{
+    header('Location: ?p=connection');
+}
+exit();
 ?>

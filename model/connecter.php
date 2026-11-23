@@ -1,10 +1,13 @@
 <?php
 
-if(!empty($_POST['email']) && !empty($_POST['mdp'])){
+$email = giveInputString($_POST, 'email');
+$mdp = giveInputString($_POST, 'mdp');
+
+if($email !== '' && $mdp !== ''){
     $info = Joueur::connecter(
         array(
-            'mdp' =>$_POST['mdp'],
-            'email' =>$_POST['email'],
+            'mdp' =>$mdp,
+            'email' =>$email,
         )        
     );  
     

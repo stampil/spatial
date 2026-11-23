@@ -1,6 +1,7 @@
 <?php
-    if(!empty($_GET['erreur'])){
-        Tools::show_error_html($_GET['erreur']);
+    $erreur = giveInputString($_GET, 'erreur');
+    if($erreur !== ''){
+        Tools::show_error_html($erreur);
     }
 ?>
 
