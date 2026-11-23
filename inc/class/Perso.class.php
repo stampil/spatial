@@ -151,6 +151,9 @@ class Perso {
         if($action === self::ACTION_CONQUETE && $this->sur_planete->gouverneur !== 0){
             return 'Cette planète a déjà un gouverneur.';
         }
+        if($action === self::ACTION_CONQUETE && $this->sur_planete->id_camp !== null){
+            return 'Cette planète est tenue par '.(new Camp($this->sur_planete->id_camp))->nom.'.';
+        }
         if($action === self::ACTION_APAISER && ($this->sur_planete->gouverneur !== $this->joueur->id || $this->sur_planete->perc_revolte === 0)){
             return "Cette planète n'a pas besoin d'être apaisée.";
         }

@@ -274,6 +274,14 @@ body {
     letter-spacing: var(--md-sys-typescale-title-medium-tracking);
 }
 
+.md3-camp-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
 .md3-choices {
     margin: 0 0 20px;
     padding: 0;

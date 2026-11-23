@@ -8,6 +8,9 @@ class Planete {
     const SECONDS_PER_HOUR = 3600;
     const OPERATION_CONSTRUIRE = 'construire';
     const OPERATION_DEMOLIR = 'demolir';
+    const MIN_PLANETES = 3;
+    const MAX_PLANETES = 12;
+    const SLOT_DEPART = 8;
 
     private MyPDO $bdd;
     public int $id;
@@ -22,6 +25,7 @@ class Planete {
     public int $nb_usine_ressource;
     public int $nb_academie;
     public ?string $revolte_maj;
+    public ?int $id_camp;
     public Systeme $systeme;
     public static int $min_slot = 1;
     public static int $max_slot = 16;
@@ -52,27 +56,38 @@ class Planete {
         return $ret[0]->id;
     }
 
+    public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp): int{
+        $nom_planete = preg_replace("/-[0-9]+/",' '.$numero,$Systeme->nom);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,creato)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,now());";
+        $gouverneur=0;
+        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,0,0,0,0,0);
+        return MyPDO::getInstance()->lastInsertId();
+    }
+
     public static function fillSysteme(Perso $Perso,Systeme $Systeme): void{
-        $nb_planetes = rand(3, 12);
+        $nb_planetes = rand(self::MIN_PLANETES, self::MAX_PLANETES);
         
         for ($i=1; $i<=$nb_planetes; $i++){
-            $nom_planete = preg_replace("/-[0-9]+/",' '.$i,$Systeme->nom);
-            
-            $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,creato)
-                VALUES (?,?,?,?,?,?,?,?,?,?,now());";
-            $gouverneur=0;
             $slot =rand(self::$min_slot,self::$max_slot);
-            if($i==1){//premiere planete créer : base du joueur
-                //$gouverneur = $Joueur->id; // = $id_joueur pas encore : tuto fera devenir gouverneur
-                $slot = 8; //meme base de depart pour tout les joueurs et permettre une bonne expension
+            if($i==1){//premiere planete créer : base du joueur, le tuto la fera gouverner
+                $slot = self::SLOT_DEPART; //meme base de depart pour tout les joueurs et permettre une bonne expension
             }
-            MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,0,0,0,0,0);
+            $id_planete = self::create($Systeme, $i, $slot, null);
             if($i==1){
-                $id_planete =  MyPDO::getInstance()->lastInsertId();
                 $Planete = new Planete($id_planete);
                 $Perso->goToPlanete($Planete);
             }
             
+        }
+    }
+
+    public static function fillSystemeIA(Systeme $Systeme, array $id_camps): void{
+        $nb_planetes = rand(self::MIN_PLANETES, self::MAX_PLANETES);
+
+        for ($i=1; $i<=$nb_planetes; $i++){
+            $id_camp = $id_camps[rand(0,count($id_camps)-1)];
+            self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp);
         }
     }
 
@@ -108,6 +123,7 @@ class Planete {
         $this->nb_usine_ressource = $ret[0]->nb_usine_ressource;
         $this->nb_academie = $ret[0]->nb_academie;
         $this->revolte_maj = $ret[0]->revolte_maj;
+        $this->id_camp = $ret[0]->id_camp;
         $this->systeme = new Systeme($this->id_systeme);
         return $this;
 
@@ -227,8 +243,8 @@ class Planete {
     }
 
     public function gouverner(Joueur $joueur): bool {
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, revolte_maj=? WHERE id=? AND gouverneur=0";
-        $this->bdd->query($query,$joueur->id,Tools::now(),$this->id);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, revolte_maj=? WHERE id=? AND gouverneur=0 AND id_camp IS NULL";
+        $this->bdd->query($query,$joueur->id,$joueur->id_camp,Tools::now(),$this->id);
         return $this->bdd->lastRowCount === 1;
     }
 
@@ -258,7 +274,7 @@ class Planete {
         if($this->bdd->lastRowCount !== 1 || $revolte < self::MAX_REVOLTE){
             return;
         }
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=0, perc_revolte=?, revolte_maj=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0 WHERE id=?";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=0, id_camp=NULL, perc_revolte=?, revolte_maj=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0 WHERE id=?";
         $this->bdd->query($query,rand(0,self::INITIAL_REVOLTE_MAX),$this->id);
         $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
         Tools::addMessage($this->nom.' est devenue indépendante : sa révolte a atteint '.self::MAX_REVOLTE.' %.');

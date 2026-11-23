@@ -21,7 +21,7 @@ if($Joueur->etape_tuto >= Joueur::TUTO_END_STEP){
     $Camp = $Joueur->getCamp();
 ?>
 <div class="md3-card">
-    <h2>Camp : <?= $Camp->getNom() ?></h2>
+    <h2>Camp : <?= Camp::libelle($Joueur->id_camp) ?></h2>
     <p class="md3-secondary"><?= htmlspecialchars($Camp->histoire) ?></p>
 </div>
 <p>Crédits : <?= $Joueur->credits ?> (revenu net : <?= sprintf('%+d', $revenu) ?> cr/h)</p>

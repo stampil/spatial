@@ -74,6 +74,29 @@ class Systeme {
          
      }
      
+    public function getIdCamp(): ?int {
+        $comptes = array();
+        foreach($this->planetes as $planete){
+            if($planete->id_camp !== null){
+                $comptes[$planete->id_camp] = ($comptes[$planete->id_camp] ?? 0) + 1;
+            }
+        }
+        $id_camp = null;
+        $maximum = 0;
+        $egalite = false;
+        foreach($comptes as $id => $nombre){
+            if($nombre > $maximum){
+                $id_camp = $id;
+                $maximum = $nombre;
+                $egalite = false;
+            }
+            elseif($nombre === $maximum){
+                $egalite = true;
+            }
+        }
+        return $egalite ? null : $id_camp;
+    }
+
     public function getNom(): string {
         return '<a target="_blank" href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a>';
     }     

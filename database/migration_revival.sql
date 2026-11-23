@@ -4,7 +4,8 @@ ALTER TABLE `perso`
   ADD COLUMN `fin_mort` datetime DEFAULT NULL AFTER `fin_prison`;
 
 ALTER TABLE `planete`
-  ADD COLUMN `revolte_maj` datetime DEFAULT NULL AFTER `nb_academie`;
+  ADD COLUMN `revolte_maj` datetime DEFAULT NULL AFTER `nb_academie`,
+  ADD COLUMN `id_camp` int(11) DEFAULT NULL AFTER `revolte_maj`;
 
 ALTER TABLE `joueur`
   ADD COLUMN `credits_maj` datetime DEFAULT NULL AFTER `lastco`,
@@ -37,11 +38,12 @@ CREATE TABLE IF NOT EXISTS `camp` (
   `nom` varchar(255) NOT NULL,
   `histoire` text NOT NULL,
   `jouable` tinyint(1) NOT NULL,
+  `couleur` varchar(7) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `camp` (`id`, `nom`, `histoire`, `jouable`) VALUES
-(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 0),
-(2, 'Empire', 'Un ordre ancien qui a unifié les systèmes par la force de ses flottes. Son industrie de masse produit unités et ressources à moindre coût, mais ses bannières flottent sur chaque planète conquise : l''Empire est toujours visible sur la carte.', 1),
-(3, 'Rébellion', 'Des planètes lassées de l''ordre impérial, des mutins et des ingénieurs libres ont choisi la discrétion. Incapable de rivaliser en nombre, la Rébellion gagne en restant invisible tant qu''on ne l''a pas découverte.', 1);
+INSERT INTO `camp` (`id`, `nom`, `histoire`, `jouable`, `couleur`) VALUES
+(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 0, '#B3261C'),
+(2, 'Empire', 'Un ordre ancien qui a unifié les systèmes par la force de ses flottes. Son industrie de masse produit unités et ressources à moindre coût, mais ses bannières flottent sur chaque planète conquise : l''Empire est toujours visible sur la carte.', 1, '#1565C0'),
+(3, 'Rébellion', 'Des planètes lassées de l''ordre impérial, des mutins et des ingénieurs libres ont choisi la discrétion. Incapable de rivaliser en nombre, la Rébellion gagne en restant invisible tant qu''on ne l''a pas découverte.', 1, '#2E7D32');

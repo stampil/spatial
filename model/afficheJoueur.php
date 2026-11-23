@@ -9,7 +9,7 @@ else{
 $j = new Joueur($id_joueur);
 //$j->credits++;
 echo '<p>'.htmlspecialchars($j->nom).' '.$j->credits.'$</p>';
-echo '<p>Camp : '.$j->getCamp()->getNom().'</p>';
+echo '<p>Camp : '.Camp::libelle($j->id_camp).'</p>';
 
 ?>
 

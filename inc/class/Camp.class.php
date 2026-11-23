@@ -2,11 +2,17 @@
 
 class Camp {
 
+    const PIRATES = 1;
+    const EMPIRE = 2;
+    const SANS_CAMP_NOM = 'Sans camp';
+    const SANS_CAMP_COULEUR = '#79747E';
+
     private MyPDO $bdd;
     public int $id;
     public string $nom;
     public string $histoire;
     public bool $jouable;
+    public string $couleur;
 
     public static function liste(): array {
         $query = "SELECT *
@@ -55,10 +61,18 @@ class Camp {
         $this->nom = $ret[0]->nom;
         $this->histoire = $ret[0]->histoire;
         $this->jouable = (bool) $ret[0]->jouable;
+        $this->couleur = $ret[0]->couleur;
     }
 
-    public function getNom(): string {
-        return htmlspecialchars($this->nom);
+    public static function libelle(?int $id_camp): string {
+        $nom = self::SANS_CAMP_NOM;
+        $couleur = self::SANS_CAMP_COULEUR;
+        if($id_camp !== null){
+            $camp = new Camp($id_camp);
+            $nom = $camp->nom;
+            $couleur = $camp->couleur;
+        }
+        return '<span class="md3-camp-dot" style="background-color:'.htmlspecialchars($couleur).'"></span> '.htmlspecialchars($nom);
     }
 
     public function adversaires(): array {

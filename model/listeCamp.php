@@ -7,7 +7,7 @@ foreach(Camp::liste() as $ligne){
     }
 ?>
 <div class="md3-card">
-    <h2><?= $camp->getNom() ?><?= $camp->jouable ? '' : ' (non jouable, piloté par l\'IA)' ?></h2>
+    <h2><?= Camp::libelle($camp->id) ?><?= $camp->jouable ? '' : ' (non jouable, piloté par l\'IA)' ?></h2>
     <p class="md3-secondary"><?= htmlspecialchars($camp->histoire) ?></p>
     <p class="md3-secondary">Adversaires : <?= implode(', ', $adversaires) ?></p>
 </div>

@@ -9,6 +9,7 @@ else{
 $s = new Systeme($id_systeme);
 
 echo $s->nom?$s->getNom():'Système'.$s->id;
+echo ' '.Camp::libelle($s->getIdCamp());
 
 ?>
 <p>possède les planètes suivantes</p>
@@ -17,7 +18,7 @@ foreach($s->planetes as $p){
     $p = new Planete($p->id);
     $map_planete=$p->id%27;
 if(!$map_planete) $map_planete = 1;
-    echo ($p->nom?$p->getNom():'planète'.$p->id).' slot : '.$p->slot.'<div class="planet" style="background: url(img/planete/'.$map_planete.'.jpg);width:'.(50+3*$p->slot).'px;height:'.(50+3*$p->slot).'px"></div><br>';
+    echo ($p->nom?$p->getNom():'planète'.$p->id).' '.Camp::libelle($p->id_camp).' slot : '.$p->slot.'<div class="planet" style="background: url(img/planete/'.$map_planete.'.jpg);width:'.(50+3*$p->slot).'px;height:'.(50+3*$p->slot).'px"></div><br>';
 }
 ?>
 

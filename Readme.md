@@ -5,6 +5,7 @@
 - Créer la base `systeme` et y importer `database/systeme.sql`.
 - Sur une base déjà existante, importer `database/migration_revival.sql` (nouvelles colonnes et tables).
 - Copier `inc/config.example.php` en `inc/config.php` et y renseigner les identifiants de la base.
+- Peupler l'univers une seule fois (systèmes d'Empire, de Pirates, disputés et sans camp) : `php database/peupler.php`.
 - Lancer en local depuis la racine du projet : `php -S localhost:8000`.
 
 # Elements de gameplay
