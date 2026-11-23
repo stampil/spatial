@@ -29,7 +29,7 @@ if($email !== '' && $mdp !== ''){
         exit();
     }
     else{
-        header('Location: index.php?p=connection&erreur=identifiants non reconnus');
+        header('Location: index.php?p=connection&erreur=Identifiants non reconnus');
         exit();
     }
 }

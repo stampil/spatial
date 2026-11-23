@@ -6,13 +6,13 @@ $mdp = giveInputString($_POST, 'mdp');
 
 $erreur = '';
 if($email === '' || $nom === '' || $mdp === ''){
-    $erreur = 'tous les champs sont obligatoires';
+    $erreur = 'Tous les champs sont obligatoires';
 }
 elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-    $erreur = 'email invalide';
+    $erreur = 'Email invalide';
 }
 elseif(strlen($mdp) < PASSWORD_MIN_LENGTH){
-    $erreur = 'mot de passe trop court';
+    $erreur = 'Mot de passe trop court';
 }
 else{
     $Joueur = Joueur::inscrire(
@@ -23,7 +23,7 @@ else{
         )        
     );  
     if($Joueur === null){
-        $erreur = 'email ou nom deja utilise';
+        $erreur = 'Email ou nom déjà utilisé';
     }
 }
 

@@ -13,11 +13,11 @@ $o = new Perso($id);
 <?php
 if($Joueur->etape_tuto==1){
 ?>
-Voici les caracteristiques de votre perso.<br>
-Il a <?= $o->diplomatie ?>/5 étoiles  en diplomatie<br>
-Un perso avec une faible diplomatie mettra plus de temps, voir pourra se faire emprisonner ou tuer plus facilement lors de ses missions.<br />
-Dans ce tuto, nous n'iront pas dans ces extremes.<br/>
-Les actions de votre perso s'affichent de maniere contextuels, par exemple, si vous avez un vaisseau sur la meme planete, une action "monter dans le vaisseau" apparaitra
+Voici les caractéristiques de votre perso.<br>
+Il a <?= $o->diplomatie ?>/<?= Perso::MAX_STARS ?> étoile<?= $o->diplomatie > 1 ? 's' : '' ?> en diplomatie<br>
+Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions.<br />
+Dans ce tuto, nous n'irons pas dans ces extrêmes.<br/>
+Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra
 <br />
 <?php   
 }
@@ -26,14 +26,14 @@ Les actions de votre perso s'affichent de maniere contextuels, par exemple, si v
 <?= $o->getNom() ?><br>
 Force : <?= $o->getFO() ?><br />
 Endurance : <?= $o->getPV() ?><br />
-Diplomatie:  <?= $o->getDiplomatie() ?><br />
+Diplomatie : <?= $o->getDiplomatie() ?><br />
 
 <br />
-Status:<br />
+Statut :<br />
 <?php 
 if(!Tools::isFinCompteRebours($o->fin_diplomatie)){
     ?>
-Fin diplomatie :
+Fin de la diplomatie :
 <span data-countdown="<?= htmlspecialchars($o->fin_diplomatie) ?>"></span>
 <br>
 <?php } ?>

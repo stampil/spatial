@@ -6,7 +6,7 @@ class Systeme {
     public int $id;
     public string $nom;
     public array $planetes;
-    private static array $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lamdba","Mu","Nu","Ksi","Omicron","Pi",
+    private static array $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","Mu","Nu","Ksi","Omicron","Pi",
         "Rho","Sigma","Tau","Upsilon","Phi","Chi","Psi","Omega");
 
         
@@ -34,7 +34,7 @@ class Systeme {
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
         if(empty($ret)){
-            throw new UnexpectedValueException("Systeme n'existe pas");
+            throw new UnexpectedValueException("Ce système n'existe pas");
         }
         
         $this->nom = $ret[0]->nom;

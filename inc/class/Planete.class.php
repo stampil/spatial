@@ -71,7 +71,7 @@ class Planete {
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
         if(empty($ret)){
-            throw new UnexpectedValueException("Planete n'existe pas");
+            throw new UnexpectedValueException("Cette planète n'existe pas");
         }
         
         $this->nom = $ret[0]->nom;

@@ -17,6 +17,6 @@ switch($etape){
 
 <br>  Actions :
 
-<p><a href="?p=listeSysteme" >lister les systeme</a></p>
-<p><a href="?p=listePlanete" >lister les planetes</a></p>
-<p><a href="?p=listePerso" >lister les perso</a></p>
+<p><a href="?p=listeSysteme" >Lister les systèmes</a></p>
+<p><a href="?p=listePlanete" >Lister les planètes</a></p>
+<p><a href="?p=listePerso" >Lister les persos</a></p>

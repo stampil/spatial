@@ -71,7 +71,7 @@ class Joueur {
                 WHERE id=? ";
         $ret = $this->bdd->query($query, $id);
         if(empty($ret)){
-            throw new UnexpectedValueException("Joueur n'existe pas");
+            throw new UnexpectedValueException("Ce joueur n'existe pas");
         }
         
         $this->id = $ret[0]->id;

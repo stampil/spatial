@@ -60,7 +60,7 @@ class Perso {
         $ret = $this->bdd->query($query, $id);
         $planete = null;
         if(empty($ret[0])){
-            throw new UnexpectedValueException("Perso n'existe pas");
+            throw new UnexpectedValueException("Ce perso n'existe pas");
         }
         if($ret[0]->sur_planete){
             $planete = new Planete($ret[0]->sur_planete);

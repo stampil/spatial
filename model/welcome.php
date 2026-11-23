@@ -5,4 +5,4 @@ if(!empty($_SESSION['Sid'])){
 }
 ?>
 <a href="?p=inscription">Inscription</a>
-<a href="?p=connection">Connection</a>
+<a href="?p=connection">Connexion</a>

@@ -8,7 +8,7 @@ else{
 
 $p = new Planete($id_planete);
 //$p->perc_revolte++;
-echo ($p->nom?$p->getNom():'planète sans nom').' du systeme '.($p->systeme->nom?$p->systeme->getNom():'sans nom').' revolté a '.$p->perc_revolte.' %  slot : '.$p->slot;
+echo ($p->nom?$p->getNom():'planète sans nom').' du système '.($p->systeme->nom?$p->systeme->getNom():'sans nom').' révoltée à '.$p->perc_revolte.' %  slot : '.$p->slot;
 
 /*$p->systeme->nom='SOL';
 $p->systeme->save();*/
