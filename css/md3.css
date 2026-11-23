@@ -32,6 +32,7 @@
     --md-sys-typescale-label-medium-tracking: 0.03125rem;
     --md-sys-typescale-font: 'Roboto Flex', Roboto, sans-serif;
 
+    --md-sys-shape-corner-none: 0;
     --md-sys-shape-corner-small: 8px;
     --md-sys-shape-corner-medium: 12px;
     --md-sys-shape-corner-full: 9999px;
@@ -203,7 +204,7 @@ body {
     height: 40px;
     padding: 0 24px;
     border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: var(--md-sys-shape-corner-none);
     background-color: var(--md-sys-color-primary);
     color: var(--md-sys-color-on-primary);
     font-family: inherit;
