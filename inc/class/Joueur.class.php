@@ -180,6 +180,16 @@ class Joueur {
         return new Perso($ret[0]->id);
     
     }
+    public function ouvrirSession(): void {
+        session_regenerate_id(true);
+        $_SESSION['Sid'] = $this->id;
+        $ips = explode(" ",$this->IPs);
+        array_push($ips, giveIP());
+        $this->IPs = implode(' ', array_unique($ips));
+        $this->lastco = Tools::now();
+        $this->save();
+    }
+
     public function getCamp(): Camp {
         return new Camp($this->id_camp);
     }

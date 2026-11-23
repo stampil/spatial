@@ -12,18 +12,8 @@ if($email !== '' && $mdp !== ''){
     );  
     
     if($info){
-        //$j = new Joueur($info->id);
-        session_regenerate_id(true);
-        $_SESSION['Sid'] = $info->id;
         $Joueur = new Joueur($info->id);
-        $ip = giveIP();
-        $ips = explode(" ",$Joueur->IPs);
-        array_push($ips, $ip);
-        $ips = array_unique($ips);
-        $ips = implode(' ', $ips);
-        $Joueur->IPs = $ips; 
-        $Joueur->lastco = Tools::now();
-        $Joueur->save();
+        $Joueur->ouvrirSession();
 
         header('Location: index.php?p=tableauBord');
         exit();

@@ -36,7 +36,8 @@ if($erreur !== ''){
     header('Location: ?p=inscription&erreur='.urlencode($erreur));
 }
 else{
-    header('Location: ?p=connection');
+    $Joueur->ouvrirSession();
+    header('Location: index.php?p=tableauBord');
 }
 exit();
 ?>
