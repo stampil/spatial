@@ -20,6 +20,20 @@ Compris : ouvrir l'appli dans le navigateur intégré. Ta base (port 3306) refus
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». Ils restent lancés : PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872`.
 
+### 3. Peu de contenu : navigation et actions de jeu (23/11)
+
+Instruction exacte : « c moi ou c si light que cela ? y a aucune action dans le jeu, ni meme hors jeu ( par ex se déconnecter, retour a l'accueul, pas de menu etc ) »
+
+Compris : tu constates qu'il n'y a aucune action de jeu ni aucune navigation (déconnexion, retour à l'accueil, menu). Ce n'est pas toi : relevé dans la source, sans rien exécuter.
+
+- Liens et formulaires de toute l'appli : 9 en tout. `welcome` vers inscription et connexion ; le tableau de bord vers les 3 listes ; `tuto_0` vers la liste des persos ; la fiche du perso vers la diplomatie ; les 2 formulaires de connexion et d'inscription.
+- Aucun lien de déconnexion, d'accueil ou de retour, et aucun menu (`grep` de `deconnection`, `<nav>`, `<menu>` vide dans `model/` et `index.php`). On ne se déconnecte qu'en tapant `?p=deconnection` ou `?d=1` dans l'adresse.
+- Seule action de jeu : « Faire de la diplomatie ». Elle ne fait que poser une date de fin (`Perso::setDiplomatie`, 120 s divisées par la diplomatie) : à la fin du compte à rebours, rien ne se passe, la planète n'est pas conquise.
+- `gouverneur`, `nb_usine_*`, `nb_academie`, `fin_voyage_planetaire` ne sont lus par aucune page. La base n'a que 4 tables (`joueur`, `perso`, `planete`, `systeme`) : ni vaisseau, ni flotte, ni combat. Le `Readme.md` décrit bien plus que ce qui existe.
+
 ## Questions en suspens
 
-Aucune.
+- **Q16.** Par quoi commencer ?
+  - (1) Un menu de navigation commun à toutes les pages : accueil, listes, déconnexion, et « retour » sur les pages de détail. Selon ta règle UI, je suivrais Material Design 3 (barre d'app supérieure). **Recommandé en premier : petit, et ça rend le reste utilisable.**
+  - (2) Faire aboutir la diplomatie : à la fin du compte à rebours, la planète passe sous ton contrôle. Il me faut tes règles (chance de réussite, risque d'assassinat du diplomate, effet de la révolte), car le `Readme.md` ne les chiffre pas.
+  - (3) Premières actions sur une planète (usines, ferme, académie) : gros chantier, à découper avec toi.
