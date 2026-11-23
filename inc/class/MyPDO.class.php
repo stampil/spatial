@@ -27,15 +27,6 @@ class MyPDO extends PDO {
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         $this->query("SET NAMES 'utf8'");
-        $ret = $this->query("USE $DB_NAME");
-        if($ret === self::QUERY_FAILED){
-            $ret2 = $this->query("CREATE DATABASE `$DB_NAME` /*!40100 DEFAULT CHARACTER SET utf8 */");
-            if($ret2 !== self::QUERY_FAILED){
-                echo 'base '.$DB_NAME.' créée';
-            }
-            $this->query("USE $DB_NAME");
-            
-        }
     }
 
     public static function getInstance(): MyPDO {
