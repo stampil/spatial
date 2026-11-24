@@ -11,6 +11,10 @@ class Planete {
     const MIN_PLANETES = 3;
     const MAX_PLANETES = 12;
     const SLOT_DEPART = 8;
+    const BOUCLIER_PAR_SLOT = 2;
+    const CANON_PAR_SLOT = 1;
+    const TROUPES_DIVISEUR_SLOT = 2;
+    const CAPTURE_REVOLTE = 50;
 
     private MyPDO $bdd;
     public int $id;
@@ -26,6 +30,9 @@ class Planete {
     public int $nb_academie;
     public ?string $revolte_maj;
     public ?int $id_camp;
+    public int $bouclier;
+    public int $canon;
+    public int $troupes;
     public Systeme $systeme;
     public static int $min_slot = 1;
     public static int $max_slot = 16;
@@ -65,10 +72,18 @@ class Planete {
 
     public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp): int{
         $nom_planete = preg_replace("/-[0-9]+/",' '.$numero,$Systeme->nom);
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,creato)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,now());";
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,creato)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
         $gouverneur=0;
-        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,0,0,0,0,0);
+        $bouclier = 0;
+        $canon = 0;
+        $troupes = 0;
+        if($id_camp !== null){
+            $bouclier = $slot * self::BOUCLIER_PAR_SLOT;
+            $canon = $slot * self::CANON_PAR_SLOT;
+            $troupes = intdiv($slot, self::TROUPES_DIVISEUR_SLOT) + 1;
+        }
+        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,0,0,0,0,0);
         return MyPDO::getInstance()->lastInsertId();
     }
 
@@ -134,6 +149,9 @@ class Planete {
         $this->nb_academie = $ret[0]->nb_academie;
         $this->revolte_maj = $ret[0]->revolte_maj;
         $this->id_camp = $ret[0]->id_camp;
+        $this->bouclier = $ret[0]->bouclier;
+        $this->canon = $ret[0]->canon;
+        $this->troupes = $ret[0]->troupes;
         $this->systeme = new Systeme($this->id_systeme);
         return $this;
 
@@ -261,6 +279,16 @@ class Planete {
         return $this->bdd->lastRowCount === 1;
     }
 
+    public function capturer(Joueur $joueur, int $troupes): bool {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0";
+        $this->bdd->query($query,$joueur->id,$joueur->id_camp,$troupes,self::CAPTURE_REVOLTE,Tools::now(),$this->id,$this->gouverneur);
+        if($this->bdd->lastRowCount !== 1){
+            return false;
+        }
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
+        return true;
+    }
+
     public function apaiser(int $points): void {
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=GREATEST(perc_revolte-?,0) WHERE id=?";
         $this->bdd->query($query,$points,$this->id);
@@ -280,7 +308,8 @@ class Planete {
         if($heures < 1){
             return;
         }
-        $revolte = min($this->perc_revolte + $heures * self::REVOLTE_PER_HOUR, self::MAX_REVOLTE);
+        $revolteMax = $this->troupes > 0 ? self::MAX_REVOLTE - 1 : self::MAX_REVOLTE;
+        $revolte = min($this->perc_revolte + $heures * self::REVOLTE_PER_HOUR, $revolteMax);
         $nouvelleMaj = Tools::formatDate($depuis + $heures * self::SECONDS_PER_HOUR);
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=?, revolte_maj=? WHERE id=? AND revolte_maj=?";
         $this->bdd->query($query,$revolte,$nouvelleMaj,$this->id,$this->revolte_maj);

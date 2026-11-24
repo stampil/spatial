@@ -17,16 +17,19 @@ class Installation {
         if($ret === MyPDO::QUERY_FAILED || (int) $ret[0]->obtenu !== self::LOCK_OBTAINED){
             exit("Installation de la base en cours, réessayez dans un instant.");
         }
-        if(!self::estInstallee()){
+        $nouvelle = !self::estInstallee();
+        if($nouvelle){
             if(self::existe('joueur')){
                 exit("La base est incomplète : importer database/migration_revival.sql, ou supprimer ses tables pour une nouvelle installation.");
             }
             self::executer(self::SQL_FILE);
-            Univers::peupler();
         }
         foreach(self::enAttente() as $version){
             self::executer(self::MIGRATIONS_DIR . '/' . $version . '.sql');
             $bdd->query("INSERT INTO " . MyPDO::DB_FLAG . "schema_migrations (version) VALUES (?)", $version);
+        }
+        if($nouvelle){
+            Univers::peupler();
         }
         $bdd->query("SELECT RELEASE_LOCK(?)", self::LOCK_NAME);
     }

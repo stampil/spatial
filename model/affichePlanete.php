@@ -13,6 +13,7 @@ if(!$p->systeme->estConnuDe($Joueur->id)){
 //$p->perc_revolte++;
 echo '<p>'.($p->nom?$p->getNom():'planète sans nom').' du système '.($p->systeme->nom?$p->systeme->getNom():'sans nom').' révoltée à '.$p->perc_revolte.' %  slot : '.$p->slot.'</p>';
 echo '<p>Gouverneur : '.$p->getGouverneurNom().'</p>';
+echo '<p>Défense : bouclier '.$p->bouclier.', canon '.$p->canon.', garnison '.$p->troupes.' troupe(s).</p>';
 
 /*$p->systeme->nom='SOL';
 $p->systeme->save();*/
@@ -48,6 +49,34 @@ if(!$map_planete) $map_planete = 1;
 </style>
 <div id="planet"></div>
 <?php
+if($p->gouverneur !== $Joueur->id){
+    $presents = Vaisseau::stock($p->id, $Joueur->id);
+    $escadre = 0;
+    foreach(Combat::ESCADRE as $type){
+        $escadre += $presents[$type] ?? 0;
+    }
+    $troupes = $presents[Vaisseau::TROUPE] ?? 0;
+    if($escadre > 0 && $p->bouclier + $p->canon > 0){
+?>
+<form method="POST" action="?p=combattre">
+    <input type="hidden" name="planete" value="<?= $p->id ?>" />
+    <input type="hidden" name="action" value="attaquer" />
+    <?= csrfField() ?>
+    <input type="submit" value="Attaquer avec <?= $escadre ?> vaisseau(x) de combat" />
+</form>
+<?php
+    }
+    if($troupes > 0 && $p->bouclier + $p->canon === 0){
+?>
+<form method="POST" action="?p=combattre">
+    <input type="hidden" name="planete" value="<?= $p->id ?>" />
+    <input type="hidden" name="action" value="debarquer" />
+    <?= csrfField() ?>
+    <input type="submit" value="Débarquer <?= $troupes ?> troupe(s) d'assaut" />
+</form>
+<?php
+    }
+}
 if($p->gouverneur === $Joueur->id){
     $planete = $p;
     require 'inc/planeteGestion.php';

@@ -61,17 +61,15 @@ Tes mots : « ok d'apres le readme, fait un plan de ce qu'il reste a faire pour 
 
 **Choix de ma main dans ce plan** (à corriger si besoin) : les distances entre systèmes n'existent pas en base, donc durée de trajet fixe : courte dans un système, plus longue entre systèmes ; les valeurs de défense, de puissance, de vitesse, de prix des troupes, la réduction de l'Empire et la part d'épaves récupérée seront mes propositions au moment de la phase, notées dans le suivi.
 
-### 6. Tutoriel prolongé : reste le combat, les troupes et la capture (24/11)
+### 6. Tutoriel prolongé : reste les étapes finales (24/11)
 
 Tes mots : « poursuis le tuto fait créé vaisseau d'explration, fait trouver un systeme voisin, fait faire des trouve de debarquement , de vaisseau d'attaque et fait le tuto jusqu'a une capture d'une planete camps pirate ».
 
-**Fait** (commits poussés et publiés) : l'onglet Vaisseaux et les déplacements ; les migrations numérotées de la base (le site en ligne se met à jour seul) ; l'exploration : table `decouverte`, un système voisin des Pirates créé à l'inscription et invisible tant qu'il n'est pas exploré, destination « Système voisin (inconnu) », le vaisseau de reconnaissance qui arrive explore le système ; les étapes 2 à 4 du tutoriel (usine légère, reconnaissance, exploration), avec un encadré « Tutoriel » sur chaque page, durées divisées par 5 et maintenance suspendue pendant le tutoriel. Pour l'instant le tutoriel se termine à l'étape 5 (exploration faite).
+**Fait** (commits poussés et publiés) : l'onglet Vaisseaux et les déplacements ; les migrations numérotées (le site en ligne se met à jour seul) ; l'exploration (système voisin des Pirates invisible tant qu'il n'est pas exploré, la reconnaissance qui arrive l'explore) ; les étapes 2 à 4 du tutoriel avec leur encadré ; le combat : défense des planètes (bouclier, canon, garnison), troupe d'assaut produite par l'académie, transport en barge (10 troupes par barge), attaque en 3 phases puis débarquement, capture (la planète prend ton camp, révoltée à 50 %, garnison des survivants qui empêche l'indépendance), épaves en crédits. Pour l'instant le tutoriel se termine à l'étape 5 (exploration faite).
 
-**Reste, en deux commits :**
-- **Combat et troupes** : colonnes `planete.bouclier`, `planete.canon`, `planete.troupes` (garnison) ; l'académie forme la troupe d'assaut ; la barge transporte les troupes ; attaque d'une planète par une flotte posée dessus (3 phases du Readme : chasseurs, frégates, capitaux contre canon et bouclier), puis combat au sol ; en cas de victoire la planète prend le camp du joueur, elle est révoltée, les épaves rapportent des crédits.
-- **Étapes finales du tutoriel** (la fin passe de 5 à 8 ; les joueurs de l'ancienne fin passent à la nouvelle sans refaire) : 5 : usine moyenne et académie, barge, 3 troupes, 3 chasseurs ; 6 : envoyer la flotte sur la planète pirate ; 7 : détruire la défense et débarquer ; 8 : capture, fin du tutoriel ; prime de 600 crédits à l'étape 5.
+**Reste, un commit : les étapes finales du tutoriel** (la fin passe de 5 à 8 ; les joueurs de l'ancienne fin passent à la nouvelle sans refaire) : 5 : construire une usine de vaisseaux moyens et une académie, produire 1 barge, 3 troupes d'assaut et 3 chasseurs (prime de 600 crédits à l'entrée de l'étape) ; 6 : envoyer chasseurs, barge et troupes sur la planète pirate ; 7 : attaquer, puis débarquer ; 8 : planète capturée, fin du tutoriel.
 
-**Mes valeurs, à corriger si besoin** : planète pirate du tutoriel : bouclier 10, canon 5 (j'ai baissé les 20 et 10 prévus : trois chasseurs de force 5 doivent pouvoir la vaincre), garnison 3 troupes ; troupe d'assaut : 60 crédits, 20 s, force 10 ; barge : 10 troupes au maximum ; chasseur : force 5 ; le combat se résout par comparaison des forces avec un aléa de plus ou moins 20 %.
+**Mes valeurs, à corriger si besoin** : planète pirate du tutoriel : bouclier 5, canon 5, garnison 1 troupe (assez faible pour qu'un seul assaut de 3 chasseurs et 3 troupes réussisse) ; planètes des Pirates et de l'Empire du jeu : bouclier = 2 × slots, canon = slots, garnison = slots ÷ 2 + 1 ; troupe : 60 crédits, 20 s, force 10 ; chasseur 5, frégate 15, capital 50 ; aléa du combat ± 20 % ; bonus de phase 25 % ; épaves 10 crédits par point de défense détruit ; planète capturée révoltée à 50 %.
 
 ### 7. Serveurs de test (23/11)
 

@@ -105,6 +105,9 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `nb_academie` int(11) NOT NULL,
   `revolte_maj` datetime DEFAULT NULL,
   `id_camp` int(11) DEFAULT NULL,
+  `bouclier` int(11) NOT NULL DEFAULT '0',
+  `canon` int(11) NOT NULL DEFAULT '0',
+  `troupes` int(11) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
@@ -218,7 +221,8 @@ CREATE TABLE IF NOT EXISTS `schema_migrations` (
 
 INSERT INTO `schema_migrations` (`version`) VALUES
 ('001_vaisseau_deplacement'),
-('002_exploration');
+('002_exploration'),
+('003_combat');
 
 COMMIT;
 

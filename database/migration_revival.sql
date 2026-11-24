@@ -5,7 +5,10 @@ ALTER TABLE `perso`
 
 ALTER TABLE `planete`
   ADD COLUMN `revolte_maj` datetime DEFAULT NULL AFTER `nb_academie`,
-  ADD COLUMN `id_camp` int(11) DEFAULT NULL AFTER `revolte_maj`;
+  ADD COLUMN `id_camp` int(11) DEFAULT NULL AFTER `revolte_maj`,
+  ADD COLUMN `bouclier` int(11) NOT NULL DEFAULT '0' AFTER `id_camp`,
+  ADD COLUMN `canon` int(11) NOT NULL DEFAULT '0' AFTER `bouclier`,
+  ADD COLUMN `troupes` int(11) NOT NULL DEFAULT '0' AFTER `canon`;
 
 ALTER TABLE `joueur`
   ADD COLUMN `credits_maj` datetime DEFAULT NULL AFTER `lastco`,
@@ -65,4 +68,5 @@ CREATE TABLE IF NOT EXISTS `schema_migrations` (
 
 INSERT INTO `schema_migrations` (`version`) VALUES
 ('001_vaisseau_deplacement'),
-('002_exploration');
+('002_exploration'),
+('003_combat');
