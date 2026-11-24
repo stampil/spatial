@@ -61,25 +61,17 @@ Tes mots : « ok d'apres le readme, fait un plan de ce qu'il reste a faire pour 
 
 **Choix de ma main dans ce plan** (à corriger si besoin) : les distances entre systèmes n'existent pas en base, donc durée de trajet fixe : courte dans un système, plus longue entre systèmes ; les valeurs de défense, de puissance, de vitesse, de prix des troupes, la réduction de l'Empire et la part d'épaves récupérée seront mes propositions au moment de la phase, notées dans le suivi.
 
-### 6. Tutoriel prolongé : exploration, troupes, flotte d'attaque, capture d'une planète pirate (23/11)
+### 6. Tutoriel prolongé : reste le combat, les troupes et la capture (24/11)
 
-Tes mots : « poursuis le tuto fait créé vaisseau d'explration, fait trouver un systeme voisin, fait faire des trouve de debarquement , de vaisseau d'attaque et fait le tuto jusqu'a une capture d'une planete camps pirate ». Aujourd'hui le tutoriel s'arrête à la prise de la première planète par diplomatie (étape 2 = fin).
+Tes mots : « poursuis le tuto fait créé vaisseau d'explration, fait trouver un systeme voisin, fait faire des trouve de debarquement , de vaisseau d'attaque et fait le tuto jusqu'a une capture d'une planete camps pirate ».
 
-Compris : « trouve de debarquement » = troupes de débarquement (troupes d'assaut). Le tutoriel continue, étape par étape, jusqu'à la prise par la force d'une planète des Pirates. Ce tutoriel a besoin des phases A à D du plan, dans leur version minimale ; je les livre en 4 commits, chacun poussé et publié :
+**Fait** (commits poussés et publiés) : l'onglet Vaisseaux et les déplacements ; les migrations numérotées de la base (le site en ligne se met à jour seul) ; l'exploration : table `decouverte`, un système voisin des Pirates créé à l'inscription et invisible tant qu'il n'est pas exploré, destination « Système voisin (inconnu) », le vaisseau de reconnaissance qui arrive explore le système ; les étapes 2 à 4 du tutoriel (usine légère, reconnaissance, exploration), avec un encadré « Tutoriel » sur chaque page, durées divisées par 5 et maintenance suspendue pendant le tutoriel. Pour l'instant le tutoriel se termine à l'étape 5 (exploration faite).
 
-1. **Onglet Vaisseaux et déplacements** (point 6 ci-dessus).
-2. **Exploration** : table `decouverte` (qui a découvert quel système) ; une reconnaissance qui arrive dans un système le découvre et révèle ses planètes (camp, slots) ; à l'inscription, un système voisin des Pirates est créé pour le joueur (une planète pirate faiblement défendue, quelques planètes pirates et sans camp autour) et reste inconnu tant qu'il n'est pas exploré. Étapes du tutoriel : construire une usine légère, produire une reconnaissance, l'envoyer au système voisin.
-3. **Combat et troupes** : colonnes `planete.bouclier`, `planete.canon`, `planete.troupes` (garnison) ; l'académie forme la troupe d'assaut ; la barge transporte les troupes ; combat de vaisseaux contre la défense de la planète (3 phases du Readme : chasseurs, frégates, capitaux, contre bouclier et canon), puis combat au sol ; en cas de victoire la planète change de camp (celui du joueur), elle est révoltée, les épaves rapportent des crédits.
-4. **Étapes finales du tutoriel** : construire usines et académie, produire barge, troupes et vaisseaux d'attaque, partir en flotte, vaincre la défense, débarquer, capturer ; textes guidés à chaque étape, fin du tutoriel à la capture.
+**Reste, en deux commits :**
+- **Combat et troupes** : colonnes `planete.bouclier`, `planete.canon`, `planete.troupes` (garnison) ; l'académie forme la troupe d'assaut ; la barge transporte les troupes ; attaque d'une planète par une flotte posée dessus (3 phases du Readme : chasseurs, frégates, capitaux contre canon et bouclier), puis combat au sol ; en cas de victoire la planète prend le camp du joueur, elle est révoltée, les épaves rapportent des crédits.
+- **Étapes finales du tutoriel** (la fin passe de 5 à 8 ; les joueurs de l'ancienne fin passent à la nouvelle sans refaire) : 5 : usine moyenne et académie, barge, 3 troupes, 3 chasseurs ; 6 : envoyer la flotte sur la planète pirate ; 7 : détruire la défense et débarquer ; 8 : capture, fin du tutoriel ; prime de 600 crédits à l'étape 5.
 
-**Déroulé du tutoriel que je propose** (étape actuelle 2 = fin devient une étape intermédiaire ; le chiffre de fin passe à 8) :
-- 2 : construire une usine de vaisseaux légers ; 3 : produire un vaisseau de reconnaissance ; 4 : l'envoyer explorer le système voisin ;
-- 5 : le système est découvert, une planète pirate est repérée : construire une usine de vaisseaux moyens et une académie ; produire une barge, 3 troupes d'assaut, 3 chasseurs ;
-- 6 : envoyer la flotte (chasseurs et barge chargée) sur la planète pirate ; 7 : le combat de vaisseaux détruit la défense, les troupes débarquent ; 8 : capture, fin du tutoriel.
-
-**Mes valeurs** (à corriger si besoin) : pendant le tutoriel les durées de production et de trajet sont divisées par 5 et la maintenance est suspendue (sinon le revenu devient négatif et bloque la construction) ; une prime de 600 crédits à l'étape 5 (le total des constructions dépasse les 500 de départ) ; planète pirate du tutoriel : bouclier 20, canon 10, garnison 3 troupes ; troupe d'assaut : 60 crédits, 20 s, force 10 ; barge : 10 troupes au maximum ; chasseur : force 5 ; le combat se résout par comparaison des forces avec un aléa de plus ou moins 20 %.
-
-Les joueurs déjà à l'étape 2 (fin de l'ancien tutoriel) : la migration les passe à la nouvelle fin (8), sans refaire le tutoriel.
+**Mes valeurs, à corriger si besoin** : planète pirate du tutoriel : bouclier 10, canon 5 (j'ai baissé les 20 et 10 prévus : trois chasseurs de force 5 doivent pouvoir la vaincre), garnison 3 troupes ; troupe d'assaut : 60 crédits, 20 s, force 10 ; barge : 10 troupes au maximum ; chasseur : force 5 ; le combat se résout par comparaison des forces avec un aléa de plus ou moins 20 %.
 
 ### 7. Serveurs de test (23/11)
 

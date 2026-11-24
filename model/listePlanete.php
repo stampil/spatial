@@ -1,7 +1,7 @@
 
 <?php
 
-$planetes = Planete::liste();
+$planetes = Planete::listeVisibles($Joueur->id);
     
 foreach($planetes as $p){
     $p = new Planete($p->id);

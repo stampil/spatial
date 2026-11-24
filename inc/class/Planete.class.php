@@ -42,6 +42,13 @@ class Planete {
     }
     
     
+    public static function listeVisibles(int $joueurId): array{
+        $query = "SELECT * FROM " . MyPDO::DB_FLAG . "planete
+                WHERE id_systeme IN (SELECT id FROM " . MyPDO::DB_FLAG . "systeme WHERE visible=1)
+                OR id_systeme IN (SELECT id_systeme FROM " . MyPDO::DB_FLAG . "decouverte WHERE id_joueur=?)";
+        return MyPDO::getInstance()->query($query,$joueurId);
+    }
+
     public static function listeGouvernees(int $joueurId): array{
         $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE gouverneur=?";
         return MyPDO::getInstance()->query($query,$joueurId);
@@ -82,11 +89,14 @@ class Planete {
         }
     }
 
-    public static function fillSystemeIA(Systeme $Systeme, array $id_camps): void{
+    public static function fillSystemeIA(Systeme $Systeme, array $id_camps, ?int $id_camp_premiere = null): void{
         $nb_planetes = rand(self::MIN_PLANETES, self::MAX_PLANETES);
 
         for ($i=1; $i<=$nb_planetes; $i++){
             $id_camp = $id_camps[rand(0,count($id_camps)-1)];
+            if($i==1 && $id_camp_premiere !== null){
+                $id_camp = $id_camp_premiere;
+            }
             self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp);
         }
     }
@@ -179,6 +189,9 @@ class Planete {
 
     public function revenuNet(): int {
         $revenu = Batiment::BASE_INCOME + $this->nombre(Batiment::FERME) * Batiment::FERME_INCOME;
+        if($this->gouverneur !== 0 && (new Joueur($this->gouverneur))->enTuto()){
+            return $revenu;
+        }
         foreach(Batiment::CATALOGUE as $batiment => $infos){
             $revenu -= $this->nombre($batiment) * $infos['maintenance'];
         }

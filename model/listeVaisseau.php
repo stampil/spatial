@@ -9,16 +9,19 @@ if(count($posees) === 0 && count($enRoute) === 0){
 }
 
 $planetesParSysteme = array();
-foreach(Planete::liste() as $ligne){
+foreach(Planete::listeVisibles($Joueur->id) as $ligne){
     $planetesParSysteme[$ligne->id_systeme][] = $ligne;
 }
 $options = '';
-foreach(Systeme::liste() as $systeme){
+foreach(Systeme::listeVisibles($Joueur->id) as $systeme){
     $options .= '<optgroup label="'.htmlspecialchars($systeme->nom).'">';
     foreach($planetesParSysteme[$systeme->id] ?? array() as $planete){
         $options .= '<option value="'.(int) $planete->id.'">'.htmlspecialchars($planete->nom).'</option>';
     }
     $options .= '</optgroup>';
+}
+if($Joueur->id_systeme_voisin !== null && !Decouverte::existe($Joueur->id, $Joueur->id_systeme_voisin)){
+    $options .= '<optgroup label="Secteur inexploré"><option value="'.(int) Planete::liste($Joueur->id_systeme_voisin)[0]->id.'">Système voisin (inconnu)</option></optgroup>';
 }
 
 foreach($posees as $planeteId => $types){

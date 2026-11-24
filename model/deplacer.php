@@ -14,7 +14,7 @@ foreach(Vaisseau::CATALOGUE as $type => $infos){
     }
     $ordres++;
     $erreur = Vaisseau::deplacer($Joueur, $depart, $destination, $type, $nombre);
-    Tools::addMessage($erreur ?? $nombre.' × '.$infos['nom'].' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', Vaisseau::dureeTrajet($type, $depart, $destination)).'.');
+    Tools::addMessage($erreur ?? $nombre.' × '.$infos['nom'].' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', Vaisseau::dureeTrajet($Joueur, $type, $depart, $destination)).'.');
 }
 if($ordres === 0){
     Tools::addMessage('Aucun vaisseau choisi.');

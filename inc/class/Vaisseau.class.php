@@ -5,6 +5,7 @@ class Vaisseau {
     const TRAJET_MEME_SYSTEME_SECONDES = 60;
     const TRAJET_ENTRE_SYSTEMES_SECONDES = 300;
     const PERCENT = 100;
+    const RECONNAISSANCE = 'reconnaissance';
 
     const CATALOGUE = array(
         'chasseur' => array('nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100),
@@ -63,12 +64,12 @@ class Vaisseau {
         return MyPDO::getInstance()->query($query,$joueurId);
     }
 
-    public static function dureeTrajet(string $type, Planete $depart, Planete $destination): int {
+    public static function dureeTrajet(Joueur $joueur, string $type, Planete $depart, Planete $destination): int {
         $base = self::TRAJET_ENTRE_SYSTEMES_SECONDES;
         if($depart->id_systeme === $destination->id_systeme){
             $base = self::TRAJET_MEME_SYSTEME_SECONDES;
         }
-        return intdiv($base * self::CATALOGUE[$type]['vitesse'], self::PERCENT);
+        return $joueur->dureeEffective(intdiv($base * self::CATALOGUE[$type]['vitesse'], self::PERCENT));
     }
 
     public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre): ?string {
@@ -78,13 +79,16 @@ class Vaisseau {
         if($depart->id === $destination->id){
             return 'Les vaisseaux sont déjà sur cette planète.';
         }
+        if(!$joueur->peutCibler($destination->systeme)){
+            return 'Destination inconnue.';
+        }
         $disponibles = self::stock($depart->id, $joueur->id)[$type] ?? 0;
         if($nombre < 1 || $nombre > $disponibles){
             return 'Pas assez de vaisseaux : '.self::CATALOGUE[$type]['nom'].' (disponibles : '.$disponibles.').';
         }
         $db = MyPDO::getInstance();
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL ORDER BY id LIMIT " . $nombre;
-        $db->query($query,$destination->id,Tools::nowPlus(self::dureeTrajet($type, $depart, $destination)),$joueur->id,$depart->id,$type);
+        $db->query($query,$destination->id,Tools::nowPlus(self::dureeTrajet($joueur, $type, $depart, $destination)),$joueur->id,$depart->id,$type);
         if($db->lastRowCount !== $nombre){
             return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[$type]['nom'].'.';
         }
@@ -97,8 +101,13 @@ class Vaisseau {
         foreach($db->query($query,$joueur->id,Tools::now()) as $ligne){
             $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND arrivee IS NOT NULL AND arrivee<=?";
             $db->query($query,$joueur->id,$ligne->id_destination,$ligne->type,Tools::now());
-            if($db->lastRowCount > 0){
-                Tools::addMessage($db->lastRowCount.' × '.self::CATALOGUE[$ligne->type]['nom'].' : arrivée sur '.(new Planete($ligne->id_destination))->nom.'.');
+            $nombre = $db->lastRowCount;
+            if($nombre > 0){
+                $planete = new Planete($ligne->id_destination);
+                Tools::addMessage($nombre.' × '.self::CATALOGUE[$ligne->type]['nom'].' : arrivée sur '.$planete->nom.'.');
+                if($ligne->type === self::RECONNAISSANCE && Decouverte::ajouter($joueur->id, $planete->id_systeme)){
+                    Tools::addMessage('Système '.$planete->systeme->nom.' exploré : '.count($planete->systeme->planetes).' planètes découvertes.');
+                }
             }
         }
     }
@@ -121,7 +130,7 @@ class Vaisseau {
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "production (id_joueur,id_planete,type,fin)
             SELECT ?,?,?,? FROM " . MyPDO::DB_FLAG . "planete
             WHERE id=? AND gouverneur=? AND $usine > (SELECT COUNT(*) FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=? AND type IN ($marques))";
-        $db->query($query,$joueur->id,$planete->id,$type,Tools::nowPlus($infos['duree']),$planete->id,$joueur->id,$planete->id,...$types);
+        $db->query($query,$joueur->id,$planete->id,$type,Tools::nowPlus($joueur->dureeEffective($infos['duree'])),$planete->id,$joueur->id,$planete->id,...$types);
         if($db->lastRowCount !== 1){
             return 'Toutes les usines de ce type sont occupées.';
         }

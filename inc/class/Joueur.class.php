@@ -14,10 +14,12 @@ class Joueur {
     public ?string $credits_maj;
     public int $etape_tuto;
     public int $id_camp;
+    public ?int $id_systeme_voisin;
 
     public string $IPs;
     
-    const TUTO_END_STEP = 2;
+    const TUTO_END_STEP = 5;
+    const TUTO_DIVISEUR_DUREES = 5;
 
     private static int $credits_depart = 500;
     
@@ -37,6 +39,8 @@ class Joueur {
         $id_perso = Perso::create($joueur);
         $perso = new Perso($id_perso);
         Planete::fillSysteme($perso,$systeme);
+        Decouverte::ajouter($joueur->id, $id_systeme);
+        Univers::creerVoisin($joueur);
         
         return $joueur;
     }
@@ -88,6 +92,7 @@ class Joueur {
         $this->mdp = $ret[0]->mdp;
         $this->etape_tuto= $ret[0]->etape_tuto;
         $this->id_camp = $ret[0]->id_camp;
+        $this->id_systeme_voisin = $ret[0]->id_systeme_voisin;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 
@@ -167,6 +172,7 @@ class Joueur {
         }
         Vaisseau::resolveProduction($this);
         Vaisseau::resolveArrivees($this);
+        Tuto::avancer($this);
         foreach(Perso::liste($this) as $ligne){
             (new Perso($ligne->id))->resolve($this);
         }
@@ -181,6 +187,21 @@ class Joueur {
         return new Perso($ret[0]->id);
     
     }
+    public function enTuto(): bool {
+        return $this->etape_tuto < self::TUTO_END_STEP;
+    }
+
+    public function dureeEffective(int $secondes): int {
+        if($this->enTuto()){
+            return intdiv($secondes, self::TUTO_DIVISEUR_DUREES);
+        }
+        return $secondes;
+    }
+
+    public function peutCibler(Systeme $systeme): bool {
+        return $systeme->estConnuDe($this->id) || $systeme->id === $this->id_systeme_voisin;
+    }
+
     public function ouvrirSession(): void {
         session_regenerate_id(true);
         $_SESSION['Sid'] = $this->id;

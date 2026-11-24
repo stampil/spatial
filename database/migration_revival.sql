@@ -9,7 +9,8 @@ ALTER TABLE `planete`
 
 ALTER TABLE `joueur`
   ADD COLUMN `credits_maj` datetime DEFAULT NULL AFTER `lastco`,
-  ADD COLUMN `id_camp` int(11) NOT NULL AFTER `credits_maj`;
+  ADD COLUMN `id_camp` int(11) NOT NULL AFTER `credits_maj`,
+  ADD COLUMN `id_systeme_voisin` int(11) DEFAULT NULL AFTER `id_camp`;
 
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -50,10 +51,18 @@ INSERT INTO `camp` (`id`, `nom`, `histoire`, `jouable`, `couleur`) VALUES
 (2, 'Empire', 'Un ordre ancien qui a unifié les systèmes par la force de ses flottes. Son industrie de masse produit unités et ressources à moindre coût, mais ses bannières flottent sur chaque planète conquise : l''Empire est toujours visible sur la carte.', 1, '#1565C0'),
 (3, 'Rébellion', 'Des planètes lassées de l''ordre impérial, des mutins et des ingénieurs libres ont choisi la discrétion. Incapable de rivaliser en nombre, la Rébellion gagne en restant invisible tant qu''on ne l''a pas découverte.', 1, '#2E7D32');
 
+CREATE TABLE IF NOT EXISTS `decouverte` (
+  `id_joueur` int(11) NOT NULL,
+  `id_systeme` int(11) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id_joueur`,`id_systeme`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(64) NOT NULL,
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `schema_migrations` (`version`) VALUES
-('001_vaisseau_deplacement');
+('001_vaisseau_deplacement'),
+('002_exploration');

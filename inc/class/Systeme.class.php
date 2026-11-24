@@ -5,6 +5,7 @@ class Systeme {
     private MyPDO $bdd;
     public int $id;
     public string $nom;
+    public bool $visible;
     public array $planetes;
     private static array $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","Mu","Nu","Ksi","Omicron","Pi",
         "Rho","Sigma","Tau","Upsilon","Phi","Chi","Psi","Omega");
@@ -15,6 +16,12 @@ class Systeme {
                 FROM " . MyPDO::DB_FLAG . "systeme ";
         $ret = MyPDO::getInstance()->query($query);
         return $ret;
+    }
+
+    public static function listeVisibles(int $joueurId): array {
+        $query = "SELECT * FROM " . MyPDO::DB_FLAG . "systeme
+                WHERE visible=1 OR id IN (SELECT id_systeme FROM " . MyPDO::DB_FLAG . "decouverte WHERE id_joueur=?)";
+        return MyPDO::getInstance()->query($query,$joueurId);
     }
 
     /**
@@ -38,6 +45,7 @@ class Systeme {
         }
         
         $this->nom = $ret[0]->nom;
+        $this->visible = (bool) $ret[0]->visible;
         $this->id = $ret[0]->id;
         $this->planetes = Planete::liste($this->id);
         return $this;
@@ -54,7 +62,7 @@ class Systeme {
                 );
     }
     
-     public static function create(): int {
+     public static function create(bool $visible = false): int {
         $systemes = self::liste();
         
         $Noms = array();
@@ -67,13 +75,17 @@ class Systeme {
             $nom = self::$noms[rand(0,count(self::$noms)-1)].'-'.rand(1000,9999);
         }while(in_array($nom, $Noms));
          
-         $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom,visible,creato) VALUES(?,0,now()) ";
-        MyPDO::getInstance()->query($query,$nom); //nom vide a la charge du joueur de le renommer la premiere fois
+         $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom,visible,creato) VALUES(?,?,now()) ";
+        MyPDO::getInstance()->query($query,$nom,(int) $visible); //nom vide a la charge du joueur de le renommer la premiere fois
         
         return MyPDO::getInstance()->lastInsertId();
          
      }
      
+    public function estConnuDe(int $joueurId): bool {
+        return $this->visible || Decouverte::existe($joueurId, $this->id);
+    }
+
     public function getIdCamp(): ?int {
         $comptes = array();
         foreach($this->planetes as $planete){

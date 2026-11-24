@@ -16,7 +16,7 @@ switch($etape){
 ?>
 
 <?php
-if($Joueur->etape_tuto >= Joueur::TUTO_END_STEP){
+if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
     $revenu = $Joueur->revenuNet();
     $Camp = $Joueur->getCamp();
 ?>

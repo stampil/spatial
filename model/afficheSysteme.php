@@ -7,6 +7,9 @@ else{
 }
 
 $s = new Systeme($id_systeme);
+if(!$s->estConnuDe($Joueur->id)){
+    throw new UnexpectedValueException("Ce système est inconnu.");
+}
 
 echo $s->nom?$s->getNom():'Système'.$s->id;
 

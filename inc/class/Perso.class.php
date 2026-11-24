@@ -196,10 +196,10 @@ class Perso {
             return;
         }
         Tools::addMessage('Vous gouvernez maintenant '.$planete->nom.'.');
-        if($joueur->etape_tuto < Joueur::TUTO_END_STEP){
-            $joueur->etape_tuto = Joueur::TUTO_END_STEP;
+        if($joueur->etape_tuto < Tuto::ETAPE_USINE){
+            $joueur->etape_tuto = Tuto::ETAPE_USINE;
             $joueur->save();
-            Tools::addMessage('Le tutoriel est terminé.');
+            Tools::addMessage('Tutoriel : votre première planète est conquise.');
         }
     }
 

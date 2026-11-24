@@ -7,6 +7,9 @@ else{
 }
 
 $p = new Planete($id_planete);
+if(!$p->systeme->estConnuDe($Joueur->id)){
+    throw new UnexpectedValueException("Cette planète est inconnue.");
+}
 //$p->perc_revolte++;
 echo '<p>'.($p->nom?$p->getNom():'planète sans nom').' du système '.($p->systeme->nom?$p->systeme->getNom():'sans nom').' révoltée à '.$p->perc_revolte.' %  slot : '.$p->slot.'</p>';
 echo '<p>Gouverneur : '.$p->getGouverneurNom().'</p>';

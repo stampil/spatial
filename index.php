@@ -74,6 +74,9 @@ if(!empty($_SESSION['Sid'])){
     <?php require 'inc/menu.php'; ?>
     <main class="md3-page">
     <?php
+    if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE && $Joueur->enTuto()){
+        require 'inc/tuto.php';
+    }
     foreach(Tools::takeMessages() as $message){
         Tools::show_info_html($message);
     }
