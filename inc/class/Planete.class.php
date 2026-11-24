@@ -281,7 +281,7 @@ class Planete {
     }
 
 public function getNom(): string {
-    return '<a target="_blank" href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.htmlspecialchars($this->nom).'</a>';
+    return '<a target="_blank" href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->id_camp);
 }
     
 }

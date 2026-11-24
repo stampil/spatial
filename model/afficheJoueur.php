@@ -8,8 +8,7 @@ else{
 
 $j = new Joueur($id_joueur);
 //$j->credits++;
-echo '<p>'.htmlspecialchars($j->nom).' '.$j->credits.'$</p>';
-echo '<p>Camp : '.Camp::libelle($j->id_camp).'</p>';
+echo '<p>'.$j->getNom().' '.$j->credits.'$</p>';
 
 ?>
 

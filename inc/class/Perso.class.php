@@ -113,7 +113,7 @@ class Perso {
     }
     
     public function getNom(): string {
-        return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a>';
+        return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->joueur->id_camp);
     }  
     
     public function getDiplomatie(): string {

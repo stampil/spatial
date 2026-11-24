@@ -98,7 +98,7 @@ class Systeme {
     }
 
     public function getNom(): string {
-        return '<a target="_blank" href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a>';
+        return '<a target="_blank" href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->getIdCamp());
     }     
         
 }
