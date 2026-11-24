@@ -18,9 +18,23 @@ class Perso {
     const ROLE_HEROS = 'heros';
     const ROLE_ASSASSIN = 'assassin';
     const ROLES = array(
-        self::ROLE_DIPLOMATE => array('nom' => 'Diplomate', 'prix' => 100),
-        self::ROLE_HEROS => array('nom' => 'Héros', 'prix' => 300),
-        self::ROLE_ASSASSIN => array('nom' => 'Assassin', 'prix' => 200),
+        self::ROLE_DIPLOMATE => array('nom' => 'Diplomate', 'icone' => 'diplomatie', 'prix' => 100),
+        self::ROLE_HEROS => array('nom' => 'Héros', 'icone' => 'heros', 'prix' => 300),
+        self::ROLE_ASSASSIN => array('nom' => 'Assassin', 'icone' => 'assassin', 'prix' => 200),
+    );
+    const ETAT_MORT = 'mort';
+    const ETAT_PRISON = 'prison';
+    const ETAT_VOYAGE = 'voyage';
+    const ETAT_EMBARQUE = 'embarque';
+    const ETAT_MISSION = 'mission';
+    const ETAT_LIBRE = 'libre';
+    const ETATS = array(
+        self::ETAT_MORT => array('libelle' => 'Tué', 'variante' => 'alerte'),
+        self::ETAT_PRISON => array('libelle' => 'Emprisonné', 'variante' => 'alerte'),
+        self::ETAT_VOYAGE => array('libelle' => 'En voyage', 'variante' => ''),
+        self::ETAT_EMBARQUE => array('libelle' => 'Embarqué', 'variante' => ''),
+        self::ETAT_MISSION => array('libelle' => 'En mission', 'variante' => ''),
+        self::ETAT_LIBRE => array('libelle' => 'Libre', 'variante' => 'ok'),
     );
     const CARACTERISTIQUE_FORCE = 'FO';
     const CARACTERISTIQUE_DIPLOMATIE = 'diplomatie';
@@ -187,12 +201,28 @@ class Perso {
     }
 
     public function getNom(): string {
-        return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->joueur->id_camp);
+        return '<a href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->joueur->id_camp);
     }  
     
-    public function getDiplomatie(): string {
-        return $this->getStats($this->diplomatie);
+    public function etat(): string {
+        if($this->fin_mort !== null){
+            return self::ETAT_MORT;
+        }
+        if($this->isImprisoned()){
+            return self::ETAT_PRISON;
+        }
+        if($this->arrivee !== null){
+            return self::ETAT_VOYAGE;
+        }
+        if($this->embarque){
+            return self::ETAT_EMBARQUE;
+        }
+        if($this->action_diplomatie !== null){
+            return self::ETAT_MISSION;
+        }
+        return self::ETAT_LIBRE;
     }
+
     public function isImprisoned(): bool {
         return !Tools::isFinCompteRebours($this->fin_prison);
     }
@@ -358,28 +388,5 @@ class Perso {
             Tools::addMessage('Un nouveau perso, '.$this->nom.', est arrivé.');
         }
     }
-    
-    public function getFO(): string {
-        return $this->getStats($this->FO);
-    }
-    
-     public function getPV(): string {
-        return $this->getStats($this->PV);
-    }   
-    
-    
-    private function getStats(int $stat): string {
-        $ret = '<span class="star">';
-        for($i=0;$i<$stat;$i++){
-            $ret.='★';
-        }
-        for($i=$stat;$i<self::MAX_STARS;$i++){
-            $ret.='☆';
-        }
-        $ret.='</span>';
-        return $ret;
-    }
-    
-    
-    
+
 }

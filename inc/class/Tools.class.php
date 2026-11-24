@@ -33,6 +33,9 @@ class Tools {
     
     public static function addMessage(string $message): void{
         $_SESSION[MESSAGES_KEY][] = $message;
+        if(!empty($_SESSION['Sid'])){
+            Journal::ajouter((int) $_SESSION['Sid'], $message);
+        }
     }
     
     public static function takeMessages(): array{

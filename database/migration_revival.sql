@@ -83,6 +83,15 @@ CREATE TABLE IF NOT EXISTS `decouverte` (
   PRIMARY KEY (`id_joueur`,`id_systeme`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `journal` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(64) NOT NULL,
   PRIMARY KEY (`version`)
@@ -97,7 +106,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('006_flottes'),
 ('007_persos_transport'),
 ('008_roles'),
-('009_carte');
+('009_carte'),
+('010_journal');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

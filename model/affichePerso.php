@@ -7,65 +7,76 @@ else{
 }
 
 $o = new Perso($id);
-
+$couleur = (new Camp($o->joueur->id_camp))->couleur;
+$etat = Perso::ETATS[$o->etat()];
 ?>
 
 <?php
 if($Joueur->etape_tuto==1){
 ?>
-Voici les caractéristiques de votre perso.<br>
-Il a <?= $o->diplomatie ?>/<?= Perso::MAX_STARS ?> étoile<?= $o->diplomatie > 1 ? 's' : '' ?> en diplomatie<br>
-Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions.<br />
-Dans ce tuto, nous n'irons pas dans ces extrêmes.<br/>
-Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra
-<br />
+<details class="mission" open>
+    <summary><?= Icone::html('mission') ?>Mission : les caractéristiques de votre perso</summary>
+    <p class="mission__texte">Il a <?= $o->diplomatie ?>/<?= Perso::MAX_STARS ?> étoile<?= $o->diplomatie > 1 ? 's' : '' ?> en diplomatie. Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions. Dans ce tuto, nous n'irons pas dans ces extrêmes. Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra.</p>
+</details>
 <?php   
 }
 ?>
 
-<?= $o->getNom() ?><br>
-Force : <?= $o->getFO() ?><br />
-Endurance : <?= $o->getPV() ?><br />
-Diplomatie : <?= $o->getDiplomatie() ?><br />
-Rôle : <?= $o->getRole() ?><br />
+<section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
+    <div class="fiche__tete">
+        <div class="avatar" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Icone::html(Perso::ROLES[$o->role]['icone']) ?></div>
+        <div>
+            <h1 class="fiche__nom"><?= htmlspecialchars($o->nom) ?></h1>
+            <div class="pastilles">
+                <?= Vue::pastille($o->getRole()) ?>
+                <?= Vue::pastille($etat['libelle'], $etat['variante']) ?>
+            </div>
+        </div>
+    </div>
+    <?= Vue::jauge('Force', $o->FO, Perso::MAX_STARS, 'force') ?>
+    <?= Vue::jauge('Endurance', $o->PV, Perso::MAX_STARS, 'endurance') ?>
+    <?= Vue::jauge('Diplomatie', $o->diplomatie, Perso::MAX_STARS, 'diplomatie') ?>
+</section>
 
-<br />
-Statut :<br />
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('info') ?>Statut</h2>
 <?php
 if($o->fin_mort !== null){
 ?>
-Tué : réapparaît dans <span data-countdown="<?= htmlspecialchars($o->fin_mort) ?>"></span><br>
+<p>Tué : réapparaît dans <span data-countdown="<?= htmlspecialchars($o->fin_mort) ?>"></span></p>
 <?php
 }
 elseif($o->isImprisoned()){
 ?>
-Emprisonné : libéré dans <span data-countdown="<?= htmlspecialchars($o->fin_prison) ?>"></span><br>
+<p>Emprisonné : libéré dans <span data-countdown="<?= htmlspecialchars($o->fin_prison) ?>"></span></p>
 <?php
 }
 elseif($o->arrivee !== null){
     $destination = new Planete($o->id_destination);
 ?>
-En voyage vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?> : arrivée dans <span data-countdown="<?= htmlspecialchars($o->arrivee) ?>"></span><br>
+<p>En voyage vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?> : arrivée dans <span data-countdown="<?= htmlspecialchars($o->arrivee) ?>"></span></p>
 <?php
 }
 elseif($o->embarque){
 ?>
-Embarqué sur <?= $o->sur_planete->getNom() ?> : il partira avec le prochain transport personnel.<br>
+<p>Embarqué sur <?= $o->sur_planete->getNom() ?> : il partira avec le prochain transport personnel.</p>
 <?php
 }
 elseif($o->action_diplomatie !== null){
 ?>
-Fin de la diplomatie : <span data-countdown="<?= htmlspecialchars($o->fin_diplomatie) ?>"></span><br>
+<p>Fin de la diplomatie : <span data-countdown="<?= htmlspecialchars($o->fin_diplomatie) ?>"></span></p>
 <?php
 }
 else{
 ?>
-Libre<br>
+<p>Libre<?= $o->sur_planete !== null ? ' sur '.$o->sur_planete->getNom() : '' ?></p>
 <?php
 }
 ?>
-<br />
-Action :<br />
+</section>
+
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('actions') ?>Actions</h2>
 <?php
 if($o->canAct()){
     $planete = $o->sur_planete;
@@ -139,4 +150,10 @@ elseif($o->embarque){
 </form>
 <?php
 }
+else{
 ?>
+<p class="md3-secondary">Aucune action possible pour l'instant.</p>
+<?php
+}
+?>
+</section>

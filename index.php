@@ -50,9 +50,9 @@ if(!empty($_SESSION['Sid'])){
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500&display=swap">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
         <link rel="stylesheet" href="css/main.css" type="text/css">
         <link rel="stylesheet" href="css/md3.css" type="text/css">
+        <link rel="stylesheet" href="css/jeu.css" type="text/css">
         <?php
         if(is_file('css/'.$p.'.css')){
         ?>
@@ -68,19 +68,27 @@ if(!empty($_SESSION['Sid'])){
         ?>
             <script src="js/<?=$p?>.js" defer></script>
         <?php } ?>
-        <title>
-            <?php echo $p; ?>
-        </title> 
+        <title><?= htmlspecialchars(APP_TITLE.(isset(PAGES_TITRES[$p]) ? ' · '.PAGES_TITRES[$p] : '')) ?></title>
     </head>
     <body<?= isset($Joueur) && $Joueur->etape_tuto != 0 ? ' class="md3-avec-barre"' : '' ?>>
-    <?php require 'inc/menu.php'; ?>
+    <?php
+    require 'inc/menu.php';
+    if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE){
+        require 'inc/hud.php';
+    }
+    ?>
     <main class="md3-page">
     <?php
     if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE && $Joueur->enTuto()){
         require 'inc/tuto.php';
     }
-    foreach(Tools::takeMessages() as $message){
-        Tools::show_info_html($message);
+    $messages = Tools::takeMessages();
+    if(count($messages) > 0){
+        echo '<div class="messages" role="status" aria-live="polite">';
+        foreach($messages as $message){
+            Tools::show_info_html($message);
+        }
+        echo '</div>';
     }
     foreach(Tools::takeRapports() as $rapport){
         require 'inc/rapport.php';
@@ -95,7 +103,7 @@ if(!empty($_SESSION['Sid'])){
         }
     }
     catch(UnexpectedValueException $exception){
-        echo $exception->getMessage();
+        Tools::show_error_html($exception->getMessage());
     }
     ?>
     </main>

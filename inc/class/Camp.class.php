@@ -8,6 +8,11 @@ class Camp {
     const DISCRETS = array(self::PIRATES, self::REBELLION);
     const EMPIRE_REMISE_POURCENT = 20;
     const PERCENT = 100;
+    const AVANTAGES = array(
+        self::PIRATES => 'Détourne les ressources des planètes sans les conquérir.',
+        self::EMPIRE => 'Unités à -%d %%, toujours visible sur la carte.',
+        self::REBELLION => 'Invisible sur la carte tant qu\'on ne l\'a pas découverte.',
+    );
     const SANS_CAMP_NOM = 'Sans camp';
     const SANS_CAMP_COULEUR = '#79747E';
 
@@ -77,6 +82,10 @@ class Camp {
             $couleur = $camp->couleur;
         }
         return '<span class="md3-camp-dot" style="background-color:'.htmlspecialchars($couleur).'"></span> '.htmlspecialchars($nom);
+    }
+
+    public function avantage(): string {
+        return sprintf(self::AVANTAGES[$this->id], self::EMPIRE_REMISE_POURCENT);
     }
 
     public function adversaires(): array {

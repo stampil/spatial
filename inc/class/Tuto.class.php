@@ -87,6 +87,24 @@ class Tuto {
         return new Planete(MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin)[0]->id);
     }
 
+    public static function titre(Joueur $joueur): string {
+        switch($joueur->etape_tuto){
+            case self::ETAPE_USINE:
+                return 'Construire une usine';
+            case self::ETAPE_RECONNAISSANCE:
+                return 'Produire un vaisseau de reconnaissance';
+            case self::ETAPE_EXPLORATION:
+                return 'Explorer le système voisin';
+            case self::ETAPE_PREPARATION:
+                return 'Préparer l\'assaut';
+            case self::ETAPE_ENVOI:
+                return 'Envoyer la flotte';
+            case self::ETAPE_ASSAUT:
+                return 'Prendre la planète pirate';
+        }
+        return '';
+    }
+
     public static function texte(Joueur $joueur): string {
         $idPlanete = Planete::premiereGouvernee($joueur->id);
         if($idPlanete === null){
@@ -99,11 +117,11 @@ class Tuto {
             case self::ETAPE_RECONNAISSANCE:
                 return 'Sur la fiche de '.$planete->getNom().', l\'usine de vaisseaux légers peut produire un vaisseau de reconnaissance. Lancez sa production : pendant le tutoriel, les durées sont divisées par '.Joueur::TUTO_DIVISEUR_DUREES.'.';
             case self::ETAPE_EXPLORATION:
-                return 'Un système voisin, encore inconnu, existe près du vôtre. Dans l\'onglet <a href="?p=listeVaisseau">Vaisseaux</a>, choisissez votre vaisseau de reconnaissance, la destination « Système voisin (inconnu) », puis envoyez-le : à son arrivée, le système sera exploré.';
+                return 'Un système voisin, encore inconnu, existe près du vôtre : sur la <a href="?p=carte">carte</a>, c\'est le cercle en pointillés. Touchez votre système, puis « Envoyer » pour votre vaisseau de reconnaissance, touchez le secteur inconnu et « Envoyer ici » : à son arrivée, le système sera exploré.';
             case self::ETAPE_PREPARATION:
                 return 'Le système voisin est exploré : sa planète '.self::planeteCible($joueur)->getNom().' est aux mains des Pirates. Préparez l\'assaut sur la fiche de '.$planete->getNom().' : construisez une usine de vaisseaux moyens et une académie, puis produisez '.self::BARGES_REQUISES.' barge de débarquement, '.self::TROUPES_REQUISES.' troupes d\'assaut et '.self::CHASSEURS_REQUIS.' chasseurs.';
             case self::ETAPE_ENVOI:
-                return 'Dans l\'onglet <a href="?p=listeVaisseau">Vaisseaux</a>, envoyez vos chasseurs, la barge et les troupes sur '.self::planeteCible($joueur)->getNom().' (une barge transporte '.Vaisseau::CAPACITE_BARGE.' troupes) : choisissez-la comme destination.';
+                return 'Sur la <a href="?p=carte">carte</a>, touchez votre système, gardez vos chasseurs, la barge et les troupes puis « Envoyer ». Touchez ensuite le système voisin et « Envoyer ici » sur '.self::planeteCible($joueur)->getNom().' (une barge transporte '.Vaisseau::CAPACITE_BARGE.' troupes).';
             case self::ETAPE_ASSAUT:
                 return 'Votre flotte est arrivée. Ouvrez la fiche de '.self::planeteCible($joueur)->getNom().' : attaquez avec vos vaisseaux pour détruire sa défense, puis débarquez vos troupes. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
         }

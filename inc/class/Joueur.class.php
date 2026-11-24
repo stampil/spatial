@@ -245,7 +245,7 @@ class Joueur {
     }
 
     public function getNom(): string {
-        return '<a target="_blank" href="?p=afficheJoueur&id_joueur='.$this->id.'" class="nomJoueur">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->id_camp);
+        return '<a href="?p=afficheJoueur&id_joueur='.$this->id.'" class="nomJoueur">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->id_camp);
     }  
        
 }

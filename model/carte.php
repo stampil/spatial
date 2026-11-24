@@ -25,4 +25,8 @@
         <div class="carte__feuille-corps" id="carte-feuille-corps"></div>
     </aside>
 </div>
-<script type="application/json" id="carte-donnees"><?= json_encode(Carte::donnees($Joueur), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>
+<?php
+$donnees = Carte::donnees($Joueur);
+$donnees['focus'] = isset($_GET['systeme']) ? (int) $_GET['systeme'] : null;
+?>
+<script type="application/json" id="carte-donnees"><?= json_encode($donnees, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>

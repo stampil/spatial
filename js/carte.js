@@ -31,7 +31,6 @@
     const MODULE_ALEATOIRE = 2147483648;
     const DELAI_RECHARGE_MIN = 5000;
     const MILLISECONDES = 1000;
-    const DELAI_MESSAGE = 8000;
     const SECONDES_MINUTE = 60;
     const SECONDES_HEURE = 3600;
     const TYPE_TROUPE = 'troupe_assaut';
@@ -745,11 +744,11 @@
         return DONNEES.base !== null && positions[DONNEES.base] !== undefined;
     }
 
-    function centrerSurBase(echelle) {
+    function centrerSur(identifiant, echelle) {
         const dimensions = taille();
         vue.echelle = echelle;
-        vue.x = dimensions.largeur / 2 - positions[DONNEES.base].x * echelle;
-        vue.y = dimensions.hauteur / 2 - positions[DONNEES.base].y * echelle;
+        vue.x = dimensions.largeur / 2 - positions[identifiant].x * echelle;
+        vue.y = dimensions.hauteur / 2 - positions[identifiant].y * echelle;
         appliquerVue();
     }
 
@@ -769,7 +768,7 @@
     document.getElementById('carte-zoom-arriere').addEventListener('click', () => zoomerAuCentre(1 / PAS_ZOOM));
     document.getElementById('carte-base').addEventListener('click', () => {
         if (baseConnue()) {
-            centrerSurBase(ECHELLE_BASE);
+            centrerSur(DONNEES.base, ECHELLE_BASE);
         } else {
             ajuster(toutesLesPositions(), ECHELLE_AJUSTEMENT_MAX);
         }
@@ -788,25 +787,28 @@
         }
     });
 
-    document.querySelectorAll('main > .md3-alert').forEach((message) => {
-        const retirer = () => message.remove();
-        message.addEventListener('click', retirer);
-        setTimeout(retirer, DELAI_MESSAGE);
-    });
-
     if (DONNEES.enRoute.length > 0) {
         boutonTrajets.hidden = false;
         boutonTrajets.textContent = 'Flottes en route (' + DONNEES.enRoute.length + ')';
         boutonTrajets.addEventListener('click', ouvrirTrajets);
     }
 
+    let dimensionsPrecedentes = taille();
     window.addEventListener('resize', () => {
+        const dimensions = taille();
+        vue.x += (dimensions.largeur - dimensionsPrecedentes.largeur) / 2;
+        vue.y += (dimensions.hauteur - dimensionsPrecedentes.hauteur) / 2;
+        dimensionsPrecedentes = dimensions;
         appliquerVue();
     });
 
     ajuster(toutesLesPositions(), ECHELLE_AJUSTEMENT_MAX);
     if (vue.echelle < ECHELLE_LISIBLE && baseConnue()) {
-        centrerSurBase(ECHELLE_DEPART);
+        centrerSur(DONNEES.base, ECHELLE_DEPART);
+    }
+    if (DONNEES.focus !== null && systemes[DONNEES.focus]) {
+        centrerSur(DONNEES.focus, ECHELLE_BASE);
+        ouvrirSysteme(DONNEES.focus);
     }
     tic();
     setInterval(tic, MILLISECONDES);

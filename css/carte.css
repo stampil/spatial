@@ -15,9 +15,8 @@ main.md3-page {
     padding: 0;
 }
 
-main.md3-page > .md3-alert,
-main.md3-page > .md3-card {
-    margin: 8px 16px 0;
+main.md3-page > .mission {
+    margin: 8px 16px;
 }
 
 .carte {

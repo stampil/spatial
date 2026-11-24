@@ -5,21 +5,25 @@
     }
 ?>
 
-<h1>Inscription</h1>
+<h1 class="titre-vue"><?= Icone::html('inscription') ?>Inscription</h1>
 
 <form method="POST" action="index.php?p=inscrire">
 
 
+<div class="formulaire">
 <div class="md3-field"><label for="email">Email *</label><input type="email" id="email" name="email" required /></div>
 <div class="md3-field"><label for="nom">Nom du joueur *</label><input type="text" id="nom" name="nom" required /></div>
 <div class="md3-field"><label for="mdp">Mot de passe *</label><input type="password" id="mdp" name="mdp" required minlength="<?= PASSWORD_MIN_LENGTH ?>"/></div>
-<fieldset class="md3-choices">
+</div>
+<fieldset class="factions">
 <legend>Camp *</legend>
-<?php foreach(Camp::listeJouables() as $ligne){ ?>
-<label class="md3-choice">
-<input type="radio" name="camp" value="<?= (int) $ligne->id ?>" required />
-<span class="md3-choice__nom"><?= htmlspecialchars($ligne->nom) ?></span>
-<span class="md3-secondary"><?= htmlspecialchars($ligne->histoire) ?></span>
+<?php foreach(Camp::listeJouables() as $ligne){ $camp = new Camp($ligne->id); ?>
+<label class="faction" style="--accent:<?= htmlspecialchars($camp->couleur) ?>">
+<input type="radio" name="camp" value="<?= $camp->id ?>" required />
+<?= Vue::emblemeCamp($camp->id, 48) ?>
+<span class="faction__nom"><?= htmlspecialchars($camp->nom) ?></span>
+<span class="md3-secondary"><?= htmlspecialchars($camp->histoire) ?></span>
+<span class="faction__avantage"><?= htmlspecialchars($camp->avantage()) ?></span>
 </label>
 <?php } ?>
 </fieldset>

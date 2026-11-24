@@ -1,57 +1,57 @@
+<h1 class="titre-vue"><?= Icone::html('fusee') ?>Flottes</h1>
 <?php
 $posees = Vaisseau::posees($Joueur->id);
 $enRoute = Vaisseau::enRoute($Joueur->id);
 $flottes = Flotte::liste($Joueur->id);
+$gouvernees = Planete::listeGouvernees($Joueur->id);
 
 if(count($posees) === 0 && count($enRoute) === 0 && count($flottes) === 0){
 ?>
 <p class="md3-secondary">Vous n'avez aucun vaisseau. Construisez une usine sur une planète que vous gouvernez pour en produire.</p>
 <?php
 }
+?>
+<p><a class="md3-button md3-button--tonal" href="?p=carte">Donner des ordres sur la carte</a></p>
+<?php
+foreach($flottes as $ligne){
+    $flotte = new Flotte($ligne->id);
+    $auRepos = $flotte->planeteAuRepos();
+    $trajet = $flotte->enRoute();
+?>
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('persos') ?>Flotte <?= htmlspecialchars($flotte->nom) ?></h2>
+    <?= Vue::composition($flotte->composition()) ?>
+    <?php if($auRepos !== null){ $planete = new Planete($auRepos); ?>
+    <p>Au repos sur <?= $planete->getNom() ?></p>
+    <div class="md3-actions">
+        <a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a>
+        <form method="POST" action="?p=gererFlotte">
+            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+            <input type="hidden" name="action" value="dissoudre" />
+            <?= csrfField() ?>
+            <input type="submit" class="md3-button md3-button--outlined" value="Dissoudre la flotte" />
+        </form>
+    </div>
+    <?php } elseif($trajet !== null){ ?>
+    <?php $destination = new Planete($trajet->id_destination); ?>
+    <p class="md3-secondary">De <?= (new Planete($trajet->id_planete))->getNom() ?> vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?></p>
+    <?php if($trajet->depart !== null){ ?>
+    <?= Vue::progression('Trajet', strtotime($trajet->arrivee) - time(), strtotime($trajet->arrivee) - strtotime($trajet->depart), 'fusee') ?>
+    <?php } else { ?>
+    <p>Arrivée dans <span data-countdown="<?= htmlspecialchars($trajet->arrivee) ?>"></span></p>
+    <?php } ?>
+    <?php } ?>
+</section>
+<?php } ?>
 
-$planetesParSysteme = array();
-foreach(Planete::listeVisibles($Joueur->id) as $ligne){
-    $planetesParSysteme[$ligne->id_systeme][] = $ligne;
-}
-$options = '';
-foreach(Systeme::listeVisibles($Joueur->id) as $systeme){
-    $options .= '<optgroup label="'.htmlspecialchars($systeme->nom).'">';
-    foreach($planetesParSysteme[$systeme->id] ?? array() as $planete){
-        $options .= '<option value="'.(int) $planete->id.'">'.htmlspecialchars($planete->nom).'</option>';
-    }
-    $options .= '</optgroup>';
-}
-if($Joueur->id_systeme_voisin !== null && !Decouverte::existe($Joueur->id, $Joueur->id_systeme_voisin)){
-    $options .= '<optgroup label="Secteur inexploré"><option value="'.(int) Planete::liste($Joueur->id_systeme_voisin)[0]->id.'">Système voisin (inconnu)</option></optgroup>';
-}
-$optionExploration = '';
-if(count(Systeme::explorables($Joueur->id)) > 0){
-    $optionExploration = '<optgroup label="Exploration"><option value="'.Vaisseau::DESTINATION_EXPLORATION.'">Explorer un secteur inconnu (reconnaissance)</option></optgroup>';
-}
-
+<?php
 foreach($posees as $planeteId => $types){
     $planete = new Planete($planeteId);
+    $escadre = array_intersect_key($types, array_flip(Combat::ESCADRE));
 ?>
-<section class="md3-card">
-    <h2><?= $planete->getNom() ?></h2>
-    <form method="POST" action="?p=deplacer">
-        <input type="hidden" name="depart" value="<?= $planete->id ?>" />
-        <?= csrfField() ?>
-        <?php foreach($types as $type => $nombre){ ?>
-        <div class="md3-row">
-            <div><strong><?= Vaisseau::CATALOGUE[$type]['nom'] ?></strong> × <?= $nombre ?></div>
-            <input type="number" class="md3-number" name="nombre[<?= $type ?>]" min="0" max="<?= $nombre ?>" value="0" aria-label="Nombre à envoyer" />
-        </div>
-        <?php } ?>
-        <div class="md3-row">
-            <select class="md3-select" name="destination" required aria-label="Destination">
-                <option value="" disabled selected>Destination</option>
-                <?= $options ?>
-                <?= $optionExploration ?>
-            </select>
-            <input type="submit" value="Envoyer" />
-        </div>
-    </form>
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
+    <?= Vue::composition($types) ?>
     <?php if(($types[Vaisseau::TRANSPORT_PERSO] ?? 0) > 0){ ?>
     <?php
     $embarques = array();
@@ -61,81 +61,61 @@ foreach($posees as $planeteId => $types){
     ?>
     <p class="md3-secondary">Persos embarqués (<?= count($embarques) ?>/<?= $types[Vaisseau::TRANSPORT_PERSO] * Vaisseau::CAPACITE_TRANSPORT_PERSO ?>) : <?= count($embarques) > 0 ? implode(', ', $embarques) : 'aucun' ?>. Ils partent avec le transport.</p>
     <?php } ?>
-    <?php $escadre = array_intersect_key($types, array_flip(Combat::ESCADRE)); ?>
+    <p><a href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a></p>
     <?php if(count($escadre) > 0){ ?>
-    <form method="POST" action="?p=creerFlotte">
-        <input type="hidden" name="planete" value="<?= $planete->id ?>" />
-        <?= csrfField() ?>
-        <?php foreach($escadre as $type => $nombre){ ?>
-        <div class="md3-row">
-            <div><strong><?= Vaisseau::CATALOGUE[$type]['nom'] ?></strong> × <?= $nombre ?></div>
-            <input type="number" class="md3-number" name="nombre[<?= $type ?>]" min="0" max="<?= $nombre ?>" value="0" aria-label="Nombre dans la flotte" />
-        </div>
-        <?php } ?>
-        <div class="md3-row">
-            <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" placeholder="Nom de la flotte" required aria-label="Nom de la flotte" />
-            <input type="submit" class="md3-button md3-button--tonal" value="Créer une flotte" />
-        </div>
-    </form>
-    <?php } ?>
-</section>
-<?php } ?>
-
-<?php
-foreach($flottes as $ligne){
-    $flotte = new Flotte($ligne->id);
-    $composition = array();
-    foreach($flotte->composition() as $type => $nombre){
-        array_push($composition, $nombre.' × '.Vaisseau::CATALOGUE[$type]['nom']);
-    }
-    $auRepos = $flotte->planeteAuRepos();
-    $trajet = $flotte->enRoute();
-?>
-<section class="md3-card">
-    <h2>Flotte <?= htmlspecialchars($flotte->nom) ?></h2>
-    <p class="md3-secondary"><?= implode(', ', $composition) ?></p>
-    <?php if($auRepos !== null){ ?>
-    <p>Sur <?= (new Planete($auRepos))->getNom() ?></p>
-    <form method="POST" action="?p=gererFlotte">
-        <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
-        <input type="hidden" name="action" value="envoyer" />
-        <?= csrfField() ?>
-        <div class="md3-row">
-            <select class="md3-select" name="destination" required aria-label="Destination">
-                <option value="" disabled selected>Destination</option>
-                <?= $options ?>
-            </select>
-            <input type="submit" value="Envoyer la flotte" />
-        </div>
-    </form>
-    <form method="POST" action="?p=gererFlotte">
-        <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
-        <input type="hidden" name="action" value="dissoudre" />
-        <?= csrfField() ?>
-        <input type="submit" class="md3-button md3-button--outlined" value="Dissoudre la flotte" />
-    </form>
-    <?php } elseif($trajet !== null){ ?>
-    <?php $destination = new Planete($trajet->id_destination); ?>
-    <div class="md3-row">
-        <span class="md3-secondary">De <?= (new Planete($trajet->id_planete))->getNom() ?> vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?></span>
-        <span data-countdown="<?= htmlspecialchars($trajet->arrivee) ?>"></span>
-    </div>
+    <details class="systeme-details">
+        <summary>Créer une flotte</summary>
+        <form class="systeme-details__corps" method="POST" action="?p=creerFlotte">
+            <input type="hidden" name="planete" value="<?= $planete->id ?>" />
+            <?= csrfField() ?>
+            <?php foreach($escadre as $type => $nombre){ ?>
+            <div class="ligne-jeu">
+                <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type]['nom'] ?> × <?= $nombre ?></span>
+                <input type="number" class="md3-number" name="nombre[<?= $type ?>]" min="0" max="<?= $nombre ?>" value="0" aria-label="Nombre dans la flotte" />
+            </div>
+            <?php } ?>
+            <div class="ligne-jeu">
+                <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" placeholder="Nom de la flotte" required aria-label="Nom de la flotte" />
+                <input type="submit" class="md3-button md3-button--tonal" value="Créer une flotte" />
+            </div>
+        </form>
+    </details>
     <?php } ?>
 </section>
 <?php } ?>
 
 <?php if(count($enRoute) > 0){ ?>
-<section class="md3-card">
-    <h2>En route</h2>
-    <?php foreach($enRoute as $ligne){ ?>
-    <div class="md3-row">
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('route') ?>En route</h2>
+    <?php foreach($enRoute as $ligne){ $destination = new Planete($ligne->id_destination); ?>
+    <div class="ligne-jeu">
         <div>
             <strong><?= Vaisseau::CATALOGUE[$ligne->type]['nom'] ?></strong> × <?= $ligne->nombre ?><br>
-            <?php $destination = new Planete($ligne->id_destination); ?>
             <span class="md3-secondary">de <?= (new Planete($ligne->id_planete))->getNom() ?> vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?></span>
         </div>
+        <?php if($ligne->depart !== null){ ?>
+        <?= Vue::progression('Trajet', strtotime($ligne->arrivee) - time(), strtotime($ligne->arrivee) - strtotime($ligne->depart), Vaisseau::CATALOGUE[$ligne->type]['icone']) ?>
+        <?php } else { ?>
         <span data-countdown="<?= htmlspecialchars($ligne->arrivee) ?>"></span>
+        <?php } ?>
     </div>
+    <?php } ?>
+</section>
+<?php } ?>
+
+<?php
+$productionsEnCours = array();
+foreach($gouvernees as $ligne){
+    foreach(Vaisseau::enProduction($ligne->id) as $production){
+        array_push($productionsEnCours, $production);
+    }
+}
+if(count($productionsEnCours) > 0){
+?>
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('usine_legere') ?>Production en cours</h2>
+    <?php foreach($productionsEnCours as $production){ ?>
+    <?= Vue::progression(Vaisseau::CATALOGUE[$production->type]['nom'].' · '.(new Planete($production->id_planete))->nom, strtotime($production->fin) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$production->type]['duree']), Vaisseau::CATALOGUE[$production->type]['icone']) ?>
     <?php } ?>
 </section>
 <?php } ?>

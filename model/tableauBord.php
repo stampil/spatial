@@ -1,43 +1,43 @@
-
-
-
-<?php
-$etape = $Joueur->etape_tuto;
-switch($etape){
-    case '0':
-        include 'tuto_0.php';
-        
-        break;
-    case '1':
-        break;
-    
-}
-
-?>
-
+<h1 class="titre-vue"><?= Icone::html('quartier') ?>Quartier général</h1>
 <?php
 if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
-    $revenu = $Joueur->revenuNet();
     $Camp = $Joueur->getCamp();
 ?>
-<div class="md3-card">
-    <h2>Camp : <?= Camp::libelle($Joueur->id_camp) ?></h2>
+<section class="panneau" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>">
+    <div class="fiche__tete">
+        <?= Vue::emblemeCamp($Camp->id, 48) ?>
+        <h2 class="fiche__nom" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>"><?= htmlspecialchars($Camp->nom) ?></h2>
+    </div>
     <p class="md3-secondary"><?= htmlspecialchars($Camp->histoire) ?></p>
+    <p><strong>Avantage :</strong> <?= htmlspecialchars($Camp->avantage()) ?></p>
+</section>
+
+<div class="raccourcis">
+    <a class="emplacement" href="?p=carte"><?= Icone::html('carte') ?>Carte</a>
+    <a class="emplacement" href="?p=listePlanete"><?= Icone::html('planetes') ?><?= count(Planete::listeGouvernees($Joueur->id)) ?> colonies</a>
+    <a class="emplacement" href="?p=listeVaisseau"><?= Icone::html('fusee') ?><?= Vaisseau::nombreDeplacements($Joueur->id) ?> en route</a>
+    <a class="emplacement" href="?p=listePerso"><?= Icone::html('persos') ?><?= count(Perso::liste($Joueur)) ?> persos</a>
 </div>
-<p>Crédits : <?= $Joueur->credits ?> (revenu net : <?= sprintf('%+d', $revenu) ?> cr/h)</p>
-<p>Vos planètes :
-<?php
-    foreach(Planete::listeGouvernees($Joueur->id) as $ligne){
-        echo (new Planete($ligne->id))->getNom().' ';
-    }
-?>
-</p>
+
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('journal') ?>Journal</h2>
+    <?php $evenements = Journal::recents($Joueur->id); ?>
+    <?php if(count($evenements) === 0){ ?>
+    <p class="md3-secondary">Rien à signaler pour l'instant.</p>
+    <?php } ?>
+    <ul class="journal">
+        <?php foreach($evenements as $evenement){ ?>
+        <li><span class="journal__date"><?= htmlspecialchars($evenement->creato) ?></span><?= htmlspecialchars($evenement->message) ?></li>
+        <?php } ?>
+    </ul>
+</section>
 <?php
 }
+else{
 ?>
-
-<br>  Actions :
-
-<p><a href="?p=listeSysteme" >Lister les systèmes</a></p>
-<p><a href="?p=listePlanete" >Lister les planètes</a></p>
-<p><a href="?p=listePerso" >Lister les persos</a></p>
+<section class="panneau">
+    <p>Prenez contact avec votre premier personnage pour commencer la partie.</p>
+    <a class="md3-button" href="?p=listePerso">Voir mes persos</a>
+</section>
+<?php
+}

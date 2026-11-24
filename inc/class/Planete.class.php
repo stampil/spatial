@@ -15,6 +15,7 @@ class Planete {
     const CANON_PAR_SLOT = 1;
     const TROUPES_DIVISEUR_SLOT = 2;
     const CAPTURE_REVOLTE = 50;
+    const REVOLTE_ALERTE = 70;
 
     private MyPDO $bdd;
     public int $id;
@@ -86,12 +87,24 @@ class Planete {
         $canon = 0;
         $troupes = 0;
         if($id_camp !== null){
-            $bouclier = $slot * self::BOUCLIER_PAR_SLOT;
-            $canon = $slot * self::CANON_PAR_SLOT;
-            $troupes = intdiv($slot, self::TROUPES_DIVISEUR_SLOT) + 1;
+            $bouclier = self::bouclierDeBase($slot);
+            $canon = self::canonDeBase($slot);
+            $troupes = self::troupesDeBase($slot);
         }
         MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,0,0,0,0,0,$bonus);
         return MyPDO::getInstance()->lastInsertId();
+    }
+
+    public static function bouclierDeBase(int $slot): int{
+        return $slot * self::BOUCLIER_PAR_SLOT;
+    }
+
+    public static function canonDeBase(int $slot): int{
+        return $slot * self::CANON_PAR_SLOT;
+    }
+
+    public static function troupesDeBase(int $slot): int{
+        return intdiv($slot, self::TROUPES_DIVISEUR_SLOT) + 1;
     }
 
     public static function fillSysteme(Perso $Perso,Systeme $Systeme): void{
@@ -341,7 +354,7 @@ class Planete {
     }
 
 public function getNom(): string {
-    return '<a target="_blank" href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->id_camp);
+    return '<a href="?p=affichePlanete&id_planete='.$this->id.'" class="nomPlanete">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->id_camp);
 }
     
 }
