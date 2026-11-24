@@ -1,44 +1,21 @@
 a{
     text-decoration: none;
-    color:black;
+    color:var(--md-sys-color-on-surface);
     font-style: italic;
 }
 
 .nomPlanete{
-    color:darkblue;
+    color:var(--md-sys-color-primary);
 }
 
 .nomSysteme{
-    color:darkmagenta;
+    color:var(--md-sys-color-tertiary);
 }
 
 .nomJoueur{
-    color:darkslategrey;
+    color:var(--md-sys-color-on-surface);
 }
 
 .nomPerso{
-    color:darkslateblue;
-}
-
-.star{
-    font-size: 20px;
-}
-
-.planet {
-        width: 100px;
-	height: 100px;
-	border-radius: 50%;
-	background-size: 210px;
-	box-shadow: inset 16px 0 40px 6px rgb(0, 0, 0),
-		inset -3px 0 6px 2px rgba(255, 255, 255, 0.2);
-	animation-name: rotate;
-	animation-duration: 180s;
-	animation-iteration-count: infinite;
-	animation-timing-function: linear;
-    display:inline-block;
-}
-
-@keyframes rotate {
-  from { background-position-x: 0px; }
-  to { background-position-x: 1440px; }
+    color:var(--md-sys-color-secondary);
 }

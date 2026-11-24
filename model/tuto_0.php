@@ -1,16 +1,11 @@
-<?php
-
-
-?>
-
-Bienvenue  <?= $Joueur->getNom(); ?> sur ce jeu 4X  (exploration, expansion, exploitation et extermination).<br>
-Dans cette phase de tuto, un nouveau systeme vient d'etre créé specialement pour vous, Le systeme <?= $Perso->sur_systeme->getNom(); ?>. ce systeme deviendra visible des autres joueurs 7 jours apres le tuto terminé.<br>
-Votre planete natale : <?= $Perso->sur_planete->getNom(); ?> du systeme <?= $Perso->sur_systeme->getNom(); ?><br>
-Humm... vous n'avez ni vaisseau, ni troupe, ni planete sous votre commandement...<br>
-pour construire des troupes et des vaisseaux, il vous faut une planete, il y a deux moyen de conquerir une planete, par la force ou par la diplomatie.<br />
-Votre puissance de frappe etant reduit a vous et vous seul pour l'instant, optons pour la diplomatie.<br />
-Cliquer sur "Liste perso" pour voir Votre (premier) personnage.<br>
-
-
-<a href="?p=listePerso" />Liste perso</a>
-
+<section class="panneau">
+    <h1 class="titre-vue"><?= Icone::html('mission') ?>Bienvenue</h1>
+    <p>Bienvenue <?= $Joueur->getNom(); ?> sur ce jeu 4X (exploration, expansion, exploitation et extermination).</p>
+    <p>Dans cette phase de tuto, un nouveau système vient d'être créé spécialement pour vous, le système <?= $Perso->sur_systeme->getNom(); ?>. Ce système deviendra visible des autres joueurs 7 jours après la fin du tuto.</p>
+    <p>Votre planète natale : <?= $Perso->sur_planete->getNom(); ?> du système <?= $Perso->sur_systeme->getNom(); ?></p>
+    <p>Humm... vous n'avez ni vaisseau, ni troupe, ni planète sous votre commandement...</p>
+    <p>Pour construire des troupes et des vaisseaux, il vous faut une planète, il y a deux moyens de conquérir une planète, par la force ou par la diplomatie.</p>
+    <p>Votre puissance de frappe étant réduite à vous et vous seul pour l'instant, optons pour la diplomatie.</p>
+    <p>Touchez « Liste des persos » pour voir votre (premier) personnage.</p>
+    <a class="md3-button" href="?p=listePerso">Liste des persos</a>
+</section>

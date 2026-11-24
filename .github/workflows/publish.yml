@@ -1,0 +1,59 @@
+# Publishes the game on InfinityFree at each push on revival: tools/package.sh builds the site, and only the files that
+# changed go up by FTP. The passwords are the secrets HOSTING_PASSWORD and DB_PASSWORD, the database the variables DB_HOST and DB_NAME.
+name: Publish
+
+on:
+  push:
+    branches: [revival]
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ftpupload.net
+      HOSTING_USER: if0_43514686
+      DB_USER: if0_43464490
+    steps:
+      - name: Check that the hosting is set up
+        id: hosting
+        env:
+          HOSTING_PASSWORD: ${{ secrets.HOSTING_PASSWORD }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_NAME: ${{ vars.DB_NAME }}
+        run: |
+          if [ -z "$HOSTING_PASSWORD" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_HOST" ] || [ -z "$DB_NAME" ]; then
+            echo "::notice::HOSTING_PASSWORD, DB_PASSWORD, DB_HOST or DB_NAME is not set in the repository: nothing is published."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out
+        if: steps.hosting.outputs.ready == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build the site
+        if: steps.hosting.outputs.ready == 'true'
+        env:
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: bash tools/package.sh
+
+      - name: Upload what changed
+        if: steps.hosting.outputs.ready == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: ${{ env.FTP_SERVER }}
+          username: ${{ env.HOSTING_USER }}
+          password: ${{ secrets.HOSTING_PASSWORD }}
+          local-dir: build/htdocs/
+          server-dir: htdocs/

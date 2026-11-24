@@ -38,6 +38,10 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `etape_tuto` tinyint(1) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL,
   `lastco` datetime NOT NULL,
+  `credits_maj` datetime DEFAULT NULL,
+  `id_camp` int(11) NOT NULL,
+  `id_systeme_voisin` int(11) DEFAULT NULL,
+  `fin_tuto` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `nom` (`nom`)
@@ -47,8 +51,8 @@ CREATE TABLE IF NOT EXISTS `joueur` (
 -- Déchargement des données de la table `joueur`
 --
 
-INSERT INTO `joueur` (`id`, `nom`, `email`, `IPs`, `credits`, `mdp`, `etape_tuto`, `creato`, `lastco`) VALUES
-(3, 'Vartus', 'developpeurntic@gmail.com', '::1', 500, 'gPhvB3xN.mAVULqmxVcgCaqgkR0b7wdU.n1Grn0ekmnx35OJ30IDTnO/eAjAlGYx6/cJ/8avLHGmSIJAeMx.o0', 1, '2022-12-19 10:21:18', '2022-12-19 09:21:23');
+INSERT INTO `joueur` (`id`, `nom`, `email`, `IPs`, `credits`, `mdp`, `etape_tuto`, `creato`, `lastco`, `id_camp`) VALUES
+(3, 'Vartus', 'developpeurntic@gmail.com', '::1', 500, 'gPhvB3xN.mAVULqmxVcgCaqgkR0b7wdU.n1Grn0ekmnx35OJ30IDTnO/eAjAlGYx6/cJ/8avLHGmSIJAeMx.o0', 1, '2022-12-19 10:21:18', '2022-12-19 09:21:23', 2);
 
 -- --------------------------------------------------------
 
@@ -67,6 +71,13 @@ CREATE TABLE IF NOT EXISTS `perso` (
   `sur_planete` int(11) NOT NULL,
   `fin_diplomatie` datetime DEFAULT NULL,
   `fin_voyage_planetaire` datetime DEFAULT NULL,
+  `action_diplomatie` tinyint(1) DEFAULT NULL,
+  `fin_prison` datetime DEFAULT NULL,
+  `fin_mort` datetime DEFAULT NULL,
+  `embarque` tinyint(1) NOT NULL DEFAULT '0',
+  `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
+  `arrivee` datetime DEFAULT NULL,
+  `role` varchar(16) NOT NULL DEFAULT 'diplomate',
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
@@ -97,6 +108,12 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `nb_usine_vaiss_lourd` int(11) NOT NULL,
   `nb_usine_ressource` int(11) NOT NULL,
   `nb_academie` int(11) NOT NULL,
+  `revolte_maj` datetime DEFAULT NULL,
+  `id_camp` int(11) DEFAULT NULL,
+  `bouclier` int(11) NOT NULL DEFAULT '0',
+  `canon` int(11) NOT NULL DEFAULT '0',
+  `troupes` int(11) NOT NULL DEFAULT '0',
+  `bonus` varchar(16) DEFAULT NULL,
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
@@ -140,6 +157,8 @@ CREATE TABLE IF NOT EXISTS `systeme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
   `visible` tinyint(1) NOT NULL DEFAULT '0',
+  `x` int(11) NOT NULL DEFAULT '0',
+  `y` int(11) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
@@ -158,6 +177,93 @@ INSERT INTO `systeme` (`id`, `nom`, `visible`, `creato`) VALUES
 (8, 'Ksi-4361', 0, '2022-12-19 09:58:42'),
 (9, 'Nu-2343', 0, '2022-12-19 10:02:32'),
 (10, 'Sigma-9547', 0, '2022-12-19 10:21:18');
+CREATE TABLE IF NOT EXISTS `production` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `fin` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `vaisseau` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `creato` datetime NOT NULL,
+  `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
+  `arrivee` datetime DEFAULT NULL,
+  `depart` datetime DEFAULT NULL,
+  `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`),
+  KEY `id_flotte` (`id_flotte`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `flotte` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `nom` varchar(64) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `camp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(255) NOT NULL,
+  `histoire` text NOT NULL,
+  `jouable` tinyint(1) NOT NULL,
+  `couleur` varchar(7) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nom` (`nom`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `camp` (`id`, `nom`, `histoire`, `jouable`, `couleur`) VALUES
+(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 0, '#B3261C'),
+(2, 'Empire', 'Un ordre ancien qui a unifié les systèmes par la force de ses flottes. Son industrie de masse produit unités et ressources à moindre coût, mais ses bannières flottent sur chaque planète conquise : l''Empire est toujours visible sur la carte.', 1, '#1565C0'),
+(3, 'Rébellion', 'Des planètes lassées de l''ordre impérial, des mutins et des ingénieurs libres ont choisi la discrétion. Incapable de rivaliser en nombre, la Rébellion gagne en restant invisible tant qu''on ne l''a pas découverte.', 1, '#2E7D32');
+CREATE TABLE IF NOT EXISTS `decouverte` (
+  `id_joueur` int(11) NOT NULL,
+  `id_systeme` int(11) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id_joueur`,`id_systeme`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `journal` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `schema_migrations` (
+  `version` varchar(64) NOT NULL,
+  PRIMARY KEY (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `schema_migrations` (`version`) VALUES
+('001_vaisseau_deplacement'),
+('002_exploration'),
+('003_combat'),
+('004_fin_du_tutoriel'),
+('005_visibilite'),
+('006_flottes'),
+('007_persos_transport'),
+('008_roles'),
+('009_carte'),
+('010_journal');
+
+UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
+
+UPDATE `planete` SET `bonus` = ELT(1 + `id` % 5, 'chantier', 'forge', 'marche', 'citadelle', 'relais') WHERE `id_systeme` IN (SELECT `id` FROM `systeme` WHERE `visible` = 1);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

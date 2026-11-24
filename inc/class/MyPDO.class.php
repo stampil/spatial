@@ -3,75 +3,67 @@
 class MyPDO extends PDO {
 
     const DB_FLAG = '';
+    const QUERY_FAILED = -1;
 
-    public static $cache = array();
-    public static $cache_activate = true;
-    public static $nb_cache = 0;
-    private static $_instance = null;
+    public static array $cache = array();
+    public int $lastRowCount = 0;
+    private static ?MyPDO $_instance = null;
 
-    public function __construct($options = null) {
-        if (!self::$_instance) {
-            die(__CLASS__ . ' must call : MyPDO::getInstance() !');
-        }
-        $DB_HOST = 'localhost';
-        $DB_PORT = '3306';
-        $DB_NAME = 'systeme';
-        $DB_USER = 'root';
-        $DB_PASS = '';
+    private function __construct() {
+        $config = require __DIR__ . '/../config.php';
+        $DB_HOST = $config['host'];
+        $DB_PORT = $config['port'];
+        $DB_NAME = $config['name'];
+        $DB_USER = $config['user'];
+        $DB_PASS = $config['pass'];
 
         $path = 'mysql:host=' . $DB_HOST . ';port=' . $DB_PORT . ';dbname=' . $DB_NAME;
 
         try{
-            parent::__construct($path, $DB_USER, $DB_PASS, $options);
+            parent::__construct($path, $DB_USER, $DB_PASS);
         }
         catch(Exception $e){
                 exit('Erreur de connexion à la BDD '.$DB_NAME.' sur la DB '.$DB_HOST.' avec l\'user '.$DB_USER.': '.$e->getMessage());
         }
+        $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         $this->query("SET NAMES 'utf8'");
-        $ret = $this->query("USE $DB_NAME");
-        if($ret==-1){
-            $ret2 = $this->query("CREATE DATABASE `$DB_NAME` /*!40100 DEFAULT CHARACTER SET utf8 */");
-            if($ret2!=-1) echo 'base '.$DB_NAME.' créée';
-            $this->query("USE $DB_NAME");
-            
-        }
     }
 
-    public static function getInstance() {
+    public static function getInstance(): MyPDO {
 
         if (is_null(self::$_instance)) {
-            self::$_instance = true; //force $_instance set temporaly with true for pass the __construct step
             self::$_instance = new MyPDO();
         }
 
         return self::$_instance;
     }
 
-    public function query($query) { //secured query with prepare and execute
-        $timestart = microtime(true);
-        $args = func_get_args();
-        array_shift($args); //first element is not an argument but the query itself, should removed
-        if (is_array(@$args[0])) {
+    #[\ReturnTypeWillChange]
+    public function query(string $query, ...$args) { //secured query with prepare and execute
+        if (is_array($args[0] ?? null)) {
             $args = $args[0];
         }
 
-        if (MyPDO::$cache_activate && isset(MyPDO::$cache[$query . "::" . serialize($args)])) {
-            //echo "<div class='query'>cache : '$query' <div>";
-            MyPDO::$nb_cache++;
-            return MyPDO::$cache[$query . "::" . serialize($args)];
+        $cacheKey = $query . "::" . serialize($args);
+        if (isset(MyPDO::$cache[$cacheKey])) {
+            return MyPDO::$cache[$cacheKey];
         }
 
-        MyPDO::$cache_activate = true;
         $reponse = parent::prepare($query);
         $reponse->execute($args);
+        $this->lastRowCount = $reponse->rowCount();
         $err = $reponse->errorInfo();
         if (@$err[2]) {
-            if (preg_match("/Duplicate entry/", $err[2]))
-                return -1;
-            echo $err[2] . '<hr />' . $query . '<hr />';
-            print_r($args);
-            return -1;
+            if (preg_match("/Duplicate entry/", $err[2])) {
+                return self::QUERY_FAILED;
+            }
+            error_log($err[2] . ' | ' . $query);
+            return self::QUERY_FAILED;
+        }
+
+        if ($reponse->columnCount() === 0) { // a write may make cached SELECT results stale
+            MyPDO::$cache = array();
         }
 
         $ret = array();
@@ -79,17 +71,10 @@ class MyPDO extends PDO {
             array_push($ret, $o);
         }
         $reponse->closeCursor();
-        if (count($ret))
-            MyPDO::$cache[$query . "::" . serialize($args)] = $ret; // on cache que les requete qui retourne des resultat, insert update doit tjrs etre executé
-        $timeend = microtime(true);
-        $time = $timeend - $timestart;
-        $page_load_time = number_format($time, 3);
-        //echo '<div class="query">query: '.$query.' ('.$page_load_time.'sec)</div>';
+        if (count($ret)) {
+            MyPDO::$cache[$cacheKey] = $ret; // on cache que les requete qui retourne des resultat, insert update doit tjrs etre executé
+        }
         return $ret;
-    }
-
-    public function insecureQuery($query) { //you can use the old query at your risk ;) and should use secure quote() function with it
-        return parent::query($query);
     }
 
 }

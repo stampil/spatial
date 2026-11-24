@@ -1,22 +1,43 @@
-
-
-
+<h1 class="titre-vue"><?= Icone::html('quartier') ?>Quartier général</h1>
 <?php
-$etape = $Joueur->etape_tuto;
-switch($etape){
-    case '0':
-        include 'tuto_0.php';
-        
-        break;
-    case '1':
-        break;
-    
-}
-
+if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
+    $Camp = $Joueur->getCamp();
 ?>
+<section class="panneau" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>">
+    <div class="fiche__tete">
+        <?= Vue::emblemeCamp($Camp->id, 48) ?>
+        <h2 class="fiche__nom" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>"><?= htmlspecialchars($Camp->nom) ?></h2>
+    </div>
+    <p class="md3-secondary"><?= htmlspecialchars($Camp->histoire) ?></p>
+    <p><strong>Avantage :</strong> <?= htmlspecialchars($Camp->avantage()) ?></p>
+</section>
 
-<br>  Actions :
+<div class="raccourcis">
+    <a class="emplacement" href="?p=carte"><?= Icone::html('carte') ?>Carte</a>
+    <a class="emplacement" href="?p=listePlanete"><?= Icone::html('planetes') ?><?= count(Planete::listeGouvernees($Joueur->id)) ?> colonies</a>
+    <a class="emplacement" href="?p=listeVaisseau"><?= Icone::html('fusee') ?><?= Vaisseau::nombreDeplacements($Joueur->id) ?> en route</a>
+    <a class="emplacement" href="?p=listePerso"><?= Icone::html('persos') ?><?= count(Perso::liste($Joueur)) ?> persos</a>
+</div>
 
-<p><a href="?p=listeSysteme" >lister les systeme</a></p>
-<p><a href="?p=listePlanete" >lister les planetes</a></p>
-<p><a href="?p=listeperso" >lister les perso</a></p>
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('journal') ?>Journal</h2>
+    <?php $evenements = Journal::recents($Joueur->id); ?>
+    <?php if(count($evenements) === 0){ ?>
+    <p class="md3-secondary">Rien à signaler pour l'instant.</p>
+    <?php } ?>
+    <ul class="journal">
+        <?php foreach($evenements as $evenement){ ?>
+        <li><span class="journal__date"><?= htmlspecialchars($evenement->creato) ?></span><?= htmlspecialchars($evenement->message) ?></li>
+        <?php } ?>
+    </ul>
+</section>
+<?php
+}
+else{
+?>
+<section class="panneau">
+    <p>Prenez contact avec votre premier personnage pour commencer la partie.</p>
+    <a class="md3-button" href="?p=listePerso">Voir mes persos</a>
+</section>
+<?php
+}

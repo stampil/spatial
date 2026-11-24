@@ -1,30 +1,26 @@
 <?php
 
-if(!empty($_POST['email']) && !empty($_POST['mdp'])){
+$email = giveInputString($_POST, 'email');
+$mdp = giveInputString($_POST, 'mdp');
+
+if($email !== '' && $mdp !== ''){
     $info = Joueur::connecter(
         array(
-            'mdp' =>Tools::crypte($_POST['mdp']),
-            'email' =>$_POST['email'],
+            'mdp' =>$mdp,
+            'email' =>$email,
         )        
     );  
     
-    if($info && $info->id){
-        //$j = new Joueur($info->id);
-        $_SESSION['Sid'] = $info->id;
+    if($info){
         $Joueur = new Joueur($info->id);
-        $ip = giveIP();
-        $ips = explode(" ",$Joueur->IPs);
-        array_push($ips, $ip);
-        $ips = array_unique($ips);
-        $ips = implode(' ', $ips);
-        $Joueur->IPs = $ips; 
-        $Joueur->lastco = date("Y-m-d H:i:s");
-        $Joueur->save();
+        $Joueur->ouvrirSession();
 
-        header('Location: index.php?p=tableauBord');
+        header('Location: index.php?p='.HOME_PAGE);
+        exit();
     }
     else{
-        header('Location: index.php?p=connection&erreur=identifiants non reconnus');
+        header('Location: index.php?p=connection&erreur=Identifiants non reconnus');
+        exit();
     }
 }
 
