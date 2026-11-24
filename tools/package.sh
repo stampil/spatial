@@ -9,7 +9,7 @@ rm -rf "$ROOT/build"
 mkdir -p "$SITE"
 git -C "$ROOT" archive HEAD | tar -x -C "$SITE"
 rm -rf "$SITE/.github" "$SITE/tools" "$SITE/SUIVI.md" "$SITE/Readme.md" "$SITE/.gitignore"
-find "$SITE/database" -type f ! -name installation.sql -delete
+find "$SITE/database" -type f ! -name installation.sql ! -path "*/migrations/*" -delete
 cat > "$SITE/.htaccess" <<'RULES'
 # The sources are only included by index.php, never served; the state of the FTP upload stays on the server.
 RewriteEngine On
