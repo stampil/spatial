@@ -24,13 +24,9 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 Le code est en ligne et le site installe lui-même sa base à la première visite (tables, 3 camps, 16 systèmes) : plus d'import dans phpMyAdmin. Seul le premier chargement le confirmera sur InfinityFree ; je le regarde dès que tu me donnes l'adresse du site.
 
-### 5. Plan du noyau dur : ce qu'il reste (24/11)
+### 5. Hors noyau dur, pour plus tard (24/11)
 
-Tes mots (23/11) : « ok d'apres le readme, fait un plan de ce qu'il reste a faire pour un noyan dur ». Les phases A à D sont faites sous la forme qu'exige le tutoriel prolongé (vaisseaux et déplacements, exploration, combat et défense, troupes et capture par la force) ; le tutoriel va maintenant de l'inscription à la capture d'une planète pirate (prime de 800 crédits à l'étape 5, fin à l'étape 8). Ce que le Readme demande et qui manque encore :
-
-- **But du jeu** : page de classement (plus grosse flotte, plus de planètes).
-
-**Hors noyau** (après) : détournement de ressources par les pirates, combats entre pirates validés à la main, IA des camps (flottes et attaques des Pirates et de l'Empire), régénération de la défense des planètes.
+Ta phrase (24/11) : « go fini le noyau dur ». Le noyau dur est fini. Ce qui reste est hors noyau et attend ton « go » : détournement de ressources par les pirates, combats entre pirates validés à la main, IA des camps (flottes et attaques des Pirates et de l'Empire), régénération de la défense des planètes.
 
 ### 6. Serveurs de test (23/11)
 
