@@ -166,6 +166,7 @@ class Joueur {
             (new Planete($ligne->id))->updateRevolte();
         }
         Vaisseau::resolveProduction($this);
+        Vaisseau::resolveArrivees($this);
         foreach(Perso::liste($this) as $ligne){
             (new Perso($ligne->id))->resolve($this);
         }

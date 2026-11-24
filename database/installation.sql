@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `id_planete` bigint(20) UNSIGNED NOT NULL,
   `type` varchar(32) NOT NULL,
   `creato` datetime NOT NULL,
+  `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
+  `arrivee` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
   KEY `id_planete` (`id_planete`)

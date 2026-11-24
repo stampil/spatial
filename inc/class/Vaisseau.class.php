@@ -2,13 +2,17 @@
 
 class Vaisseau {
 
+    const TRAJET_MEME_SYSTEME_SECONDES = 60;
+    const TRAJET_ENTRE_SYSTEMES_SECONDES = 300;
+    const PERCENT = 100;
+
     const CATALOGUE = array(
-        'chasseur' => array('nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30),
-        'reconnaissance' => array('nom' => 'Vaisseau de reconnaissance', 'usine' => Batiment::USINE_LEGERE, 'prix' => 30, 'duree' => 30),
-        'transport_perso' => array('nom' => 'Transport personnel', 'usine' => Batiment::USINE_LEGERE, 'prix' => 50, 'duree' => 45),
-        'fregate' => array('nom' => 'Frégate', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 120, 'duree' => 90),
-        'barge' => array('nom' => 'Barge de débarquement', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 150, 'duree' => 120),
-        'capital' => array('nom' => 'Vaisseau capital', 'usine' => Batiment::USINE_LOURDE, 'prix' => 400, 'duree' => 300),
+        'chasseur' => array('nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100),
+        'reconnaissance' => array('nom' => 'Vaisseau de reconnaissance', 'usine' => Batiment::USINE_LEGERE, 'prix' => 30, 'duree' => 30, 'vitesse' => 50),
+        'transport_perso' => array('nom' => 'Transport personnel', 'usine' => Batiment::USINE_LEGERE, 'prix' => 50, 'duree' => 45, 'vitesse' => 60),
+        'fregate' => array('nom' => 'Frégate', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 120, 'duree' => 90, 'vitesse' => 100),
+        'barge' => array('nom' => 'Barge de débarquement', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 150, 'duree' => 120, 'vitesse' => 200),
+        'capital' => array('nom' => 'Vaisseau capital', 'usine' => Batiment::USINE_LOURDE, 'prix' => 400, 'duree' => 300, 'vitesse' => 150),
     );
 
     public static function typesDeLUsine(string $usine): array {
@@ -36,13 +40,67 @@ class Vaisseau {
         return (int) MyPDO::getInstance()->query($query,$planeteId,...$types)[0]->nombre;
     }
 
-    public static function stock(int $planeteId): array {
-        $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_planete=? GROUP BY type";
+    public static function stock(int $planeteId, int $joueurId): array {
+        $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_planete=? AND id_joueur=? AND arrivee IS NULL GROUP BY type";
         $stock = array();
-        foreach(MyPDO::getInstance()->query($query,$planeteId) as $ligne){
+        foreach(MyPDO::getInstance()->query($query,$planeteId,$joueurId) as $ligne){
             $stock[$ligne->type] = (int) $ligne->nombre;
         }
         return $stock;
+    }
+
+    public static function posees(int $joueurId): array {
+        $query = "SELECT id_planete, type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NULL GROUP BY id_planete, type ORDER BY id_planete";
+        $posees = array();
+        foreach(MyPDO::getInstance()->query($query,$joueurId) as $ligne){
+            $posees[$ligne->id_planete][$ligne->type] = (int) $ligne->nombre;
+        }
+        return $posees;
+    }
+
+    public static function enRoute(int $joueurId): array {
+        $query = "SELECT id_planete, id_destination, type, arrivee, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL GROUP BY id_planete, id_destination, type, arrivee ORDER BY arrivee";
+        return MyPDO::getInstance()->query($query,$joueurId);
+    }
+
+    public static function dureeTrajet(string $type, Planete $depart, Planete $destination): int {
+        $base = self::TRAJET_ENTRE_SYSTEMES_SECONDES;
+        if($depart->id_systeme === $destination->id_systeme){
+            $base = self::TRAJET_MEME_SYSTEME_SECONDES;
+        }
+        return intdiv($base * self::CATALOGUE[$type]['vitesse'], self::PERCENT);
+    }
+
+    public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre): ?string {
+        if(!isset(self::CATALOGUE[$type])){
+            return 'Type de vaisseau inconnu.';
+        }
+        if($depart->id === $destination->id){
+            return 'Les vaisseaux sont déjà sur cette planète.';
+        }
+        $disponibles = self::stock($depart->id, $joueur->id)[$type] ?? 0;
+        if($nombre < 1 || $nombre > $disponibles){
+            return 'Pas assez de vaisseaux : '.self::CATALOGUE[$type]['nom'].' (disponibles : '.$disponibles.').';
+        }
+        $db = MyPDO::getInstance();
+        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL ORDER BY id LIMIT " . $nombre;
+        $db->query($query,$destination->id,Tools::nowPlus(self::dureeTrajet($type, $depart, $destination)),$joueur->id,$depart->id,$type);
+        if($db->lastRowCount !== $nombre){
+            return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[$type]['nom'].'.';
+        }
+        return null;
+    }
+
+    public static function resolveArrivees(Joueur $joueur): void {
+        $db = MyPDO::getInstance();
+        $query = "SELECT id_destination, type FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND arrivee<=? GROUP BY id_destination, type";
+        foreach($db->query($query,$joueur->id,Tools::now()) as $ligne){
+            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND arrivee IS NOT NULL AND arrivee<=?";
+            $db->query($query,$joueur->id,$ligne->id_destination,$ligne->type,Tools::now());
+            if($db->lastRowCount > 0){
+                Tools::addMessage($db->lastRowCount.' × '.self::CATALOGUE[$ligne->type]['nom'].' : arrivée sur '.(new Planete($ligne->id_destination))->nom.'.');
+            }
+        }
     }
 
     public static function produire(Joueur $joueur, Planete $planete, string $type): ?string {

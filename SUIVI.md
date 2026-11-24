@@ -61,22 +61,7 @@ Tes mots : « ok d'apres le readme, fait un plan de ce qu'il reste a faire pour 
 
 **Choix de ma main dans ce plan** (à corriger si besoin) : les distances entre systèmes n'existent pas en base, donc durée de trajet fixe : courte dans un système, plus longue entre systèmes ; les valeurs de défense, de puissance, de vitesse, de prix des troupes, la réduction de l'Empire et la part d'épaves récupérée seront mes propositions au moment de la phase, notées dans le suivi.
 
-### 6. Onglet Vaisseaux : liste, position, ordres de déplacement (23/11)
-
-Tes mots : « créé un onglet menu vaisseau, qu'on puisse listé nos vaisseau, voir ou ils se trouve et leur donner des ordre de deplacement ». C'est le début de la phase A du plan.
-
-Compris, et mes choix (à corriger si besoin) :
-
-1. **Menu.** Un onglet « Vaisseaux » (page `listeVaisseau`) après « Camps ».
-2. **Liste et position.** Les vaisseaux sont groupés par endroit : sur une planète (nom de la planète, son système, son camp en pastille), ou en route (vers quelle planète, compte à rebours de l'arrivée). Pour chaque endroit, le nombre de vaisseaux par type.
-3. **Ordre de déplacement.** Sur chaque planète où tu as des vaisseaux : pour chaque type, un nombre à envoyer (0 jusqu'au stock), et une planète de destination choisie dans la liste des planètes, groupées par système. Tu valides, les vaisseaux partent. Pas de flotte persistante dans cette étape : les vaisseaux de types différents voyagent chacun à leur vitesse (les flottes de combat viennent avec la phase C). Destination = la même planète : refusée. Formulaire en POST avec jeton CSRF, comme les autres actions.
-4. **Durée du trajet.** Fixe, car les systèmes n'ont pas de coordonnées : 60 s dans le même système, 300 s entre deux systèmes, multipliées par un facteur de vitesse du type : reconnaissance 50 %, transport personnel 60 %, chasseur 100 %, frégate 100 %, capital 150 %, barge 200 %. Valeurs de ma main.
-5. **Arrivée.** Résolue à la volée à chaque requête, comme la production : le vaisseau arrive sur la planète de destination et un message le signale. Un vaisseau en route ne peut pas recevoir un nouvel ordre.
-6. **Données.** Deux colonnes sur la table `vaisseau` : `id_destination` et `arrivee` (vides = vaisseau posé sur sa planète). Dump, migration et `installation.sql` mis à jour.
-7. **Destinations.** Toutes les planètes sont proposées, puisque l'exploration (phase B) n'existe pas encore. Ce qui se passe à l'arrivée chez un autre camp (combat) viendra avec la phase C : en attendant le vaisseau y stationne simplement.
-8. **Les persos** ne voyagent pas encore (ils suivront dans les transports, phase A suivante).
-
-### 7. Tutoriel prolongé : exploration, troupes, flotte d'attaque, capture d'une planète pirate (23/11)
+### 6. Tutoriel prolongé : exploration, troupes, flotte d'attaque, capture d'une planète pirate (23/11)
 
 Tes mots : « poursuis le tuto fait créé vaisseau d'explration, fait trouver un systeme voisin, fait faire des trouve de debarquement , de vaisseau d'attaque et fait le tuto jusqu'a une capture d'une planete camps pirate ». Aujourd'hui le tutoriel s'arrête à la prise de la première planète par diplomatie (étape 2 = fin).
 
@@ -96,7 +81,7 @@ Compris : « trouve de debarquement » = troupes de débarquement (troupes d'ass
 
 Les joueurs déjà à l'étape 2 (fin de l'ancien tutoriel) : la migration les passe à la nouvelle fin (8), sans refaire le tutoriel.
 
-### 8. Serveurs de test (23/11)
+### 7. Serveurs de test (23/11)
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872` restent lancés jusqu'à ta demande.
 

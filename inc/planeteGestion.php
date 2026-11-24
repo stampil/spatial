@@ -37,7 +37,7 @@
 </section>
 <?php } ?>
 <?php
-$stock = Vaisseau::stock($planete->id);
+$stock = Vaisseau::stock($planete->id, $Joueur->id);
 $productions = Vaisseau::enProduction($planete->id);
 foreach(Batiment::CATALOGUE as $usine => $infosUsine){
     $types = Vaisseau::typesDeLUsine($usine);
