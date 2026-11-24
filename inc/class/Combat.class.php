@@ -8,14 +8,18 @@ class Combat {
     const EPAVE_CREDITS_PAR_POINT = 10;
     const ESCADRE = array('chasseur', 'fregate', 'capital');
 
-    public static function attaquer(Joueur $joueur, Planete $planete): ?string {
+    public static function attaquer(Joueur $joueur, Planete $planete, ?Flotte $flotte = null): ?string {
+        if($flotte !== null && $flotte->id_joueur !== $joueur->id){
+            return 'Cette flotte ne vous appartient pas.';
+        }
         if($planete->gouverneur === $joueur->id){
             return 'Vous gouvernez déjà cette planète.';
         }
         if(!$planete->systeme->estConnuDe($joueur->id)){
             return 'Cette planète est inconnue.';
         }
-        $stock = Vaisseau::stock($planete->id, $joueur->id);
+        $flotteId = $flotte === null ? null : $flotte->id;
+        $stock = Vaisseau::stock($planete->id, $joueur->id, $flotteId);
         $nombres = array();
         foreach(self::ESCADRE as $type){
             $nombres[$type] = $stock[$type] ?? 0;
@@ -43,8 +47,8 @@ class Combat {
         $pertes = self::pertes($nombres, $planete->canon);
         $rapport = array();
         foreach($pertes as $type => $perdus){
-            $query = "DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL ORDER BY id LIMIT " . $perdus;
-            $db->query($query,$joueur->id,$planete->id,$type);
+            $query = "DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte <=> ? ORDER BY id LIMIT " . $perdus;
+            $db->query($query,$joueur->id,$planete->id,$type,$flotteId);
             array_push($rapport, $perdus.' × '.Vaisseau::CATALOGUE[$type]['nom']);
         }
         $message = 'Combat sur '.$planete->nom.' : défense restante, bouclier '.$bouclier.' et canon '.$canon.'. Pertes : '.(count($rapport) > 0 ? implode(', ', $rapport) : 'aucune').'.';
@@ -54,6 +58,9 @@ class Combat {
             $message .= ' Défense détruite : épaves récupérées, +'.$epaves.' cr.';
         }
         Tools::addMessage($message);
+        if($flotte !== null && count($flotte->composition()) === 0){
+            $flotte->dissoudre();
+        }
         return null;
     }
 

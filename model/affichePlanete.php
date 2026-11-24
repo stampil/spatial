@@ -66,6 +66,21 @@ if($p->gouverneur !== $Joueur->id){
 </form>
 <?php
     }
+    foreach(Flotte::liste($Joueur->id) as $ligne){
+        $flotte = new Flotte($ligne->id);
+        if($flotte->planeteAuRepos() !== $p->id || $p->bouclier + $p->canon === 0){
+            continue;
+        }
+?>
+<form method="POST" action="?p=combattre">
+    <input type="hidden" name="planete" value="<?= $p->id ?>" />
+    <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+    <input type="hidden" name="action" value="attaquer" />
+    <?= csrfField() ?>
+    <input type="submit" value="Attaquer avec la flotte <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> vaisseau(x))" />
+</form>
+<?php
+    }
     if($troupes > 0 && $p->bouclier + $p->canon === 0){
 ?>
 <form method="POST" action="?p=combattre">

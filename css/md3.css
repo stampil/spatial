@@ -283,6 +283,7 @@ body {
 }
 
 .md3-number,
+.md3-text,
 .md3-select {
     height: 40px;
     box-sizing: border-box;
@@ -296,6 +297,11 @@ body {
 
 .md3-number {
     width: 80px;
+}
+
+.md3-text {
+    width: 200px;
+    max-width: 100%;
 }
 
 .md3-select {

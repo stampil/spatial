@@ -35,9 +35,20 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `creato` datetime NOT NULL,
   `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
   `arrivee` datetime DEFAULT NULL,
+  `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
-  KEY `id_planete` (`id_planete`)
+  KEY `id_planete` (`id_planete`),
+  KEY `id_flotte` (`id_flotte`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `flotte` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `nom` varchar(64) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `camp` (
@@ -72,4 +83,5 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('002_exploration'),
 ('003_combat'),
 ('004_fin_du_tutoriel'),
-('005_visibilite');
+('005_visibilite'),
+('006_flottes');

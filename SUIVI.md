@@ -28,7 +28,6 @@ Le code est en ligne et le site installe lui-même sa base à la première visit
 
 Tes mots (23/11) : « ok d'apres le readme, fait un plan de ce qu'il reste a faire pour un noyan dur ». Les phases A à D sont faites sous la forme qu'exige le tutoriel prolongé (vaisseaux et déplacements, exploration, combat et défense, troupes et capture par la force) ; le tutoriel va maintenant de l'inscription à la capture d'une planète pirate (prime de 800 crédits à l'étape 5, fin à l'étape 8). Ce que le Readme demande et qui manque encore :
 
-- **Flottes persistantes** (grouper n chasseurs, n frégates, n capitaux sous un nom) : aujourd'hui chaque type voyage à sa vitesse et les vaisseaux d'une planète combattent tous ensemble.
 - **Persos dans les transports** (transport personnel, barge) : les persos ne voyagent pas.
 - **Académie : héros et assassin** (seuls le diplomate et la troupe d'assaut existent), héros (boost combat ou diplomatie).
 - **But du jeu** : page de classement (plus grosse flotte, plus de planètes).

@@ -46,17 +46,17 @@ class Vaisseau {
         return (int) MyPDO::getInstance()->query($query,$planeteId,...$types)[0]->nombre;
     }
 
-    public static function stock(int $planeteId, int $joueurId): array {
-        $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_planete=? AND id_joueur=? AND arrivee IS NULL GROUP BY type";
+    public static function stock(int $planeteId, int $joueurId, ?int $flotteId = null): array {
+        $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_planete=? AND id_joueur=? AND arrivee IS NULL AND id_flotte <=> ? GROUP BY type";
         $stock = array();
-        foreach(MyPDO::getInstance()->query($query,$planeteId,$joueurId) as $ligne){
+        foreach(MyPDO::getInstance()->query($query,$planeteId,$joueurId,$flotteId) as $ligne){
             $stock[$ligne->type] = (int) $ligne->nombre;
         }
         return $stock;
     }
 
     public static function posees(int $joueurId): array {
-        $query = "SELECT id_planete, type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NULL GROUP BY id_planete, type ORDER BY id_planete";
+        $query = "SELECT id_planete, type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NULL AND id_flotte IS NULL GROUP BY id_planete, type ORDER BY id_planete";
         $posees = array();
         foreach(MyPDO::getInstance()->query($query,$joueurId) as $ligne){
             $posees[$ligne->id_planete][$ligne->type] = (int) $ligne->nombre;
@@ -65,7 +65,7 @@ class Vaisseau {
     }
 
     public static function enRoute(int $joueurId): array {
-        $query = "SELECT id_planete, id_destination, type, arrivee, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL GROUP BY id_planete, id_destination, type, arrivee ORDER BY arrivee";
+        $query = "SELECT id_planete, id_destination, type, arrivee, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND id_flotte IS NULL GROUP BY id_planete, id_destination, type, arrivee ORDER BY arrivee";
         return MyPDO::getInstance()->query($query,$joueurId);
     }
 
@@ -101,7 +101,7 @@ class Vaisseau {
             return 'Pas assez de vaisseaux : '.self::CATALOGUE[$type]['nom'].' (disponibles : '.$disponibles.').';
         }
         $db = MyPDO::getInstance();
-        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL ORDER BY id LIMIT " . $nombre;
+        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
         $db->query($query,$destination->id,Tools::nowPlus(self::dureeTrajet($joueur, $type, $depart, $destination)),$joueur->id,$depart->id,$type);
         if($db->lastRowCount !== $nombre){
             return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[$type]['nom'].'.';

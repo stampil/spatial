@@ -6,7 +6,8 @@ $planete = new Planete((int) ($_POST['planete'] ?? 0));
 $action = giveInputString($_POST, 'action');
 
 if($action === 'attaquer'){
-    $erreur = Combat::attaquer($Joueur, $planete);
+    $flotteId = (int) ($_POST['flotte'] ?? 0);
+    $erreur = Combat::attaquer($Joueur, $planete, $flotteId > 0 ? new Flotte($flotteId) : null);
 }
 elseif($action === 'debarquer'){
     $erreur = Combat::debarquer($Joueur, $planete);
