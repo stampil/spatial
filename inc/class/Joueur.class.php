@@ -42,7 +42,7 @@ class Joueur {
         $perso = new Perso($id_perso);
         Planete::fillSysteme($perso,$systeme);
         Decouverte::ajouter($joueur->id, $id_systeme);
-        Univers::creerVoisin($joueur);
+        Univers::creerVoisin($joueur, $systeme);
         
         return $joueur;
     }
@@ -128,7 +128,15 @@ class Joueur {
         foreach(Planete::listeGouvernees($this->id) as $ligne){
             $revenu += (new Planete($ligne->id))->revenuNet();
         }
+        if($revenu > 0 && $this->aBonus(Bonus::MARCHE)){
+            $revenu += intdiv($revenu * Bonus::pourcent(Bonus::MARCHE), Bonus::PERCENT);
+        }
         return $revenu;
+    }
+
+    public function aBonus(string $bonus): bool {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE gouverneur=? AND bonus=? LIMIT 1";
+        return !empty($this->bdd->query($query,$this->id,$bonus));
     }
 
     public function payer(int $montant): bool {
@@ -204,6 +212,16 @@ class Joueur {
     public function prixUnite(int $prix): int {
         if($this->id_camp === Camp::EMPIRE){
             return intdiv($prix * (Camp::PERCENT - Camp::EMPIRE_REMISE_POURCENT), Camp::PERCENT);
+        }
+        return $prix;
+    }
+
+    public function prixVaisseau(string $type): int {
+        $prix = $this->prixUnite(Vaisseau::CATALOGUE[$type]['prix']);
+        foreach(Bonus::REMISES_VAISSEAU as $bonus => $typeRemise){
+            if($typeRemise === $type && $this->aBonus($bonus)){
+                $prix = intdiv($prix * (Bonus::PERCENT - Bonus::pourcent($bonus)), Bonus::PERCENT);
+            }
         }
         return $prix;
     }

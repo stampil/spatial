@@ -15,7 +15,8 @@ class Tuto {
 
     public static function avancer(Joueur $joueur): void {
         if($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && $joueur->id_systeme_voisin === null){
-            Univers::creerVoisin($joueur);
+            $idPlanete = Planete::premiereGouvernee($joueur->id);
+            Univers::creerVoisin($joueur, $idPlanete === null ? null : (new Planete($idPlanete))->systeme);
         }
         while($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && self::objectifAtteint($joueur)){
             $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET etape_tuto=etape_tuto+1 WHERE id=? AND etape_tuto=?";

@@ -84,7 +84,7 @@ class Flotte {
     }
 
     public function enRoute(): ?object {
-        $query = "SELECT id_planete, id_destination, arrivee FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_flotte=? AND arrivee IS NOT NULL ORDER BY arrivee DESC LIMIT 1";
+        $query = "SELECT id_planete, id_destination, depart, arrivee FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_flotte=? AND arrivee IS NOT NULL ORDER BY arrivee DESC LIMIT 1";
         $ret = $this->bdd->query($query,$this->id);
         return $ret[0] ?? null;
     }
@@ -104,8 +104,8 @@ class Flotte {
         foreach(array_keys($this->composition()) as $type){
             $duree = max($duree, Vaisseau::dureeTrajet($joueur, $type, new Planete($depart), $destination));
         }
-        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_flotte=? AND arrivee IS NULL";
-        $this->bdd->query($query,$destination->id,Tools::nowPlus($duree),$this->id);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, depart=?, arrivee=? WHERE id_flotte=? AND arrivee IS NULL";
+        $this->bdd->query($query,$destination->id,Tools::now(),Tools::nowPlus($duree),$this->id);
         if($this->bdd->lastRowCount === 0){
             return 'La flotte '.$this->nom.' est déjà en déplacement.';
         }

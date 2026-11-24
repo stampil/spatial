@@ -1,0 +1,312 @@
+body {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+main.md3-page {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+main.md3-page > .md3-alert,
+main.md3-page > .md3-card {
+    margin: 8px 16px 0;
+}
+
+.carte {
+    --carte-fond: #141218;
+    --carte-texte: #E6E0E9;
+    --carte-trait: #D0BCFF;
+    position: relative;
+    flex: 1;
+    min-height: 420px;
+    overflow: hidden;
+    background: var(--carte-fond);
+    color: var(--carte-texte);
+}
+
+.carte__svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.carte__etoile {
+    fill: var(--carte-texte);
+    opacity: 0.55;
+}
+
+.carte__route {
+    stroke: var(--carte-trait);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 6;
+    opacity: 0.8;
+    vector-effect: non-scaling-stroke;
+}
+
+.carte__vaisseau {
+    fill: var(--carte-trait);
+    stroke: var(--carte-fond);
+    stroke-width: 1;
+}
+
+.carte__systeme {
+    cursor: pointer;
+    outline: none;
+}
+
+.carte__disque {
+    stroke: #FFFFFF;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+.carte__halo {
+    display: none;
+    fill: none;
+    stroke: var(--carte-trait);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+}
+
+.carte__systeme--moi .carte__halo {
+    display: inline;
+}
+
+.carte__systeme--choisi .carte__halo,
+.carte__systeme:focus-visible .carte__halo {
+    display: inline;
+    stroke: #FFFFFF;
+}
+
+.carte__systeme--inconnu .carte__disque {
+    fill: none;
+    stroke-dasharray: 3 3;
+}
+
+.carte__zone {
+    fill: transparent;
+    pointer-events: all;
+}
+
+.carte__nom {
+    fill: var(--carte-texte);
+    font-family: var(--md-sys-typescale-font);
+    font-weight: 500;
+    paint-order: stroke;
+    pointer-events: none;
+    stroke: var(--carte-fond);
+    stroke-linejoin: round;
+}
+
+.carte__commandes {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.carte__commande,
+.carte__trajets {
+    box-sizing: border-box;
+    height: 48px;
+    border: 0;
+    background: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
+    font-family: inherit;
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.carte__commande {
+    width: 56px;
+    font-size: 1.25rem;
+}
+
+.carte__commande:hover,
+.carte__trajets:hover {
+    background-image: linear-gradient(color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent), color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent));
+}
+
+.carte__trajets {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 0 16px;
+    border-radius: var(--md-sys-shape-corner-small);
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.carte__bandeau {
+    position: absolute;
+    top: 72px;
+    left: 12px;
+    right: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 12px 16px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+}
+
+.carte__feuille {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 62%;
+    border-top: 3px solid var(--carte-accent, transparent);
+    border-radius: 28px 28px 0 0;
+    background: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.carte__poignee {
+    width: 32px;
+    height: 4px;
+    margin: 12px auto 4px;
+    border-radius: 2px;
+    background: var(--md-sys-color-on-surface-variant);
+    opacity: 0.4;
+}
+
+.carte__feuille-tete {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0 8px 0 16px;
+}
+
+.carte__feuille h2 {
+    margin: 4px 0 0;
+    font-size: var(--md-sys-typescale-title-large-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    font-weight: 400;
+}
+
+.carte__feuille-tete .md3-secondary {
+    margin: 0;
+}
+
+.carte__fermer {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 1.75rem;
+    cursor: pointer;
+}
+
+.carte__feuille-corps {
+    padding: 0 16px 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.carte__titre-section {
+    margin: 16px 0 4px;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: 500;
+}
+
+.carte__bloc {
+    padding: 12px 0;
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.carte__bloc .md3-secondary {
+    margin: 4px 0 0;
+}
+
+.carte__bloc .md3-actions {
+    margin-top: 8px;
+}
+
+.carte__etiquette {
+    margin-top: 8px;
+}
+
+.carte__ligne {
+    padding: 4px 0;
+    border-top: 0;
+}
+
+.carte__stepper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.carte__pas {
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--md-sys-color-outline);
+    background: transparent;
+    color: var(--md-sys-color-on-surface);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.carte__valeur {
+    min-width: 3ch;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.carte__feuille .md3-button {
+    height: 48px;
+}
+
+#carte-base {
+    font-size: var(--md-sys-typescale-label-large-size);
+}
+
+@media (min-width: 840px) {
+    .carte__feuille {
+        top: 0;
+        left: auto;
+        width: 380px;
+        max-height: none;
+        border-top: 0;
+        border-left: 3px solid var(--carte-accent, transparent);
+        border-radius: 28px 0 0 28px;
+    }
+
+    .carte__commandes {
+        top: auto;
+        right: auto;
+        bottom: 12px;
+        left: 12px;
+    }
+
+    .carte__bandeau {
+        right: 404px;
+    }
+}

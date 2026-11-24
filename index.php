@@ -50,6 +50,7 @@ if(!empty($_SESSION['Sid'])){
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
         <link rel="stylesheet" href="css/main.css" type="text/css">
         <link rel="stylesheet" href="css/md3.css" type="text/css">
         <?php
@@ -61,16 +62,17 @@ if(!empty($_SESSION['Sid'])){
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src="js/jquery.countdown.min.js"></script>
         <script src="js/main.js"></script>
+        <script src="js/rapport.js" defer></script>
                 <?php
         if(is_file('js/'.$p.'.js')){
         ?>
-            <script src="js/<?=$p?>.js"></script>
+            <script src="js/<?=$p?>.js" defer></script>
         <?php } ?>
         <title>
             <?php echo $p; ?>
         </title> 
     </head>
-    <body>
+    <body<?= isset($Joueur) && $Joueur->etape_tuto != 0 ? ' class="md3-avec-barre"' : '' ?>>
     <?php require 'inc/menu.php'; ?>
     <main class="md3-page">
     <?php
@@ -79,6 +81,9 @@ if(!empty($_SESSION['Sid'])){
     }
     foreach(Tools::takeMessages() as $message){
         Tools::show_info_html($message);
+    }
+    foreach(Tools::takeRapports() as $rapport){
+        require 'inc/rapport.php';
     }
 
     try{

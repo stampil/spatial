@@ -37,7 +37,7 @@ if($erreur !== ''){
 }
 else{
     $Joueur->ouvrirSession();
-    header('Location: index.php?p=tableauBord');
+    header('Location: index.php?p='.HOME_PAGE);
 }
 exit();
 ?>

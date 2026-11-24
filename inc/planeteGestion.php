@@ -56,7 +56,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
     <div class="md3-row">
         <div>
             <strong><?= $infos['nom'] ?></strong> × <?= $stock[$type] ?? 0 ?> en stock<br>
-            <span class="md3-secondary"><?= $Joueur->prixUnite($infos['prix']) ?> cr · <?= gmdate('i:s', $infos['duree']) ?></span>
+            <span class="md3-secondary"><?= $Joueur->prixVaisseau($type) ?> cr · <?= gmdate('i:s', $infos['duree']) ?></span>
         </div>
         <form method="POST" action="?p=produire">
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />

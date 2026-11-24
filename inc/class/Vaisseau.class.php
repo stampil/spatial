@@ -3,7 +3,7 @@
 class Vaisseau {
 
     const TRAJET_MEME_SYSTEME_SECONDES = 60;
-    const TRAJET_ENTRE_SYSTEMES_SECONDES = 300;
+    const TRAJET_SECONDES_PAR_UNITE = 1;
     const PERCENT = 100;
     const RECONNAISSANCE = 'reconnaissance';
     const BARGE = 'barge';
@@ -67,16 +67,20 @@ class Vaisseau {
     }
 
     public static function enRoute(int $joueurId): array {
-        $query = "SELECT id_planete, id_destination, type, arrivee, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND id_flotte IS NULL GROUP BY id_planete, id_destination, type, arrivee ORDER BY arrivee";
+        $query = "SELECT id_planete, id_destination, type, depart, arrivee, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND id_flotte IS NULL GROUP BY id_planete, id_destination, type, depart, arrivee ORDER BY arrivee";
         return MyPDO::getInstance()->query($query,$joueurId);
     }
 
     public static function dureeTrajet(Joueur $joueur, string $type, Planete $depart, Planete $destination): int {
-        $base = self::TRAJET_ENTRE_SYSTEMES_SECONDES;
-        if($depart->id_systeme === $destination->id_systeme){
+        return self::dureeEntre($joueur, $type, $depart->systeme->distanceA($destination->systeme), $depart->reductionTrajet($joueur));
+    }
+
+    public static function dureeEntre(Joueur $joueur, string $type, int $distance, int $reductionPourcent): int {
+        $base = $distance * self::TRAJET_SECONDES_PAR_UNITE;
+        if($distance === Systeme::DISTANCE_MEME_SYSTEME){
             $base = self::TRAJET_MEME_SYSTEME_SECONDES;
         }
-        return $joueur->dureeEffective(intdiv($base * self::CATALOGUE[$type]['vitesse'], self::PERCENT));
+        return $joueur->dureeEffective(intdiv($base * self::CATALOGUE[$type]['vitesse'] * (self::PERCENT - $reductionPourcent), self::PERCENT * self::PERCENT));
     }
 
     public static function cibleExploration(Joueur $joueur): ?Planete {
@@ -104,8 +108,8 @@ class Vaisseau {
         }
         $db = MyPDO::getInstance();
         $arrivee = Tools::nowPlus(self::dureeTrajet($joueur, $type, $depart, $destination));
-        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
-        $db->query($query,$destination->id,$arrivee,$joueur->id,$depart->id,$type);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, depart=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
+        $db->query($query,$destination->id,Tools::now(),$arrivee,$joueur->id,$depart->id,$type);
         if($db->lastRowCount !== $nombre){
             return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[$type]['nom'].'.';
         }
@@ -122,7 +126,7 @@ class Vaisseau {
         $db = MyPDO::getInstance();
         $query = "SELECT id_destination, type FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND arrivee<=? GROUP BY id_destination, type";
         foreach($db->query($query,$joueur->id,Tools::now()) as $ligne){
-            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND arrivee IS NOT NULL AND arrivee<=?";
+            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, depart=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND arrivee IS NOT NULL AND arrivee<=?";
             $db->query($query,$joueur->id,$ligne->id_destination,$ligne->type,Tools::now());
             $nombre = $db->lastRowCount;
             if($nombre > 0){
@@ -158,7 +162,7 @@ class Vaisseau {
             return 'Toutes les usines de ce type sont occupées.';
         }
         $reservation = (int) $db->lastInsertId();
-        if(!$joueur->payer($joueur->prixUnite($infos['prix']))){
+        if(!$joueur->payer($joueur->prixVaisseau($type))){
             $db->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id=?",$reservation);
             return 'Crédits insuffisants.';
         }

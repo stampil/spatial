@@ -2,12 +2,23 @@
 
 class Systeme {
 
+    const CARTE_LARGEUR = 1000;
+    const CARTE_HAUTEUR = 1000;
+    const ECART_MINIMUM = 80;
+    const VOISIN_PORTEE = 80;
+    const TENTATIVES_PAR_AGRANDISSEMENT = 20;
+    const AGRANDISSEMENT = 100;
+    const DEGRES_TOUR = 360;
+    const DISTANCE_MEME_SYSTEME = 0;
+    const DISTANCE_MINIMUM = 1;
     const REQUETE_SYSTEMES_DES_ANCIENS = "SELECT p.id_systeme FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=p.gouverneur WHERE j.fin_tuto<=?";
 
     private MyPDO $bdd;
     public int $id;
     public string $nom;
     public bool $visible;
+    public int $x;
+    public int $y;
     public array $planetes;
     private static array $noms = array("Alpha","Beta","Gamma","Delta","Epsilon","Zeta","Eta","Theta","Iota","Kappa","Lambda","Mu","Nu","Ksi","Omicron","Pi",
         "Rho","Sigma","Tau","Upsilon","Phi","Chi","Psi","Omega");
@@ -74,6 +85,8 @@ class Systeme {
         
         $this->nom = $ret[0]->nom;
         $this->visible = (bool) $ret[0]->visible;
+        $this->x = $ret[0]->x;
+        $this->y = $ret[0]->y;
         $this->id = $ret[0]->id;
         $this->planetes = Planete::liste($this->id);
         return $this;
@@ -90,7 +103,7 @@ class Systeme {
                 );
     }
     
-     public static function create(bool $visible = false): int {
+     public static function create(bool $visible = false, ?array $position = null): int {
         $systemes = self::liste();
         
         $Noms = array();
@@ -103,13 +116,50 @@ class Systeme {
             $nom = self::$noms[rand(0,count(self::$noms)-1)].'-'.rand(1000,9999);
         }while(in_array($nom, $Noms));
          
-         $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom,visible,creato) VALUES(?,?,now()) ";
-        MyPDO::getInstance()->query($query,$nom,(int) $visible); //nom vide a la charge du joueur de le renommer la premiere fois
+         list($x, $y) = $position ?? self::positionLibre();
+         $query = "INSERT INTO " . MyPDO::DB_FLAG . "systeme (nom,visible,x,y,creato) VALUES(?,?,?,?,now()) ";
+        MyPDO::getInstance()->query($query,$nom,(int) $visible,$x,$y); //nom vide a la charge du joueur de le renommer la premiere fois
         
         return MyPDO::getInstance()->lastInsertId();
          
      }
      
+    public static function positionLibre(?array $ancre = null): array {
+        $existantes = MyPDO::getInstance()->query("SELECT x, y FROM " . MyPDO::DB_FLAG . "systeme");
+        for($tentative = 0; ; $tentative++){
+            $marge = intdiv($tentative, self::TENTATIVES_PAR_AGRANDISSEMENT) * self::AGRANDISSEMENT;
+            if($ancre === null){
+                $x = random_int(-$marge, self::CARTE_LARGEUR + $marge);
+                $y = random_int(-$marge, self::CARTE_HAUTEUR + $marge);
+            }
+            else{
+                $angle = deg2rad(random_int(0, self::DEGRES_TOUR - 1));
+                $rayon = random_int(self::ECART_MINIMUM, self::ECART_MINIMUM + self::VOISIN_PORTEE + $marge);
+                $x = $ancre[0] + (int) round($rayon * cos($angle));
+                $y = $ancre[1] + (int) round($rayon * sin($angle));
+            }
+            if(self::estLibre($existantes, $x, $y)){
+                return array($x, $y);
+            }
+        }
+    }
+
+    private static function estLibre(array $existantes, int $x, int $y): bool {
+        foreach($existantes as $ligne){
+            if(hypot($ligne->x - $x, $ligne->y - $y) < self::ECART_MINIMUM){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function distanceA(Systeme $autre): int {
+        if($this->id === $autre->id){
+            return self::DISTANCE_MEME_SYSTEME;
+        }
+        return max(self::DISTANCE_MINIMUM, (int) round(hypot($this->x - $autre->x, $this->y - $autre->y)));
+    }
+
     public function estConnuDe(int $joueurId): bool {
         return Decouverte::existe($joueurId, $this->id) || $this->estVisibleDeTous();
     }

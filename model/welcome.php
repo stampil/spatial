@@ -1,6 +1,6 @@
 <?php
 if(!empty($_SESSION['Sid'])){
-    header('Location: ?p=tableauBord');
+    header('Location: ?p='.HOME_PAGE);
     exit();
 }
 ?>

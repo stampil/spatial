@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `bouclier` int(11) NOT NULL DEFAULT '0',
   `canon` int(11) NOT NULL DEFAULT '0',
   `troupes` int(11) NOT NULL DEFAULT '0',
+  `bonus` varchar(16) DEFAULT NULL,
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
@@ -156,6 +157,8 @@ CREATE TABLE IF NOT EXISTS `systeme` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
   `visible` tinyint(1) NOT NULL DEFAULT '0',
+  `x` int(11) NOT NULL DEFAULT '0',
+  `y` int(11) NOT NULL DEFAULT '0',
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
@@ -193,6 +196,7 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `creato` datetime NOT NULL,
   `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
   `arrivee` datetime DEFAULT NULL,
+  `depart` datetime DEFAULT NULL,
   `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
@@ -243,7 +247,12 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('005_visibilite'),
 ('006_flottes'),
 ('007_persos_transport'),
-('008_roles');
+('008_roles'),
+('009_carte');
+
+UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
+
+UPDATE `planete` SET `bonus` = ELT(1 + `id` % 5, 'chantier', 'forge', 'marche', 'citadelle', 'relais') WHERE `id_systeme` IN (SELECT `id` FROM `systeme` WHERE `visible` = 1);
 
 COMMIT;
 

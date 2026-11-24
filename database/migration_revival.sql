@@ -12,7 +12,12 @@ ALTER TABLE `planete`
   ADD COLUMN `id_camp` int(11) DEFAULT NULL AFTER `revolte_maj`,
   ADD COLUMN `bouclier` int(11) NOT NULL DEFAULT '0' AFTER `id_camp`,
   ADD COLUMN `canon` int(11) NOT NULL DEFAULT '0' AFTER `bouclier`,
-  ADD COLUMN `troupes` int(11) NOT NULL DEFAULT '0' AFTER `canon`;
+  ADD COLUMN `troupes` int(11) NOT NULL DEFAULT '0' AFTER `canon`,
+  ADD COLUMN `bonus` varchar(16) DEFAULT NULL AFTER `troupes`;
+
+ALTER TABLE `systeme`
+  ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `visible`,
+  ADD COLUMN `y` int(11) NOT NULL DEFAULT '0' AFTER `x`;
 
 ALTER TABLE `joueur`
   ADD COLUMN `credits_maj` datetime DEFAULT NULL AFTER `lastco`,
@@ -39,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `creato` datetime NOT NULL,
   `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
   `arrivee` datetime DEFAULT NULL,
+  `depart` datetime DEFAULT NULL,
   `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
@@ -90,4 +96,10 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('005_visibilite'),
 ('006_flottes'),
 ('007_persos_transport'),
-('008_roles');
+('008_roles'),
+('009_carte');
+
+UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
+
+UPDATE `planete` SET `bonus` = ELT(1 + `id` % 5, 'chantier', 'forge', 'marche', 'citadelle', 'relais') WHERE `id_systeme` IN (SELECT `id` FROM `systeme` WHERE `visible` = 1);
+

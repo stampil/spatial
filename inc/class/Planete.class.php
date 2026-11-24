@@ -33,6 +33,7 @@ class Planete {
     public int $bouclier;
     public int $canon;
     public int $troupes;
+    public ?string $bonus;
     public Systeme $systeme;
     public static int $min_slot = 1;
     public static int $max_slot = 16;
@@ -76,10 +77,10 @@ class Planete {
         return $ret[0]->id;
     }
 
-    public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp): int{
+    public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp, ?string $bonus = null): int{
         $nom_planete = preg_replace("/-[0-9]+/",' '.$numero,$Systeme->nom);
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,creato)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,bonus,creato)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
         $gouverneur=0;
         $bouclier = 0;
         $canon = 0;
@@ -89,7 +90,7 @@ class Planete {
             $canon = $slot * self::CANON_PAR_SLOT;
             $troupes = intdiv($slot, self::TROUPES_DIVISEUR_SLOT) + 1;
         }
-        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,0,0,0,0,0);
+        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,0,0,0,0,0,$bonus);
         return MyPDO::getInstance()->lastInsertId();
     }
 
@@ -110,7 +111,7 @@ class Planete {
         }
     }
 
-    public static function fillSystemeIA(Systeme $Systeme, array $id_camps, ?int $id_camp_premiere = null): void{
+    public static function fillSystemeIA(Systeme $Systeme, array $id_camps, ?int $id_camp_premiere = null, bool $avecBonus = false): void{
         $nb_planetes = rand(self::MIN_PLANETES, self::MAX_PLANETES);
 
         for ($i=1; $i<=$nb_planetes; $i++){
@@ -118,7 +119,7 @@ class Planete {
             if($i==1 && $id_camp_premiere !== null){
                 $id_camp = $id_camp_premiere;
             }
-            self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp);
+            self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null);
         }
     }
 
@@ -158,6 +159,7 @@ class Planete {
         $this->bouclier = $ret[0]->bouclier;
         $this->canon = $ret[0]->canon;
         $this->troupes = $ret[0]->troupes;
+        $this->bonus = $ret[0]->bonus;
         $this->systeme = new Systeme($this->id_systeme);
         return $this;
 
@@ -190,6 +192,13 @@ class Planete {
                 $this->nb_academie,
                 $this->id
                 );
+    }
+
+    public function reductionTrajet(Joueur $joueur): int {
+        if($this->bonus === Bonus::RELAIS && $this->gouverneur === $joueur->id){
+            return Bonus::pourcent(Bonus::RELAIS);
+        }
+        return 0;
     }
 
     public function getGouverneurNom(): string {

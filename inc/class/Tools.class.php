@@ -41,6 +41,16 @@ class Tools {
         return $messages;
     }
     
+    public static function addRapport(array $rapport): void{
+        $_SESSION[RAPPORTS_KEY][] = $rapport;
+    }
+    
+    public static function takeRapports(): array{
+        $rapports = $_SESSION[RAPPORTS_KEY] ?? array();
+        unset($_SESSION[RAPPORTS_KEY]);
+        return $rapports;
+    }
+    
     public static function isValidCsrfToken(mixed $token): bool{
         return is_string($token) && hash_equals($_SESSION[CSRF_KEY], $token);
     }
