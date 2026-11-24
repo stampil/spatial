@@ -4,7 +4,7 @@
 
 ### 1. Pull request, commits et push (23/11)
 
-Ta phrase : « tu pushera la PR mais tu ne la fusionne pas sur master sa sera a moi de le faire ». La PR 1 de `revival` vers `master` est ouverte : https://github.com/stampil/spatial/pull/1. La fusion sur `master` est à toi, à la fin.
+Ta phrase (23/11) : « tu pushera la PR mais tu ne la fusionne pas sur master sa sera a moi de le faire ». Ta phrase (24/11) : « push et merge sur le depot ». Compris : la PR 1 de `revival` vers `master` (https://github.com/stampil/spatial/pull/1) se fusionne sur ta demande explicite seulement ; le 24/11 tu me l'as demandé, je pousse `revival` puis je fusionne.
 
 Ta phrase : « si si tu push with lease et si tu doit reprendree, tu amend ». Ta phrase : « revival c ta branche de travail a toi ». Compris : je pousse `revival` avec `--force-with-lease`, j'amende pour reprendre un travail déjà commité, un nouveau sujet fait un nouveau commit, et je ne touche jamais à `master`.
 
