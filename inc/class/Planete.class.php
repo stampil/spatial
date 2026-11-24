@@ -50,10 +50,16 @@ class Planete {
     
     
     public static function listeVisibles(int $joueurId): array{
-        $query = "SELECT * FROM " . MyPDO::DB_FLAG . "planete
-                WHERE id_systeme IN (SELECT id FROM " . MyPDO::DB_FLAG . "systeme WHERE visible=1)
-                OR id_systeme IN (SELECT id_systeme FROM " . MyPDO::DB_FLAG . "decouverte WHERE id_joueur=?)";
-        return MyPDO::getInstance()->query($query,$joueurId);
+        $systemes = array();
+        foreach(Systeme::listeVisibles($joueurId) as $systeme){
+            array_push($systemes, $systeme->id);
+        }
+        if(count($systemes) === 0){
+            return array();
+        }
+        $marques = implode(',', array_fill(0, count($systemes), '?'));
+        $query = "SELECT * FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme IN ($marques)";
+        return MyPDO::getInstance()->query($query,$systemes);
     }
 
     public static function listeGouvernees(int $joueurId): array{
@@ -266,7 +272,7 @@ class Planete {
         if($this->nombre(Batiment::ACADEMIE) < 1){
             return "Cette planète n'a pas d'académie.";
         }
-        if(!$joueur->payer(Batiment::DIPLOMATE_PRIX)){
+        if(!$joueur->payer($joueur->prixUnite(Batiment::DIPLOMATE_PRIX))){
             return 'Crédits insuffisants.';
         }
         Perso::recruter($joueur, $this);

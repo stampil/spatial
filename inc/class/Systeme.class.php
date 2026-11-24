@@ -2,6 +2,8 @@
 
 class Systeme {
 
+    const REQUETE_SYSTEMES_DES_ANCIENS = "SELECT p.id_systeme FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=p.gouverneur WHERE j.fin_tuto<=?";
+
     private MyPDO $bdd;
     public int $id;
     public string $nom;
@@ -18,10 +20,36 @@ class Systeme {
         return $ret;
     }
 
+    private static function limiteAnciens(): string {
+        return Tools::formatDate(time() - Joueur::VISIBILITE_APRES_TUTO_SECONDES);
+    }
+
     public static function listeVisibles(int $joueurId): array {
-        $query = "SELECT * FROM " . MyPDO::DB_FLAG . "systeme
-                WHERE visible=1 OR id IN (SELECT id_systeme FROM " . MyPDO::DB_FLAG . "decouverte WHERE id_joueur=?)";
-        return MyPDO::getInstance()->query($query,$joueurId);
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "systeme
+                WHERE visible=1
+                OR id IN (SELECT id_systeme FROM " . MyPDO::DB_FLAG . "decouverte WHERE id_joueur=?)
+                OR id IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")";
+        $visibles = array();
+        foreach(MyPDO::getInstance()->query($query,$joueurId,self::limiteAnciens()) as $ligne){
+            $systeme = new Systeme($ligne->id);
+            if($systeme->estConnuDe($joueurId)){
+                array_push($visibles, $systeme);
+            }
+        }
+        return $visibles;
+    }
+
+    public static function explorables(int $joueurId): array {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "systeme
+                WHERE visible=1 OR id IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")";
+        $explorables = array();
+        foreach(MyPDO::getInstance()->query($query,self::limiteAnciens()) as $ligne){
+            $systeme = new Systeme($ligne->id);
+            if(!$systeme->estConnuDe($joueurId)){
+                array_push($explorables, $systeme);
+            }
+        }
+        return $explorables;
     }
 
     /**
@@ -83,7 +111,18 @@ class Systeme {
      }
      
     public function estConnuDe(int $joueurId): bool {
-        return $this->visible || Decouverte::existe($joueurId, $this->id);
+        return Decouverte::existe($joueurId, $this->id) || $this->estVisibleDeTous();
+    }
+
+    private function estVisibleDeTous(): bool {
+        if($this->visible){
+            return !in_array($this->getIdCamp(), Camp::DISCRETS, true);
+        }
+        if($this->getIdCamp() !== Camp::EMPIRE){
+            return false;
+        }
+        $query = self::REQUETE_SYSTEMES_DES_ANCIENS . " AND p.id_systeme=?";
+        return !empty($this->bdd->query($query,self::limiteAnciens(),$this->id));
     }
 
     public function getIdCamp(): ?int {

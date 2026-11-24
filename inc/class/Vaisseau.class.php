@@ -9,6 +9,7 @@ class Vaisseau {
     const BARGE = 'barge';
     const TROUPE = 'troupe_assaut';
     const CAPACITE_BARGE = 10;
+    const DESTINATION_EXPLORATION = 'explorer';
 
     const CATALOGUE = array(
         'chasseur' => array('nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100, 'force' => 5),
@@ -76,14 +77,23 @@ class Vaisseau {
         return $joueur->dureeEffective(intdiv($base * self::CATALOGUE[$type]['vitesse'], self::PERCENT));
     }
 
-    public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre): ?string {
+    public static function cibleExploration(Joueur $joueur): ?Planete {
+        $cibles = Systeme::explorables($joueur->id);
+        if(count($cibles) === 0){
+            return null;
+        }
+        $cible = $cibles[random_int(0, count($cibles) - 1)];
+        return new Planete($cible->planetes[0]->id);
+    }
+
+    public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre, bool $exploration = false): ?string {
         if(!isset(self::CATALOGUE[$type])){
             return 'Type de vaisseau inconnu.';
         }
         if($depart->id === $destination->id){
             return 'Les vaisseaux sont déjà sur cette planète.';
         }
-        if(!$joueur->peutCibler($destination->systeme)){
+        if(!$exploration && !$joueur->peutCibler($destination->systeme)){
             return 'Destination inconnue.';
         }
         $disponibles = self::stock($depart->id, $joueur->id)[$type] ?? 0;
@@ -139,7 +149,7 @@ class Vaisseau {
             return 'Toutes les usines de ce type sont occupées.';
         }
         $reservation = (int) $db->lastInsertId();
-        if(!$joueur->payer($infos['prix'])){
+        if(!$joueur->payer($joueur->prixUnite($infos['prix']))){
             $db->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id=?",$reservation);
             return 'Crédits insuffisants.';
         }

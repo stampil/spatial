@@ -15,11 +15,13 @@ class Joueur {
     public int $etape_tuto;
     public int $id_camp;
     public ?int $id_systeme_voisin;
+    public ?string $fin_tuto;
 
     public string $IPs;
     
     const TUTO_END_STEP = 8;
     const TUTO_DIVISEUR_DUREES = 5;
+    const VISIBILITE_APRES_TUTO_SECONDES = 7 * 24 * 3600;
 
     private static int $credits_depart = 500;
     
@@ -93,6 +95,7 @@ class Joueur {
         $this->etape_tuto= $ret[0]->etape_tuto;
         $this->id_camp = $ret[0]->id_camp;
         $this->id_systeme_voisin = $ret[0]->id_systeme_voisin;
+        $this->fin_tuto = $ret[0]->fin_tuto;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 
@@ -196,6 +199,13 @@ class Joueur {
             return intdiv($secondes, self::TUTO_DIVISEUR_DUREES);
         }
         return $secondes;
+    }
+
+    public function prixUnite(int $prix): int {
+        if($this->id_camp === Camp::EMPIRE){
+            return intdiv($prix * (Camp::PERCENT - Camp::EMPIRE_REMISE_POURCENT), Camp::PERCENT);
+        }
+        return $prix;
     }
 
     public function peutCibler(Systeme $systeme): bool {

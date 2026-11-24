@@ -4,6 +4,10 @@ class Camp {
 
     const PIRATES = 1;
     const EMPIRE = 2;
+    const REBELLION = 3;
+    const DISCRETS = array(self::PIRATES, self::REBELLION);
+    const EMPIRE_REMISE_POURCENT = 20;
+    const PERCENT = 100;
     const SANS_CAMP_NOM = 'Sans camp';
     const SANS_CAMP_COULEUR = '#79747E';
 

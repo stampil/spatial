@@ -33,6 +33,7 @@ class Tuto {
             Tools::addMessage('Tutoriel : étape réussie, prime de '.self::PRIME_CREDITS.' crédits pour préparer l\'assaut.');
         }
         elseif($etape === Joueur::TUTO_END_STEP){
+            MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET fin_tuto=? WHERE id=?",Tools::now(),$joueur->id);
             Tools::addMessage('Tutoriel terminé : vous avez capturé une planète des Pirates.');
         }
         else{

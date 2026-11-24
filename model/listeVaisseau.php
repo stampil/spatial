@@ -20,6 +20,9 @@ foreach(Systeme::listeVisibles($Joueur->id) as $systeme){
     }
     $options .= '</optgroup>';
 }
+if(count(Systeme::explorables($Joueur->id)) > 0){
+    $options .= '<optgroup label="Exploration"><option value="'.Vaisseau::DESTINATION_EXPLORATION.'">Explorer un secteur inconnu (reconnaissance)</option></optgroup>';
+}
 if($Joueur->id_systeme_voisin !== null && !Decouverte::existe($Joueur->id, $Joueur->id_systeme_voisin)){
     $options .= '<optgroup label="Secteur inexploré"><option value="'.(int) Planete::liste($Joueur->id_systeme_voisin)[0]->id.'">Système voisin (inconnu)</option></optgroup>';
 }
@@ -56,7 +59,8 @@ foreach($posees as $planeteId => $types){
     <div class="md3-row">
         <div>
             <strong><?= Vaisseau::CATALOGUE[$ligne->type]['nom'] ?></strong> × <?= $ligne->nombre ?><br>
-            <span class="md3-secondary">de <?= (new Planete($ligne->id_planete))->getNom() ?> vers <?= (new Planete($ligne->id_destination))->getNom() ?></span>
+            <?php $destination = new Planete($ligne->id_destination); ?>
+            <span class="md3-secondary">de <?= (new Planete($ligne->id_planete))->getNom() ?> vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?></span>
         </div>
         <span data-countdown="<?= htmlspecialchars($ligne->arrivee) ?>"></span>
     </div>

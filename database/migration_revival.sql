@@ -13,7 +13,8 @@ ALTER TABLE `planete`
 ALTER TABLE `joueur`
   ADD COLUMN `credits_maj` datetime DEFAULT NULL AFTER `lastco`,
   ADD COLUMN `id_camp` int(11) NOT NULL AFTER `credits_maj`,
-  ADD COLUMN `id_systeme_voisin` int(11) DEFAULT NULL AFTER `id_camp`;
+  ADD COLUMN `id_systeme_voisin` int(11) DEFAULT NULL AFTER `id_camp`,
+  ADD COLUMN `fin_tuto` datetime DEFAULT NULL AFTER `id_systeme_voisin`;
 
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -70,4 +71,5 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('001_vaisseau_deplacement'),
 ('002_exploration'),
 ('003_combat'),
-('004_fin_du_tutoriel');
+('004_fin_du_tutoriel'),
+('005_visibilite');

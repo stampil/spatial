@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `credits_maj` datetime DEFAULT NULL,
   `id_camp` int(11) NOT NULL,
   `id_systeme_voisin` int(11) DEFAULT NULL,
+  `fin_tuto` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `nom` (`nom`)
@@ -223,7 +224,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('001_vaisseau_deplacement'),
 ('002_exploration'),
 ('003_combat'),
-('004_fin_du_tutoriel');
+('004_fin_du_tutoriel'),
+('005_visibilite');
 
 COMMIT;
 

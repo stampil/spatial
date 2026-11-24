@@ -30,8 +30,6 @@ Tes mots (23/11) : « ok d'apres le readme, fait un plan de ce qu'il reste a fai
 
 - **Flottes persistantes** (grouper n chasseurs, n frégates, n capitaux sous un nom) : aujourd'hui chaque type voyage à sa vitesse et les vaisseaux d'une planète combattent tous ensemble.
 - **Persos dans les transports** (transport personnel, barge) : les persos ne voyagent pas.
-- **Fin du tuto = système visible des autres joueurs** : le texte du tutoriel dit « 7 jours après la fin » ; `systeme.visible` n'est pas encore mis à 1 à ce moment-là.
-- **Effets des camps** : unités moins chères pour l'Empire, Rébellion et Pirates invisibles tant qu'ils ne sont pas découverts.
 - **Académie : héros et assassin** (seuls le diplomate et la troupe d'assaut existent), héros (boost combat ou diplomatie).
 - **But du jeu** : page de classement (plus grosse flotte, plus de planètes).
 

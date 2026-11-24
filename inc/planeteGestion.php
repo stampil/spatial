@@ -32,7 +32,7 @@
     <form method="POST" action="?p=recruter">
         <input type="hidden" name="planete" value="<?= $planete->id ?>" />
         <?= csrfField() ?>
-        <input type="submit" value="Recruter un diplomate (<?= Batiment::DIPLOMATE_PRIX ?> cr)" />
+        <input type="submit" value="Recruter un diplomate (<?= $Joueur->prixUnite(Batiment::DIPLOMATE_PRIX) ?> cr)" />
     </form>
 </section>
 <?php } ?>
@@ -51,7 +51,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
     <div class="md3-row">
         <div>
             <strong><?= $infos['nom'] ?></strong> × <?= $stock[$type] ?? 0 ?> en stock<br>
-            <span class="md3-secondary"><?= $infos['prix'] ?> cr · <?= gmdate('i:s', $infos['duree']) ?></span>
+            <span class="md3-secondary"><?= $Joueur->prixUnite($infos['prix']) ?> cr · <?= gmdate('i:s', $infos['duree']) ?></span>
         </div>
         <form method="POST" action="?p=produire">
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
