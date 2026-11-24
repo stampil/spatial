@@ -69,4 +69,5 @@ CREATE TABLE IF NOT EXISTS `schema_migrations` (
 INSERT INTO `schema_migrations` (`version`) VALUES
 ('001_vaisseau_deplacement'),
 ('002_exploration'),
-('003_combat');
+('003_combat'),
+('004_fin_du_tutoriel');

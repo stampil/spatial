@@ -18,7 +18,7 @@ class Joueur {
 
     public string $IPs;
     
-    const TUTO_END_STEP = 5;
+    const TUTO_END_STEP = 8;
     const TUTO_DIVISEUR_DUREES = 5;
 
     private static int $credits_depart = 500;
