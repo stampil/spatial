@@ -4,7 +4,8 @@ ALTER TABLE `perso`
   ADD COLUMN `fin_mort` datetime DEFAULT NULL AFTER `fin_prison`,
   ADD COLUMN `embarque` tinyint(1) NOT NULL DEFAULT '0' AFTER `fin_mort`,
   ADD COLUMN `id_destination` bigint(20) UNSIGNED DEFAULT NULL AFTER `embarque`,
-  ADD COLUMN `arrivee` datetime DEFAULT NULL AFTER `id_destination`;
+  ADD COLUMN `arrivee` datetime DEFAULT NULL AFTER `id_destination`,
+  ADD COLUMN `role` varchar(16) NOT NULL DEFAULT 'diplomate' AFTER `arrivee`;
 
 ALTER TABLE `planete`
   ADD COLUMN `revolte_maj` datetime DEFAULT NULL AFTER `nb_academie`,
@@ -88,4 +89,5 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('004_fin_du_tutoriel'),
 ('005_visibilite'),
 ('006_flottes'),
-('007_persos_transport');
+('007_persos_transport'),
+('008_roles');

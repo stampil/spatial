@@ -27,6 +27,7 @@ Les actions de votre perso s'affichent de manière contextuelle, par exemple, si
 Force : <?= $o->getFO() ?><br />
 Endurance : <?= $o->getPV() ?><br />
 Diplomatie : <?= $o->getDiplomatie() ?><br />
+Rôle : <?= $o->getRole() ?><br />
 
 <br />
 Statut :<br />
@@ -68,7 +69,31 @@ Action :<br />
 <?php
 if($o->canAct()){
     $planete = $o->sur_planete;
-    if($planete->gouverneur === 0){
+    if($o->role === Perso::ROLE_HEROS){
+?>
+Un héros n'agit pas seul : sa présence renforce vos combats sur cette planète (force) et vos diplomates qui y travaillent (diplomatie).
+<?php
+    }
+    elseif($o->role === Perso::ROLE_ASSASSIN){
+        $cibles = Perso::ennemis($Joueur, $planete);
+        if(count($cibles) === 0){
+?>
+Aucune cible sur <?= $planete->getNom() ?>.
+<?php
+        }
+        foreach($cibles as $ligneCible){
+            $cible = new Perso($ligneCible->id);
+?>
+<form method="POST" action="?p=assassiner">
+    <input type="hidden" name="perso" value="<?= $o->id ?>" />
+    <input type="hidden" name="cible" value="<?= $cible->id ?>" />
+    <?= csrfField() ?>
+    <input type="submit" value="Assassiner" /> <?= $cible->getNom() ?> de <?= htmlspecialchars($cible->joueur->nom) ?> (chance de réussite <?= $o->chanceAssassinat($cible) ?> %, en cas d'échec : prison ou mort)
+</form>
+<?php
+        }
+    }
+    elseif($planete->gouverneur === 0){
 ?>
 <form method="POST" action="?p=faireDiplomatie">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />

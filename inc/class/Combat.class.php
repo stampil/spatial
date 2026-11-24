@@ -5,6 +5,7 @@ class Combat {
     const PERCENT = 100;
     const ALEA_POURCENT = 20;
     const BONUS_PHASE_POURCENT = 25;
+    const HEROS_BONUS_PAR_ETOILE_POURCENT = 5;
     const EPAVE_CREDITS_PAR_POINT = 10;
     const ESCADRE = array('chasseur', 'fregate', 'capital');
 
@@ -31,11 +32,12 @@ class Combat {
             return "Cette planète n'a plus de défense.";
         }
 
-        list($canon, $bouclier) = self::infliger(self::puissance($nombres['chasseur'], 'chasseur', 0), $planete->canon, $planete->bouclier);
+        $bonusHeros = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE) * self::HEROS_BONUS_PAR_ETOILE_POURCENT;
+        list($canon, $bouclier) = self::infliger(self::puissance($nombres['chasseur'], 'chasseur', $bonusHeros), $planete->canon, $planete->bouclier);
         $bonus = $canon === 0 ? self::BONUS_PHASE_POURCENT : 0;
-        list($bouclier, $canon) = self::infliger(self::puissance($nombres['fregate'], 'fregate', $bonus), $bouclier, $canon);
+        list($bouclier, $canon) = self::infliger(self::puissance($nombres['fregate'], 'fregate', $bonus + $bonusHeros), $bouclier, $canon);
         $bonus = $bouclier === 0 ? self::BONUS_PHASE_POURCENT : 0;
-        list($canon, $bouclier) = self::infliger(self::puissance($nombres['capital'], 'capital', $bonus), $canon, $bouclier);
+        list($canon, $bouclier) = self::infliger(self::puissance($nombres['capital'], 'capital', $bonus + $bonusHeros), $canon, $bouclier);
 
         $db = MyPDO::getInstance();
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=? WHERE id=? AND bouclier=? AND canon=?";
@@ -52,6 +54,9 @@ class Combat {
             array_push($rapport, $perdus.' × '.Vaisseau::CATALOGUE[$type]['nom']);
         }
         $message = 'Combat sur '.$planete->nom.' : défense restante, bouclier '.$bouclier.' et canon '.$canon.'. Pertes : '.(count($rapport) > 0 ? implode(', ', $rapport) : 'aucune').'.';
+        if($bonusHeros > 0){
+            $message .= ' Héros présent : +'.$bonusHeros.' % de puissance.';
+        }
         if($bouclier + $canon === 0){
             $epaves = ($planete->bouclier + $planete->canon) * self::EPAVE_CREDITS_PAR_POINT;
             $joueur->crediter($epaves);

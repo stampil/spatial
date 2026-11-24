@@ -4,8 +4,10 @@ if(!Tools::isValidCsrfToken($_POST[CSRF_KEY] ?? null)){
 }
 $planete = new Planete((int) ($_POST['planete'] ?? 0));
 
-$erreur = $planete->recruter($Joueur);
-Tools::addMessage($erreur ?? 'Un diplomate a été recruté sur '.$planete->nom.'.');
+$role = giveInputString($_POST, 'role');
+
+$erreur = $planete->recruter($Joueur, $role);
+Tools::addMessage($erreur ?? Perso::ROLES[$role]['nom'].' recruté sur '.$planete->nom.'.');
 
 ?>
 

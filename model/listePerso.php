@@ -17,7 +17,7 @@ $persos = Perso::liste($Joueur);
 foreach($persos as $p){
     $perso = new Perso($p->id);
 ?>
-<p> <?= $perso->getNom() ?></p>
+<p> <?= $perso->getNom() ?> (<?= $perso->getRole() ?>)</p>
 
 <?php } ?>
 

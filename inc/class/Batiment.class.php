@@ -11,7 +11,6 @@ class Batiment {
     const FERME_INCOME = 25;
     const REFUND_PERCENT = 50;
     const MAX_PERCENT = 100;
-    const DIPLOMATE_PRIX = 100;
     const CATALOGUE = array(
         self::USINE_LEGERE => array('nom' => 'Usine de vaisseaux légers', 'prix' => 100, 'maintenance' => 2),
         self::USINE_MOYENNE => array('nom' => 'Usine de vaisseaux moyens', 'prix' => 200, 'maintenance' => 4),

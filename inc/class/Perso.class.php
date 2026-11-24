@@ -14,7 +14,21 @@ class Perso {
     const RESPAWN_SECONDS = 1800;
     const APAISER_PER_DIPLOMATIE = 5;
     const SECONDS_PER_MINUTE = 60;
-    const DIPLOMATE_NOM = 'Diplomate';
+    const ROLE_DIPLOMATE = 'diplomate';
+    const ROLE_HEROS = 'heros';
+    const ROLE_ASSASSIN = 'assassin';
+    const ROLES = array(
+        self::ROLE_DIPLOMATE => array('nom' => 'Diplomate', 'prix' => 100),
+        self::ROLE_HEROS => array('nom' => 'Héros', 'prix' => 300),
+        self::ROLE_ASSASSIN => array('nom' => 'Assassin', 'prix' => 200),
+    );
+    const CARACTERISTIQUE_FORCE = 'FO';
+    const CARACTERISTIQUE_DIPLOMATIE = 'diplomatie';
+    const HEROS_SUCCESS_PER_STAR_PERCENT = 5;
+    const ASSASSINAT_BASE_PERCENT = 50;
+    const ASSASSINAT_PER_STAR_PERCENT = 10;
+    const ASSASSINAT_MIN_PERCENT = 10;
+    const ASSASSINAT_MAX_PERCENT = 90;
 
     private MyPDO $bdd;   
     
@@ -32,6 +46,7 @@ class Perso {
     public ?string $fin_prison;
     public ?string $fin_mort;
     public ?int $action_diplomatie;
+    public string $role;
     public bool $embarque;
     public ?int $id_destination;
     public ?string $arrivee;
@@ -54,10 +69,10 @@ class Perso {
     
 
         
-    public static function recruter(Joueur $Joueur, Planete $Planete): int {
-        $nom = self::DIPLOMATE_NOM.' '.(count(self::liste($Joueur)) + 1);
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$Joueur->id,$nom,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$Planete->id);
+    public static function recruter(Joueur $Joueur, Planete $Planete, string $role): int {
+        $nom = self::ROLES[$role]['nom'].' '.(count(self::liste($Joueur)) + 1);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,role,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,?,now()) ";
+        MyPDO::getInstance()->query($query,$Joueur->id,$nom,$role,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$Planete->id);
         return MyPDO::getInstance()->lastInsertId();
     }
 
@@ -106,6 +121,7 @@ class Perso {
         $this->fin_prison = $ret[0]->fin_prison;
         $this->fin_mort = $ret[0]->fin_mort;
         $this->action_diplomatie = $ret[0]->action_diplomatie;
+        $this->role = $ret[0]->role;
         $this->embarque = (bool) $ret[0]->embarque;
         $this->id_destination = $ret[0]->id_destination;
         $this->arrivee = $ret[0]->arrivee;
@@ -118,6 +134,58 @@ class Perso {
             $this->bdd->query($query,$Planete->id,$this->id);
     }
     
+    public function getRole(): string {
+        return self::ROLES[$this->role]['nom'];
+    }
+
+    public static function boostHeros(Joueur $joueur, Planete $planete, string $caracteristique): int {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND sur_planete=? AND role=? AND fin_mort IS NULL AND embarque=0 AND arrivee IS NULL AND (fin_prison IS NULL OR fin_prison<=?)";
+        $boost = 0;
+        foreach(MyPDO::getInstance()->query($query,$joueur->id,$planete->id,self::ROLE_HEROS,Tools::now()) as $ligne){
+            $boost = max($boost, (new Perso($ligne->id))->$caracteristique);
+        }
+        return $boost;
+    }
+
+    public static function ennemis(Joueur $joueur, Planete $planete): array {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "perso WHERE sur_planete=? AND id_joueur<>? AND fin_mort IS NULL AND arrivee IS NULL ORDER BY id";
+        return MyPDO::getInstance()->query($query,$planete->id,$joueur->id);
+    }
+
+    public function chanceAssassinat(Perso $cible): int {
+        $chance = self::ASSASSINAT_BASE_PERCENT + self::ASSASSINAT_PER_STAR_PERCENT * ($this->FO - $cible->PV);
+        return max(self::ASSASSINAT_MIN_PERCENT, min($chance, self::ASSASSINAT_MAX_PERCENT));
+    }
+
+    public function assassiner(Perso $cible): ?string {
+        if($this->role !== self::ROLE_ASSASSIN){
+            return "Seul un assassin peut assassiner.";
+        }
+        if(!$this->canAct()){
+            return 'Ce perso ne peut pas agir maintenant.';
+        }
+        if($cible->joueur->id === $this->joueur->id){
+            return 'Impossible de viser un perso de votre camp.';
+        }
+        if($cible->sur_planete->id !== $this->sur_planete->id || $cible->arrivee !== null){
+            return "La cible n'est pas sur cette planète.";
+        }
+        if($cible->fin_mort !== null){
+            return 'La cible est déjà morte.';
+        }
+        if(random_int(1, self::MAX_PERCENT) > $this->chanceAssassinat($cible)){
+            $this->fail();
+            return null;
+        }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=?, action_diplomatie=NULL, fin_diplomatie=NULL, embarque=0 WHERE id=? AND fin_mort IS NULL";
+        $this->bdd->query($query,Tools::nowPlus(self::RESPAWN_SECONDS),$cible->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'La cible a été tuée entre-temps.';
+        }
+        Tools::addMessage($this->nom.' a assassiné '.$cible->nom.' de '.$cible->joueur->nom.'.');
+        return null;
+    }
+
     public function getNom(): string {
         return '<a target="_blank" href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->joueur->id_camp);
     }  
@@ -183,12 +251,17 @@ class Perso {
         if($joueur->etape_tuto < Joueur::TUTO_END_STEP){
             return self::MAX_PERCENT;
         }
-        return self::SUCCESS_BASE_PERCENT + self::SUCCESS_PER_DIPLOMATIE_PERCENT * $this->diplomatie;
+        $chance = self::SUCCESS_BASE_PERCENT + self::SUCCESS_PER_DIPLOMATIE_PERCENT * $this->diplomatie;
+        $chance += self::boostHeros($joueur, $this->sur_planete, self::CARACTERISTIQUE_DIPLOMATIE) * self::HEROS_SUCCESS_PER_STAR_PERCENT;
+        return min($chance, self::MAX_PERCENT);
     }
 
     public function startDiplomatie(int $action): ?string {
         if($action !== self::ACTION_CONQUETE && $action !== self::ACTION_APAISER){
             return 'Action de diplomatie inconnue.';
+        }
+        if($this->role !== self::ROLE_DIPLOMATE){
+            return 'Seul un diplomate mène une diplomatie.';
         }
         if($this->fin_mort !== null){
             return 'Ce perso est mort.';

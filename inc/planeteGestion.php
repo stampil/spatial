@@ -29,11 +29,16 @@
 <?php if($planete->nombre(Batiment::ACADEMIE) > 0){ ?>
 <section class="md3-card">
     <h2>Académie</h2>
-    <form method="POST" action="?p=recruter">
-        <input type="hidden" name="planete" value="<?= $planete->id ?>" />
-        <?= csrfField() ?>
-        <input type="submit" value="Recruter un diplomate (<?= $Joueur->prixUnite(Batiment::DIPLOMATE_PRIX) ?> cr)" />
-    </form>
+    <div class="md3-actions">
+        <?php foreach(Perso::ROLES as $role => $infosRole){ ?>
+        <form method="POST" action="?p=recruter">
+            <input type="hidden" name="planete" value="<?= $planete->id ?>" />
+            <input type="hidden" name="role" value="<?= $role ?>" />
+            <?= csrfField() ?>
+            <input type="submit" value="Recruter : <?= $infosRole['nom'] ?> (<?= $Joueur->prixUnite($infosRole['prix']) ?> cr)" />
+        </form>
+        <?php } ?>
+    </div>
 </section>
 <?php } ?>
 <?php

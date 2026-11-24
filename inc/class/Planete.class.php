@@ -265,17 +265,20 @@ class Planete {
         return null;
     }
 
-    public function recruter(Joueur $joueur): ?string {
+    public function recruter(Joueur $joueur, string $role): ?string {
+        if(!isset(Perso::ROLES[$role])){
+            return 'Rôle inconnu.';
+        }
         if($this->gouverneur !== $joueur->id){
             return 'Vous ne gouvernez pas cette planète.';
         }
         if($this->nombre(Batiment::ACADEMIE) < 1){
             return "Cette planète n'a pas d'académie.";
         }
-        if(!$joueur->payer($joueur->prixUnite(Batiment::DIPLOMATE_PRIX))){
+        if(!$joueur->payer($joueur->prixUnite(Perso::ROLES[$role]['prix']))){
             return 'Crédits insuffisants.';
         }
-        Perso::recruter($joueur, $this);
+        Perso::recruter($joueur, $this, $role);
         return null;
     }
 
