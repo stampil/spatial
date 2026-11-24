@@ -52,6 +52,15 @@ foreach($posees as $planeteId => $types){
             <input type="submit" value="Envoyer" />
         </div>
     </form>
+    <?php if(($types[Vaisseau::TRANSPORT_PERSO] ?? 0) > 0){ ?>
+    <?php
+    $embarques = array();
+    foreach(Perso::embarques($Joueur, $planete) as $ligneEmbarque){
+        array_push($embarques, (new Perso($ligneEmbarque->id))->getNom());
+    }
+    ?>
+    <p class="md3-secondary">Persos embarqués (<?= count($embarques) ?>/<?= $types[Vaisseau::TRANSPORT_PERSO] * Vaisseau::CAPACITE_TRANSPORT_PERSO ?>) : <?= count($embarques) > 0 ? implode(', ', $embarques) : 'aucun' ?>. Ils partent avec le transport.</p>
+    <?php } ?>
     <?php $escadre = array_intersect_key($types, array_flip(Combat::ESCADRE)); ?>
     <?php if(count($escadre) > 0){ ?>
     <form method="POST" action="?p=creerFlotte">

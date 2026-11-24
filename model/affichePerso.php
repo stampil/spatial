@@ -41,6 +41,17 @@ elseif($o->isImprisoned()){
 Emprisonné : libéré dans <span data-countdown="<?= htmlspecialchars($o->fin_prison) ?>"></span><br>
 <?php
 }
+elseif($o->arrivee !== null){
+    $destination = new Planete($o->id_destination);
+?>
+En voyage vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?> : arrivée dans <span data-countdown="<?= htmlspecialchars($o->arrivee) ?>"></span><br>
+<?php
+}
+elseif($o->embarque){
+?>
+Embarqué sur <?= $o->sur_planete->getNom() ?> : il partira avec le prochain transport personnel.<br>
+<?php
+}
 elseif($o->action_diplomatie !== null){
 ?>
 Fin de la diplomatie : <span data-countdown="<?= htmlspecialchars($o->fin_diplomatie) ?>"></span><br>
@@ -82,5 +93,25 @@ if($o->canAct()){
 Aucune action possible sur <?= $planete->getNom() ?>.
 <?php
     }
+    if(Perso::placesLibres($Joueur, $planete) > 0){
+?>
+<form method="POST" action="?p=embarquerPerso">
+    <input type="hidden" name="perso" value="<?= $o->id ?>" />
+    <input type="hidden" name="action" value="embarquer" />
+    <?= csrfField() ?>
+    <input type="submit" class="md3-button md3-button--tonal" value="Monter dans un transport" /> sur <?= $planete->getNom() ?>
+</form>
+<?php
+    }
+}
+elseif($o->embarque){
+?>
+<form method="POST" action="?p=embarquerPerso">
+    <input type="hidden" name="perso" value="<?= $o->id ?>" />
+    <input type="hidden" name="action" value="descendre" />
+    <?= csrfField() ?>
+    <input type="submit" class="md3-button md3-button--outlined" value="Descendre du transport" />
+</form>
+<?php
 }
 ?>

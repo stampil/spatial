@@ -10,6 +10,8 @@ class Vaisseau {
     const TROUPE = 'troupe_assaut';
     const CAPACITE_BARGE = 10;
     const DESTINATION_EXPLORATION = 'explorer';
+    const TRANSPORT_PERSO = 'transport_perso';
+    const CAPACITE_TRANSPORT_PERSO = 2;
 
     const CATALOGUE = array(
         'chasseur' => array('nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100, 'force' => 5),
@@ -101,10 +103,17 @@ class Vaisseau {
             return 'Pas assez de vaisseaux : '.self::CATALOGUE[$type]['nom'].' (disponibles : '.$disponibles.').';
         }
         $db = MyPDO::getInstance();
+        $arrivee = Tools::nowPlus(self::dureeTrajet($joueur, $type, $depart, $destination));
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
-        $db->query($query,$destination->id,Tools::nowPlus(self::dureeTrajet($joueur, $type, $depart, $destination)),$joueur->id,$depart->id,$type);
+        $db->query($query,$destination->id,$arrivee,$joueur->id,$depart->id,$type);
         if($db->lastRowCount !== $nombre){
             return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[$type]['nom'].'.';
+        }
+        if($type === self::TRANSPORT_PERSO){
+            $passagers = Perso::emmener($joueur, $depart, $destination, $nombre * self::CAPACITE_TRANSPORT_PERSO, $arrivee);
+            if($passagers > 0){
+                Tools::addMessage($passagers.' perso(s) voyagent à bord.');
+            }
         }
         return null;
     }

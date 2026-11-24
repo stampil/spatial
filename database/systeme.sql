@@ -74,6 +74,9 @@ CREATE TABLE IF NOT EXISTS `perso` (
   `action_diplomatie` tinyint(1) DEFAULT NULL,
   `fin_prison` datetime DEFAULT NULL,
   `fin_mort` datetime DEFAULT NULL,
+  `embarque` tinyint(1) NOT NULL DEFAULT '0',
+  `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
+  `arrivee` datetime DEFAULT NULL,
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
@@ -237,7 +240,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('003_combat'),
 ('004_fin_du_tutoriel'),
 ('005_visibilite'),
-('006_flottes');
+('006_flottes'),
+('007_persos_transport');
 
 COMMIT;
 

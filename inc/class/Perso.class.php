@@ -32,6 +32,9 @@ class Perso {
     public ?string $fin_prison;
     public ?string $fin_mort;
     public ?int $action_diplomatie;
+    public bool $embarque;
+    public ?int $id_destination;
+    public ?string $arrivee;
 
     
 
@@ -103,6 +106,9 @@ class Perso {
         $this->fin_prison = $ret[0]->fin_prison;
         $this->fin_mort = $ret[0]->fin_mort;
         $this->action_diplomatie = $ret[0]->action_diplomatie;
+        $this->embarque = (bool) $ret[0]->embarque;
+        $this->id_destination = $ret[0]->id_destination;
+        $this->arrivee = $ret[0]->arrivee;
         $this->creato = $ret[0]->creato;
         
     }
@@ -124,7 +130,49 @@ class Perso {
     }
 
     public function canAct(): bool {
-        return $this->fin_mort === null && !$this->isImprisoned() && $this->action_diplomatie === null;
+        return $this->fin_mort === null && !$this->isImprisoned() && $this->action_diplomatie === null && !$this->embarque && $this->arrivee === null;
+    }
+
+    public static function placesLibres(Joueur $joueur, Planete $planete): int {
+        $transports = Vaisseau::stock($planete->id, $joueur->id)[Vaisseau::TRANSPORT_PERSO] ?? 0;
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND sur_planete=? AND embarque=1";
+        return $transports * Vaisseau::CAPACITE_TRANSPORT_PERSO - (int) MyPDO::getInstance()->query($query,$joueur->id,$planete->id)[0]->nombre;
+    }
+
+    public static function embarques(Joueur $joueur, Planete $planete): array {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND sur_planete=? AND embarque=1 ORDER BY id";
+        return MyPDO::getInstance()->query($query,$joueur->id,$planete->id);
+    }
+
+    public static function emmener(Joueur $joueur, Planete $depart, Planete $destination, int $places, string $arrivee): int {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET id_destination=?, arrivee=?, embarque=0 WHERE id_joueur=? AND sur_planete=? AND embarque=1 AND arrivee IS NULL ORDER BY id LIMIT " . $places;
+        $db = MyPDO::getInstance();
+        $db->query($query,$destination->id,$arrivee,$joueur->id,$depart->id);
+        return $db->lastRowCount;
+    }
+
+    public function embarquer(): ?string {
+        if(!$this->canAct()){
+            return 'Ce perso ne peut pas embarquer maintenant.';
+        }
+        if(self::placesLibres($this->joueur, $this->sur_planete) < 1){
+            return 'Aucune place libre dans un transport personnel sur cette planète.';
+        }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET embarque=1 WHERE id=? AND embarque=0 AND arrivee IS NULL AND action_diplomatie IS NULL";
+        $this->bdd->query($query,$this->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Ce perso ne peut pas embarquer maintenant.';
+        }
+        return null;
+    }
+
+    public function descendre(): ?string {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET embarque=0 WHERE id=? AND embarque=1";
+        $this->bdd->query($query,$this->id);
+        if($this->bdd->lastRowCount !== 1){
+            return "Ce perso n'est pas embarqué.";
+        }
+        return null;
     }
 
     public function dureeDiplomatie(): int {
@@ -148,6 +196,9 @@ class Perso {
         if($this->isImprisoned()){
             return 'Ce perso est emprisonné.';
         }
+        if($this->embarque || $this->arrivee !== null){
+            return 'Ce perso est embarqué ou en voyage.';
+        }
         if($action === self::ACTION_CONQUETE && $this->sur_planete->gouverneur !== 0){
             return 'Cette planète a déjà un gouverneur.';
         }
@@ -169,8 +220,19 @@ class Perso {
         if($this->fin_mort !== null && Tools::isFinCompteRebours($this->fin_mort)){
             $this->respawn();
         }
+        elseif($this->arrivee !== null && Tools::isFinCompteRebours($this->arrivee)){
+            $this->arriver();
+        }
         elseif($this->action_diplomatie !== null && Tools::isFinCompteRebours($this->fin_diplomatie)){
             $this->finishDiplomatie($joueur);
+        }
+    }
+
+    private function arriver(): void {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET sur_planete=id_destination, id_destination=NULL, arrivee=NULL WHERE id=? AND arrivee IS NOT NULL";
+        $this->bdd->query($query,$this->id);
+        if($this->bdd->lastRowCount === 1){
+            Tools::addMessage($this->nom.' est arrivé sur '.(new Planete($this->id_destination))->nom.'.');
         }
     }
 
@@ -217,7 +279,7 @@ class Perso {
 
     private function respawn(): void {
         $planeteId = Planete::premiereGouvernee($this->joueur->id) ?? $this->sur_planete->id;
-        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=NULL, fin_prison=NULL, PV=?, FO=?, diplomatie=?, sur_planete=? WHERE id=? AND fin_mort IS NOT NULL";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=NULL, fin_prison=NULL, embarque=0, PV=?, FO=?, diplomatie=?, sur_planete=? WHERE id=? AND fin_mort IS NOT NULL";
         $this->bdd->query($query,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$planeteId,$this->id);
         if($this->bdd->lastRowCount === 1){
             Tools::addMessage('Un nouveau perso, '.$this->nom.', est arrivé.');
