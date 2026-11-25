@@ -32,6 +32,8 @@ Ta phrase (25/11) : « ben go la faut enrichir d'image ! ».
 
 Fait de mon côté : les planètes tournent comme des globes (avec les 26 images déjà là), et le jeu affiche une image à la place de l'icône SVG dès que le fichier existe (bâtiments, vaisseaux, rôles, bonus, bannières de camps, bandeaux de chaque page, fond des combats, fond de carte, accueil), et garde l'icône sinon. Les 34 prompts sont dans `tools/prompts-images.md` (fond magenta pur pour les objets) et `tools/detourer-magenta.py` transforme le magenta en transparence, met en 512 px et range dans `img/`.
 
+Ta phrase (25/11) : « les prompt tu me les donne 1 par 1 ici ». Compris : je te donne ici, dans la conversation, un prompt complet et prêt à copier (bloc style, bloc magenta si objet, puis le prompt) à chaque message, dans l'ordre du fichier `tools/prompts-images.md`, et le suivant quand tu me le demandes.
+
 À toi : générer les images avec Gemini, les nommer comme indiqué, lancer `python3 tools/detourer-magenta.py <dossier>`, puis me dire de les commiter (ou me donner le dossier). Je n'ai pas pu tester avec de vraies images Gemini, seulement des images factices : si un détourage bave, donne-moi un exemple.
 
 ### 6. Serveurs de test (23/11)
