@@ -30,6 +30,10 @@ Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872` restent lancés jusqu'à ta demande.
 
+### 6. Pluriel des nombres (25/11)
+
+Ta phrase : « 1 planètes j'ai horreur quand tu fait ça, un pauvre ternaire ou un if sa mange pas de pain, mais gere ce pluriel ! ». Compris : sur la page système, « 1 planètes » s'affiche au singulier incorrect. À faire : une fonction unique `Tools::pluriel($nombre, $singulier, $pluriel)` (« 0 » et « 1 » au singulier, comme en français), côté PHP, et son équivalent côté `carte.js`. Je l'applique à tous les endroits du jeu qui ont le même défaut, pas seulement la page système : « planète(s) » (classement, fiche joueur), « planètes » et « emplacements » (pages système, planète, colonies), « vaisseau(x) », « troupe(s) » (y compris l'accord du verbe : « sont perdues »), « perso(s) », « déplacement(s) » de la carte, et les messages de combat/expédition. Le `(s)` entre parenthèses disparaît partout.
+
 ## Questions en suspens
 
 Aucune. Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
