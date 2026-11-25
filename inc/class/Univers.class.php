@@ -16,6 +16,8 @@ class Univers {
         array(140, 480), array(480, 780), array(270, 740), array(880, 520),
     );
 
+    const CAMPS_DECOUVERTE = array(Camp::EMPIRE, Camp::PIRATES, null);
+
     const TUTO_BOUCLIER = 5;
     const TUTO_CANON = 5;
     const TUTO_TROUPES = 1;

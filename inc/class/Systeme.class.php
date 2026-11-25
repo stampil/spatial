@@ -63,6 +63,20 @@ class Systeme {
         return $explorables;
     }
 
+    public static function decouvrir(Joueur $joueur, Systeme $origine): Systeme {
+        $explorables = self::explorables($joueur->id);
+        if(count($explorables) > 0){
+            $systeme = $explorables[random_int(0, count($explorables) - 1)];
+        }
+        else{
+            $systeme = new Systeme(self::create(true, self::positionLibre(array($origine->x, $origine->y))));
+            Planete::fillSystemeIA($systeme, Univers::CAMPS_DECOUVERTE, null, true);
+            $systeme = new Systeme($systeme->id);
+        }
+        Decouverte::ajouter($joueur->id, $systeme->id);
+        return $systeme;
+    }
+
     /**
      * __construct
      * @param int $id

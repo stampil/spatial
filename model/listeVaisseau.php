@@ -112,7 +112,7 @@ foreach($posees as $planeteId => $types){
     <div class="ligne-jeu">
         <div>
             <strong><?= Vaisseau::CATALOGUE[$ligne->type]['nom'] ?></strong> × <?= $ligne->nombre ?><br>
-            <span class="md3-secondary">de <?= (new Planete($ligne->id_planete))->getNom() ?> vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?></span>
+            <span class="md3-secondary"><?= $ligne->exploration ? 'en expédition dans l\'inconnu depuis '.$destination->getNom().' (risque de ne pas revenir)' : 'de '.(new Planete($ligne->id_planete))->getNom().' vers '.($destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu') ?></span>
         </div>
         <?php if($ligne->depart !== null){ ?>
         <?= Vue::progression('Trajet', strtotime($ligne->arrivee) - time(), strtotime($ligne->arrivee) - strtotime($ligne->depart), Vaisseau::CATALOGUE[$ligne->type]['icone']) ?>

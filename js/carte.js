@@ -335,7 +335,7 @@
     }
 
     function dessinerTrajet(trajet) {
-        if (trajet.vers === null || !positions[trajet.de] || !positions[trajet.vers]) {
+        if (trajet.expedition || trajet.vers === null || !positions[trajet.de] || !positions[trajet.vers]) {
             return;
         }
         const depart = positions[trajet.de];
@@ -592,9 +592,10 @@
     function commencerOrdre(nouvelOrdre) {
         ordre = nouvelOrdre;
         fermerFeuille();
-        bandeauTexte.textContent = 'Touchez le système de destination.';
         const reconnaissance = ordre.stock ? ordre.stock.vaisseaux.find((vaisseau) => vaisseau.type === TYPE_RECONNAISSANCE) : null;
-        boutonExplorer.hidden = !(DONNEES.peutExplorer && reconnaissance && reconnaissance.choix > 0);
+        const exploration = Boolean(reconnaissance && reconnaissance.choix > 0);
+        bandeauTexte.textContent = exploration ? 'Touchez le système de destination, ou Explorer : le vaisseau part dans l’inconnu et peut ne pas revenir.' : 'Touchez le système de destination.';
+        boutonExplorer.hidden = !exploration;
         bandeau.hidden = false;
     }
 
@@ -635,7 +636,7 @@
                 creer('div', {}, [
                     creer('strong', {texte: trajet.libelle}),
                     creer('br'),
-                    creer('span', {classe: 'md3-secondary', texte: 'de ' + nomDuSysteme(trajet.de) + ' vers ' + nomDuSysteme(trajet.vers)})
+                    creer('span', {classe: 'md3-secondary', texte: trajet.expedition ? 'en expédition dans l’inconnu depuis ' + nomDuSysteme(trajet.de) : 'de ' + nomDuSysteme(trajet.de) + ' vers ' + nomDuSysteme(trajet.vers)})
                 ]),
                 duree
             ]));

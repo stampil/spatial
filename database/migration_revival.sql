@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
   `arrivee` datetime DEFAULT NULL,
   `depart` datetime DEFAULT NULL,
+  `exploration` tinyint(1) NOT NULL DEFAULT '0',
   `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
@@ -125,7 +126,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('012_pirates_jouables'),
 ('013_sans_email'),
 ('014_pirates_ia'),
-('015_menaces_pirates');
+('015_menaces_pirates'),
+('016_exploration_risquee');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

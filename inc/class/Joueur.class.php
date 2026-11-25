@@ -182,6 +182,7 @@ class Joueur {
         }
         Vaisseau::resolveProduction($this);
         Vaisseau::resolveArrivees($this);
+        Vaisseau::resoudreExpeditions($this);
         Tuto::avancer($this);
         Menace::expirer($this);
         Ia::resoudre($this);

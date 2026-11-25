@@ -10,6 +10,9 @@ class Vaisseau {
     const TROUPE = 'troupe_assaut';
     const CAPACITE_BARGE = 10;
     const DESTINATION_EXPLORATION = 'explorer';
+    const EXPLORATION_SECONDES = 900;
+    const EXPLORATION_PERTE_POURCENT = 20;
+    const EXPLORATION_DECOUVERTE_POURCENT = 50;
     const TRANSPORT_PERSO = 'transport_perso';
     const CAPACITE_TRANSPORT_PERSO = 2;
 
@@ -93,7 +96,7 @@ class Vaisseau {
     }
 
     public static function enRoute(int $joueurId): array {
-        $query = "SELECT id_planete, id_destination, type, depart, arrivee, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND id_flotte IS NULL GROUP BY id_planete, id_destination, type, depart, arrivee ORDER BY arrivee";
+        $query = "SELECT id_planete, id_destination, type, depart, arrivee, exploration, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND id_flotte IS NULL GROUP BY id_planete, id_destination, type, depart, arrivee, exploration ORDER BY arrivee";
         return MyPDO::getInstance()->query($query,$joueurId);
     }
 
@@ -109,23 +112,59 @@ class Vaisseau {
         return $joueur->dureeEffective(intdiv($base * self::CATALOGUE[$type]['vitesse'] * (self::PERCENT - $reductionPourcent), self::PERCENT * self::PERCENT));
     }
 
-    public static function cibleExploration(Joueur $joueur): ?Planete {
-        $cibles = Systeme::explorables($joueur->id);
-        if(count($cibles) === 0){
-            return null;
-        }
-        $cible = $cibles[random_int(0, count($cibles) - 1)];
-        return new Planete($cible->planetes[0]->id);
+    public static function dureeExpedition(Joueur $joueur): int {
+        return $joueur->dureeEffective(intdiv(self::EXPLORATION_SECONDES * self::CATALOGUE[self::RECONNAISSANCE]['vitesse'], self::PERCENT));
     }
 
-    public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre, bool $exploration = false): ?string {
+    public static function explorer(Joueur $joueur, Planete $depart, int $nombre): ?string {
+        $disponibles = self::stock($depart->id, $joueur->id)[self::RECONNAISSANCE] ?? 0;
+        if($nombre < 1 || $nombre > $disponibles){
+            return 'Pas assez de vaisseaux : '.self::CATALOGUE[self::RECONNAISSANCE]['nom'].' (disponibles : '.$disponibles.').';
+        }
+        $db = MyPDO::getInstance();
+        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=id_planete, depart=?, arrivee=?, exploration=1 WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
+        $db->query($query,Tools::now(),Tools::nowPlus(self::dureeExpedition($joueur)),$joueur->id,$depart->id,self::RECONNAISSANCE);
+        if($db->lastRowCount !== $nombre){
+            return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[self::RECONNAISSANCE]['nom'].'.';
+        }
+        return null;
+    }
+
+    public static function resoudreExpeditions(Joueur $joueur): void {
+        $db = MyPDO::getInstance();
+        $perte = $joueur->enTuto() ? 0 : self::EXPLORATION_PERTE_POURCENT;
+        $query = "SELECT id, id_planete FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND exploration=1 AND arrivee<=? ORDER BY id";
+        foreach($db->query($query,$joueur->id,Tools::now()) as $ligne){
+            if(random_int(1, self::PERCENT) <= $perte){
+                $db->query("DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id=? AND exploration=1",$ligne->id);
+                if($db->lastRowCount === 1){
+                    Tools::addMessage('Un vaisseau de reconnaissance est parti explorer l\'inconnu et n\'est jamais revenu.');
+                }
+                continue;
+            }
+            $db->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET exploration=0, id_destination=NULL, depart=NULL, arrivee=NULL WHERE id=? AND exploration=1",$ligne->id);
+            if($db->lastRowCount !== 1){
+                continue;
+            }
+            $planete = new Planete($ligne->id_planete);
+            if(random_int(1, self::PERCENT) <= self::EXPLORATION_DECOUVERTE_POURCENT){
+                $systeme = Systeme::decouvrir($joueur, $planete->systeme);
+                Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' : système '.$systeme->nom.' découvert ('.count($systeme->planetes).' planètes).');
+            }
+            else{
+                Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' sans rien trouver.');
+            }
+        }
+    }
+
+    public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre): ?string {
         if(!isset(self::CATALOGUE[$type])){
             return 'Type de vaisseau inconnu.';
         }
         if($depart->id === $destination->id){
             return 'Les vaisseaux sont déjà sur cette planète.';
         }
-        if(!$exploration && !$joueur->peutCibler($destination->systeme)){
+        if(!$joueur->peutCibler($destination->systeme)){
             return 'Destination inconnue.';
         }
         $disponibles = self::stock($depart->id, $joueur->id)[$type] ?? 0;
@@ -150,9 +189,9 @@ class Vaisseau {
 
     public static function resolveArrivees(Joueur $joueur): void {
         $db = MyPDO::getInstance();
-        $query = "SELECT id_destination, type FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL AND arrivee<=? GROUP BY id_destination, type";
+        $query = "SELECT id_destination, type FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND exploration=0 AND arrivee IS NOT NULL AND arrivee<=? GROUP BY id_destination, type";
         foreach($db->query($query,$joueur->id,Tools::now()) as $ligne){
-            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, depart=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND arrivee IS NOT NULL AND arrivee<=?";
+            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, depart=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND exploration=0 AND arrivee IS NOT NULL AND arrivee<=?";
             $db->query($query,$joueur->id,$ligne->id_destination,$ligne->type,Tools::now());
             $nombre = $db->lastRowCount;
             if($nombre > 0){

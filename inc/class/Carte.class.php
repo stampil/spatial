@@ -22,7 +22,6 @@ class Carte {
         $donnees = array(
             'maintenant' => time(),
             'base' => self::systemeDeBase($joueur),
-            'peutExplorer' => count(Systeme::explorables($joueur->id)) > 0,
             'systemes' => array(),
             'voisin' => null,
             'stocks' => self::stocks($joueur, $systemes, $destinations),
@@ -177,7 +176,7 @@ class Carte {
                 $trajets[$cle]['libelle'] .= ', '.$libelle;
                 continue;
             }
-            $trajets[$cle] = self::trajet($destinations, $libelle, $ligne);
+            $trajets[$cle] = self::trajet($destinations, $libelle, $ligne, (bool) $ligne->exploration);
         }
         foreach(Flotte::liste($joueur->id) as $ligne){
             $flotte = new Flotte($ligne->id);
@@ -189,11 +188,12 @@ class Carte {
         return array_values($trajets);
     }
 
-    private static function trajet(array $destinations, string $libelle, object $ligne): array {
+    private static function trajet(array $destinations, string $libelle, object $ligne, bool $expedition = false): array {
         $de = (new Planete($ligne->id_planete))->id_systeme;
         $vers = (new Planete($ligne->id_destination))->id_systeme;
         return array(
             'libelle' => $libelle,
+            'expedition' => $expedition,
             'de' => $de,
             'vers' => isset($destinations[$vers]) ? $vers : null,
             'depart' => $ligne->depart === null ? null : strtotime($ligne->depart),
