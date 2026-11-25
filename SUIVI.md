@@ -22,23 +22,7 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 ### 4. Publication sur InfinityFree (23/11)
 
-Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite.
-
-### 7. Un jeu graphique comme un jeu vidéo, avec des prompts d'images photo-réalistes (25/11)
-
-Ta phrase (25/11) : « il faut fairele jeu + graphique comme un jeu vidéo, donner des prompt pour faire generer a une ia d'image des images du jeu et de ses icones, je veux un style photo-réaliste ». Ta phrase (25/11) : « go 5 avec tes recommandation ». Ta phrase (25/11) : « c gemini il sais pas faire de fond transparent, fait lui faire un fond magenta sans degradé ni flou ».
-
-Ta phrase (25/11) : « ben go la faut enrichir d'image ! ».
-
-Fait de mon côté : les planètes tournent comme des globes (avec les 26 images déjà là), et le jeu affiche une image à la place de l'icône SVG dès que le fichier existe (bâtiments, vaisseaux, rôles, bonus, bannières de camps, bandeaux de chaque page, fond des combats, fond de carte, accueil), et garde l'icône sinon. Les 34 prompts sont dans `tools/prompts-images.md` (fond magenta pur pour les objets) et `tools/detourer-magenta.py` transforme le magenta en transparence, met en 512 px et range dans `img/`.
-
-Ta phrase (25/11) : « les prompt tu me les donne 1 par 1 ici ». Compris : je te donne ici, dans la conversation, un prompt complet et prêt à copier (bloc style, bloc magenta si objet, puis le prompt) à chaque message, dans l'ordre du fichier `tools/prompts-images.md`, et le suivant quand tu me le demandes.
-
-Ta phrase (25/11) : « généré, mais ssa fait tres sttarwars la, je veux pas me prendre une flopé d'avocat ». Compris : les 6 premiers prompts donnaient des designs trop proches de Star Wars (coque en coin, troupier à armure blanche, escadre impériale). J'ai réécrit tous les prompts avec un bloc « design original » (ingénierie industrielle réaliste, pas de coque en coin, pas d'armure blanche, pas de cape ni de sabre, aucun nom de franchise) et je repars du prompt 1. Les 6 images déjà générées ne vont pas dans le jeu : à refaire avec les nouveaux prompts. Je ne peux pas garantir l'absence de risque juridique : si une image rappelle clairement une œuvre connue, on la régénère.
-
-Ta phrase (25/11) : « I can create more images as soon as your limit resets. Check your usage in Settings. => traite les image que tu a deja recu ». Fait : les 32 images reçues (nommées d'après l'ordre des prompts 1 à 32) sont détourées et rangées dans `img/`, branchées dans le jeu et commitées. Les 6 premières images, trop proches de Star Wars, sont écartées.
-
-Ta phrase (25/11) : « généré le prompt 33 envoi le 34 ». Fait : `page-inscription` est détouré, rangé dans `img/page/` et commité. À toi : générer `page-connection` (prompt 34), puis me dire où est le fichier.
+Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : les 2 derniers bandeaux (inscription et connexion).
 
 ### 6. Serveurs de test (23/11)
 
