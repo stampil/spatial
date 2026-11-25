@@ -24,12 +24,20 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 ### 4. Publication sur InfinityFree (23/11)
 
-Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : le nouveau style des boutons et l'expédition de reconnaissance.
+Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publié : le nom Novarche.
 
 ### 6. Serveurs de test (23/11)
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872` restent lancés jusqu'à ta demande.
 
+### 7. Navigation fluide carte → système → planète (25/11)
+
+Ta phrase : « sur la page carte quand on clique sur un ssyteme, sa doit afficher la page de ce systeme, et quand on clique sur les planete la page planete etc.. la navigation doit pouvoir etre fluid ». Compris : aujourd'hui un clic sur un système ouvre seulement une feuille en bas de la carte ; il n'existe pas de page système. À faire : une vraie page système (planètes en cartes, vaisseaux présents, camp), un clic système sur la carte y mène, un clic planète mène à la page planète, avec un fil d'Ariane Carte › Système › Planète et un retour à la carte centré sur le système. « Fluide » compris comme : transitions en fondu entre pages, sans rechargement brutal.
+
 ## Questions en suspens
 
-Aucune. Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
+**Q1 (bloquante).** Les ordres aux vaisseaux (envoyer, explorer) se donnent aujourd'hui dans la feuille de la carte. Où les mettre ? (a) sur la page planète/système, un bouton « Envoyer des vaisseaux » ouvre la carte en mode choix de destination (ma reco) ; (b) garder la feuille actuelle et ajouter un lien « Page du système ».
+
+**Q2.** « Fluide » : (a) pages classiques + fondu entre pages (API View Transitions, aucun JS lourd) (ma reco) ; (b) chargement sans rechargement (fetch + historique), plus complexe.
+
+Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
