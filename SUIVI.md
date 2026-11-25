@@ -16,7 +16,7 @@ Vide aussi la table `joueur` (anciens hash `crypt()`, et aucun camp pour les anc
 
 Ensuite, peuple l'univers une seule fois : `php database/peupler.php` (16 systèmes : 6 d'Empire, 3 de Pirates, 3 disputés, 4 sans camp). Il refuse de tourner si le jeu est déjà peuplé.
 
-Les joueurs se connectent maintenant avec leur nom (plus d'email) : la migration 013 supprime la colonne `email`, et la 014 remet les Pirates en IA. Les migrations s'appliquent seules à la première visite.
+Les joueurs se connectent maintenant avec leur nom (plus d'email) : la migration 013 supprime la colonne `email`, la 014 remet les Pirates en IA, la 015 crée les menaces pirates et la 016 l'exploration risquée. Les migrations s'appliquent seules à la première visite.
 
 ### 3. Garder l'essence du développeur d'origine (23/11)
 
@@ -24,7 +24,7 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 ### 4. Publication sur InfinityFree (23/11)
 
-Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : l'inscription sans email avec le camp en premier, la connexion par le nom, les Pirates en IA et les menaces pirates validées par le joueur.
+Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : le nouveau style des boutons et l'expédition de reconnaissance.
 
 ### 6. Serveurs de test (23/11)
 
