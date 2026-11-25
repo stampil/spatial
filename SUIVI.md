@@ -26,11 +26,11 @@ Le code est en ligne et le site installe lui-même sa base à la première visit
 
 ### 7. Un jeu graphique comme un jeu vidéo, avec des prompts d'images photo-réalistes (25/11)
 
-Ta phrase (25/11) : « il faut fairele jeu + graphique comme un jeu vidéo, donner des prompt pour faire generer a une ia d'image des images du jeu et de ses icones, je veux un style photo-réaliste ». Compris : (a) rendre l'interface plus visuelle, comme un jeu vidéo (images de planètes, de vaisseaux, de bâtiments, de camps, fond de carte galactique), (b) te donner les prompts pour que tu fasses générer ces images et ces icônes par une IA d'image, en photo-réaliste. Rien n'est codé pour ce point avant ton « go ».
+Ta phrase (25/11) : « il faut fairele jeu + graphique comme un jeu vidéo, donner des prompt pour faire generer a une ia d'image des images du jeu et de ses icones, je veux un style photo-réaliste ». Ta phrase (25/11) : « go 5 avec tes recommandation ». Ta phrase (25/11) : « c gemini il sais pas faire de fond transparent, fait lui faire un fond magenta sans degradé ni flou ».
 
-Questions en suspens pour ce point :
-- Une photo ne se lit pas à 24 px (menu, barre d'état, boutons). Je propose : les petites icônes restent en SVG, les images photo-réalistes servent aux grands visuels (planètes, vaisseaux, bâtiments, emblèmes et bannières de camps, héros, fond de carte). Ou tu veux tout remplacer, petites icônes comprises ?
-- Format des fichiers que tu me rendras : je propose PNG, carré 512 × 512 pour les objets (fond transparent si ton IA sait le faire), 1600 × 900 pour les fonds et bannières, rangés dans `img/`. Ça te va ?
+Fait de mon côté : le jeu affiche une image à la place de l'icône SVG dès que le fichier existe (bâtiments, vaisseaux, rôles, bonus, bannières de camps, fond de carte, accueil), et garde l'icône sinon. Les 25 prompts sont dans `tools/prompts-images.md` (fond magenta pur pour les objets) et `tools/detourer-magenta.py` transforme le magenta en transparence, met en 512 px et range dans `img/`.
+
+À toi : générer les images avec Gemini, les nommer comme indiqué, lancer `python3 tools/detourer-magenta.py <dossier>`, puis me dire de les commiter (ou me donner le dossier). Je n'ai pas pu tester avec de vraies images Gemini, seulement des images factices : si un détourage bave, donne-moi un exemple.
 
 ### 6. Serveurs de test (23/11)
 
