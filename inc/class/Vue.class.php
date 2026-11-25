@@ -6,11 +6,44 @@ class Vue {
     const EMBLEME_TAILLE = 32;
     const EMBLEME_VUE = 48;
     const EMBLEME_TRAIT = 3;
+    const DOSSIER_IMAGES = 'img';
+    const EXTENSION_OBJET = 'png';
+    const EXTENSION_FOND = 'jpg';
     const EMBLEMES = array(
         Camp::EMPIRE => '<polygon points="24,3 43,14 43,34 24,45 5,34 5,14" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><polygon points="24,13 34,29 14,29" fill="currentColor"/>',
         Camp::PIRATES => '<circle cx="24" cy="24" r="19" fill="none" stroke="currentColor" stroke-width="3"/><path d="M14 14L34 34M34 14L14 34" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>',
         Camp::REBELLION => '<polygon points="24,4 44,24 24,44 4,24" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="24" r="7" fill="currentColor"/>',
     );
+
+    public static function visuel(string $dossier, string $cle, ?string $iconeSecours = null): string {
+        $chemin = self::DOSSIER_IMAGES.'/'.$dossier.'/'.$cle.'.'.self::EXTENSION_OBJET;
+        if(is_file($chemin)){
+            return '<span class="visuel visuel--image" style="background-image:url('.$chemin.')" aria-hidden="true"></span>';
+        }
+        if($iconeSecours === null){
+            return '';
+        }
+        return Icone::html($iconeSecours);
+    }
+
+    public static function banniereCamp(?int $idCamp): string {
+        if($idCamp === null || !isset(Camp::VISUELS[$idCamp])){
+            return '';
+        }
+        $chemin = self::DOSSIER_IMAGES.'/camp/'.Camp::VISUELS[$idCamp].'.'.self::EXTENSION_FOND;
+        if(!is_file($chemin)){
+            return '';
+        }
+        return '<div class="banniere" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
+    }
+
+    public static function fond(string $nom): string {
+        $chemin = self::DOSSIER_IMAGES.'/'.$nom.'.'.self::EXTENSION_FOND;
+        if(!is_file($chemin)){
+            return '';
+        }
+        return '<div class="fond" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
+    }
 
     public static function pastille(string $texte, string $variante = ''): string {
         return '<span class="pastille'.($variante === '' ? '' : ' pastille--'.$variante).'">'.htmlspecialchars($texte).'</span>';

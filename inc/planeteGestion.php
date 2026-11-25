@@ -21,7 +21,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
     <?php foreach(Batiment::CATALOGUE as $batiment => $infos){ ?>
     <div class="ligne-jeu" id="bat-<?= $batiment ?>">
         <div class="ligne-jeu__info">
-            <?= Icone::html($infos['icone']) ?>
+            <?= Vue::visuel('batiment', $infos['icone'], $infos['icone']) ?>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $planete->nombre($batiment) ?><br>
                 <span class="md3-secondary"><?= $infos['prix'] ?> cr · maintenance <?= $infos['maintenance'] ?> cr/h</span>
@@ -52,7 +52,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
     <?php foreach(Perso::ROLES as $role => $infosRole){ ?>
     <div class="ligne-jeu">
         <div class="ligne-jeu__info">
-            <?= Icone::html($infosRole['icone']) ?>
+            <?= Vue::visuel('role', $role, $infosRole['icone']) ?>
             <strong><?= $infosRole['nom'] ?></strong>
         </div>
         <form method="POST" action="?p=recruter">
@@ -80,7 +80,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
     <?php foreach($types as $type){ $infos = Vaisseau::CATALOGUE[$type]; ?>
     <div class="ligne-jeu">
         <div class="ligne-jeu__info">
-            <?= Icone::html($infos['icone']) ?>
+            <?= Vue::visuel('vaisseau', $type, $infos['icone']) ?>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $stock[$type] ?? 0 ?> en stock<br>
                 <span class="md3-secondary"><?= $Joueur->prixVaisseau($type) ?> cr · <?= gmdate('i:s', $Joueur->dureeEffective($infos['duree'])) ?></span>

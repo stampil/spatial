@@ -4,6 +4,7 @@ if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
     $Camp = $Joueur->getCamp();
 ?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>">
+    <?= Vue::banniereCamp($Camp->id) ?>
     <div class="fiche__tete">
         <?= Vue::emblemeCamp($Camp->id, 48) ?>
         <h2 class="fiche__nom" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>"><?= htmlspecialchars($Camp->nom) ?></h2>

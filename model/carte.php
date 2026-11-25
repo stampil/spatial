@@ -1,4 +1,5 @@
 <div class="carte" id="carte" data-jeton="<?= htmlspecialchars($_SESSION[CSRF_KEY]) ?>">
+    <?= Vue::fond('carte') ?>
     <svg class="carte__svg" role="group" aria-label="Carte galactique"></svg>
     <div class="carte__commandes">
         <button type="button" class="carte__commande" id="carte-zoom-avant" aria-label="Zoom avant">+</button>

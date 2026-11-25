@@ -24,7 +24,7 @@ if($Joueur->etape_tuto==1){
 
 <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
     <div class="fiche__tete">
-        <div class="avatar" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Icone::html(Perso::ROLES[$o->role]['icone']) ?></div>
+        <div class="avatar" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Vue::visuel('role', $o->role, Perso::ROLES[$o->role]['icone']) ?></div>
         <div>
             <h1 class="fiche__nom"><?= htmlspecialchars($o->nom) ?></h1>
             <div class="pastilles">

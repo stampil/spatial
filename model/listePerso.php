@@ -14,7 +14,7 @@ foreach(Perso::liste($Joueur) as $ligne){
 ?>
     <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
         <div class="fiche__tete">
-            <div class="avatar" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Icone::html(Perso::ROLES[$perso->role]['icone']) ?></div>
+            <div class="avatar" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Vue::visuel('role', $perso->role, Perso::ROLES[$perso->role]['icone']) ?></div>
             <div>
                 <h2 class="fiche__nom"><a href="?p=affichePerso&id=<?= $perso->id ?>"><?= htmlspecialchars($perso->nom) ?></a></h2>
                 <div class="pastilles">

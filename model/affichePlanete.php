@@ -30,7 +30,10 @@ $defense = $p->bouclier + $p->canon;
     </div>
     <p>Gouverneur : <?= $p->getGouverneurNom() ?></p>
     <?php if($p->bonus !== null){ ?>
-    <p><strong>Bonus : <?= Bonus::libelle($p->bonus) ?>.</strong> <span class="md3-secondary"><?= htmlspecialchars(Bonus::description($p->bonus)) ?></span></p>
+    <div class="ligne-jeu__info">
+        <?= Vue::visuel('bonus', $p->bonus) ?>
+        <p><strong>Bonus : <?= Bonus::libelle($p->bonus) ?>.</strong> <span class="md3-secondary"><?= htmlspecialchars(Bonus::description($p->bonus)) ?></span></p>
+    </div>
     <?php } ?>
 </section>
 

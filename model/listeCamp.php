@@ -14,6 +14,7 @@ foreach(Camp::liste() as $ligne){
     }
 ?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($camp->couleur) ?>">
+    <?= Vue::banniereCamp($camp->id) ?>
     <div class="fiche__tete">
         <?= Vue::emblemeCamp($camp->id, 48) ?>
         <div>
