@@ -12,7 +12,8 @@ FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-reb
 FONDS.update({'page-' + page: 'page/' + page for page in ('tableauBord', 'listePlanete', 'listeVaisseau', 'listePerso', 'classement', 'listeCamp', 'inscription', 'connection')})
 EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
 COTE_OBJET = 512
-MARGE_OBJET = 24
+COTE_LOGO = 128
+DIVISEUR_MARGE = 20
 LARGEUR_FOND = 1600
 RATIO_FOND = 16 / 9
 QUALITE_JPEG = 82
@@ -52,16 +53,16 @@ def detourer(image):
     return Image.fromarray(resultat, 'RGBA')
 
 
-def cadrer(image):
+def cadrer(image, cote):
     opacite = numpy.asarray(image)[:, :, 3] / 255.0
     lignes = numpy.where(opacite.max(axis=1) > SEUIL_OPACITE_CADRAGE)[0]
     colonnes = numpy.where(opacite.max(axis=0) > SEUIL_OPACITE_CADRAGE)[0]
     image = image.crop((colonnes[0], lignes[0], colonnes[-1] + 1, lignes[-1] + 1))
-    utile = COTE_OBJET - 2 * MARGE_OBJET
+    utile = cote - 2 * (cote // DIVISEUR_MARGE)
     echelle = utile / max(image.size)
     image = image.resize((max(1, round(image.width * echelle)), max(1, round(image.height * echelle))), Image.LANCZOS)
-    carre = Image.new('RGBA', (COTE_OBJET, COTE_OBJET), (0, 0, 0, 0))
-    carre.paste(image, ((COTE_OBJET - image.width) // 2, (COTE_OBJET - image.height) // 2))
+    carre = Image.new('RGBA', (cote, cote), (0, 0, 0, 0))
+    carre.paste(image, ((cote - image.width) // 2, (cote - image.height) // 2))
     return carre
 
 
@@ -75,7 +76,7 @@ def traiter(chemin, nom, destination):
             return False
         sortie = os.path.join(destination, dossier, cle + '.png')
         os.makedirs(os.path.dirname(sortie), exist_ok=True)
-        cadrer(image).save(sortie, optimize=True)
+        cadrer(image, COTE_LOGO if dossier == 'logo' else COTE_OBJET).save(sortie, optimize=True)
         print('  %s -> %s' % (nom, sortie))
         return True
     if base in FONDS:
