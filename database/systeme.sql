@@ -31,7 +31,6 @@ DROP TABLE IF EXISTS `joueur`;
 CREATE TABLE IF NOT EXISTS `joueur` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
   `IPs` text NOT NULL,
   `credits` int(11) NOT NULL,
   `mdp` varchar(255) NOT NULL,
@@ -44,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `fin_tuto` datetime DEFAULT NULL,
   `raid_maj` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
@@ -52,8 +50,8 @@ CREATE TABLE IF NOT EXISTS `joueur` (
 -- Déchargement des données de la table `joueur`
 --
 
-INSERT INTO `joueur` (`id`, `nom`, `email`, `IPs`, `credits`, `mdp`, `etape_tuto`, `creato`, `lastco`, `id_camp`) VALUES
-(3, 'Vartus', 'developpeurntic@gmail.com', '::1', 500, 'gPhvB3xN.mAVULqmxVcgCaqgkR0b7wdU.n1Grn0ekmnx35OJ30IDTnO/eAjAlGYx6/cJ/8avLHGmSIJAeMx.o0', 1, '2022-12-19 10:21:18', '2022-12-19 09:21:23', 2);
+INSERT INTO `joueur` (`id`, `nom`, `IPs`, `credits`, `mdp`, `etape_tuto`, `creato`, `lastco`, `id_camp`) VALUES
+(3, 'Vartus', '::1', 500, 'gPhvB3xN.mAVULqmxVcgCaqgkR0b7wdU.n1Grn0ekmnx35OJ30IDTnO/eAjAlGYx6/cJ/8avLHGmSIJAeMx.o0', 1, '2022-12-19 10:21:18', '2022-12-19 09:21:23', 2);
 
 -- --------------------------------------------------------
 
@@ -274,7 +272,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('009_carte'),
 ('010_journal'),
 ('011_defense_pirates_ia'),
-('012_pirates_jouables');
+('012_pirates_jouables'),
+('013_sans_email');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

@@ -1,13 +1,13 @@
 <?php
 
-$email = giveInputString($_POST, 'email');
+$nom = giveInputString($_POST, 'nom');
 $mdp = giveInputString($_POST, 'mdp');
 
-if($email !== '' && $mdp !== ''){
+if($nom !== '' && $mdp !== ''){
     $info = Joueur::connecter(
         array(
             'mdp' =>$mdp,
-            'email' =>$email,
+            'nom' =>$nom,
         )        
     );  
     

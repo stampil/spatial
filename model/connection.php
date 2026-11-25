@@ -9,7 +9,7 @@
 
 <form class="formulaire" method="POST" action="index.php?p=connecter">
 
-<div class="md3-field"><label for="email">Email</label><input type="email" id="email" name="email" required /></div>
-<div class="md3-field"><label for="mdp">Mot de passe</label><input type="password" id="mdp" name="mdp" required minlength="<?= PASSWORD_MIN_LENGTH ?>"/></div>
+<div class="md3-field"><label for="nom">Nom du joueur</label><input type="text" id="nom" name="nom" required /></div>
+<div class="md3-field"><label for="mdp">Mot de passe</label><input type="password" id="mdp" name="mdp" required/></div>
 <input type="submit" value="Se connecter" name="go" />
 </form>

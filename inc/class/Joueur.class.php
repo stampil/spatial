@@ -3,7 +3,6 @@
 class Joueur {
 
     private MyPDO $bdd;
-    private string $email;
     private string $mdp;
     
     public string $creato;
@@ -29,8 +28,8 @@ class Joueur {
 
     
     public static function inscrire(array $infos): ?Joueur{
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,credits,id_camp,creato,lastco) VALUES(?,?,?,?,?,?,now(),now()) ";
-        $ret = MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(), $infos['mdp'],self::$credits_depart,$infos['id_camp']);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,IPs,mdp,credits,id_camp,creato,lastco) VALUES(?,?,?,?,?,now(),now()) ";
+        $ret = MyPDO::getInstance()->query($query,$infos['nom'],giveIP(), $infos['mdp'],self::$credits_depart,$infos['id_camp']);
         if($ret === MyPDO::QUERY_FAILED){
             return null;
         }
@@ -51,8 +50,8 @@ class Joueur {
    
     
     public static function connecter(array $infos): ?object{
-        $query = "select * from " . MyPDO::DB_FLAG . "joueur where email=? ";
-        $ret = MyPDO::getInstance()->query($query,$infos['email']);
+        $query = "select * from " . MyPDO::DB_FLAG . "joueur where nom=? ";
+        $ret = MyPDO::getInstance()->query($query,$infos['nom']);
         if(empty($ret) || $ret === MyPDO::QUERY_FAILED || !password_verify($infos['mdp'], $ret[0]->mdp)){
             return null;
         }
@@ -87,7 +86,6 @@ class Joueur {
         
         $this->id = $ret[0]->id;
         $this->nom = $ret[0]->nom;
-        $this->email = $ret[0]->email;
         $this->IPs = $ret[0]->IPs;
 
         $this->credits = $ret[0]->credits;
@@ -107,7 +105,6 @@ class Joueur {
         $query ="UPDATE " . MyPDO::DB_FLAG . "joueur 
             set
             nom = ?,
-            email =?,
             IPs = ?,
             mdp =?,
             etape_tuto = ?,
@@ -115,7 +112,6 @@ class Joueur {
             WHERE id =?";
         $ret = $this->bdd->query($query,          
                 $this->nom,
-                $this->email,
                 $this->IPs,
                 $this->mdp,
                 $this->etape_tuto,

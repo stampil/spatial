@@ -123,10 +123,13 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('009_carte'),
 ('010_journal'),
 ('011_defense_pirates_ia'),
-('012_pirates_jouables');
+('012_pirates_jouables'),
+('013_sans_email');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 
 UPDATE `planete` SET `bonus` = ELT(1 + `id` % 5, 'chantier', 'forge', 'marche', 'citadelle', 'relais') WHERE `id_systeme` IN (SELECT `id` FROM `systeme` WHERE `visible` = 1);
 
 UPDATE `planete` SET `defense_maj` = NOW() WHERE `id_camp` IS NOT NULL AND (`bouclier` < `slot` * 2 OR `canon` < `slot`);
+
+ALTER TABLE `joueur` DROP INDEX `email`, DROP COLUMN `email`;

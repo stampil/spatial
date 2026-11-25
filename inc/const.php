@@ -9,7 +9,6 @@
 const PAGE_NAME_PATTERN = '/^[A-Za-z0-9_]+$/';
 const LOGOUT_PAGE = 'deconnection';
 const PUBLIC_PAGES = array('welcome', 'connection', 'connecter', 'inscription', 'inscrire', LOGOUT_PAGE, '404');
-const PASSWORD_MIN_LENGTH = 6;
 const CSRF_KEY = 'csrf_token';
 const MESSAGES_KEY = 'messages';
 const RAPPORTS_KEY = 'rapports';

@@ -529,6 +529,7 @@
 }
 
 .faction {
+    position: relative;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 4px 16px;
@@ -547,7 +548,27 @@
 
 .faction input {
     position: absolute;
-    opacity: 0;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    border: 2px solid var(--md-sys-color-on-surface);
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--md-sys-color-surface) 70%, transparent);
+    appearance: none;
+    cursor: pointer;
+}
+
+.faction input:checked {
+    border-color: var(--accent, var(--md-sys-color-primary));
+    background-image: radial-gradient(circle, var(--accent, var(--md-sys-color-primary)) 0 45%, transparent 50%);
+}
+
+.faction input:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
 }
 
 .faction .embleme {
