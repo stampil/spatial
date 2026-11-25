@@ -626,3 +626,23 @@ body.md3-dialog-ouvert {
         animation: none;
     }
 }
+
+.migration {
+    display: contents;
+}
+
+.md3-nav-link--bouton {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.md3-menu__liste .md3-nav-link--bouton {
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    min-height: 48px;
+    padding: 0 16px;
+    border-radius: 0;
+}

@@ -28,6 +28,7 @@ $navClasse = isset($Joueur) ? ' md3-top-app-bar__nav--large' : '';
         <?php foreach($menuPages as $page => $label){ ?>
         <a class="md3-nav-link<?= $page === $activePage ? ' md3-nav-link--active' : '' ?>" href="?p=<?= $page ?>"<?= $page === $activePage ? ' aria-current="page"' : '' ?>><?= $label ?></a>
         <?php } ?>
+        <?php if(isset($Joueur) && count($menuPages) > 0){ echo Vue::boutonMigration(); } ?>
         <?php if(isset($Joueur)){ ?>
         <a class="md3-nav-link" href="?p=<?= LOGOUT_PAGE ?>"><?= LOGOUT_LABEL ?></a>
         <?php } ?>
@@ -40,6 +41,7 @@ $navClasse = isset($Joueur) ? ' md3-top-app-bar__nav--large' : '';
                 <?php foreach(array_diff_key($menuPages, MENU_BAS) as $page => $label){ ?>
                 <a href="?p=<?= $page ?>"><?= $label ?></a>
                 <?php } ?>
+                <?php if(count($menuPages) > 0){ echo Vue::boutonMigration(); } ?>
                 <a href="?p=<?= LOGOUT_PAGE ?>"><?= LOGOUT_LABEL ?></a>
             </div>
         </details>
