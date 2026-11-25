@@ -22,11 +22,7 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 ### 4. Publication sur InfinityFree (23/11)
 
-Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : les 2 derniers bandeaux (inscription et connexion).
-
-### 7. Logos des camps en images (25/11)
-
-Ta phrase (25/11) : « fait généré les logo des factions ». Compris : te donner les prompts pour faire générer par Gemini les 3 logos de camps (Pirates, Empire, Rébellion) en badges métalliques photo-réalistes sur fond magenta, qui remplacent les emblèmes SVG actuels dès que les fichiers existent. Fait : prompts dans `tools/prompts-images.md` (section « Logos des camps »), script et jeu prêts. Je te donne les 3 prompts un par un ici ; à toi de les générer.
+Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : les 2 derniers bandeaux (inscription et connexion) et les 3 logos de camps.
 
 ### 6. Serveurs de test (23/11)
 
