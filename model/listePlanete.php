@@ -27,7 +27,7 @@ foreach($gouvernees as $ligne){
         </div>
         <div class="pastilles">
             <?= Vue::pastille(sprintf('%+d cr/h', $p->revenuNet())) ?>
-            <?= Vue::pastille($p->batimentsTotal().' / '.$p->slot.' emplacements') ?>
+            <?= Vue::pastille($p->batimentsTotal().' / '.$p->slot.' '.__('emplacement', 'emplacements', $p->slot)) ?>
             <?php if($p->bonus !== null){ echo Vue::pastille(Bonus::libelle($p->bonus), 'ok'); } ?>
             <?php if($p->perc_revolte >= Planete::REVOLTE_ALERTE){ echo Vue::pastille('Révolte élevée', 'alerte'); } ?>
         </div>

@@ -18,6 +18,7 @@ class Carte {
             $destinations[$voisin->id] = $voisin;
         }
 
+        $enRoute = self::enRoute($joueur, $destinations);
         $donnees = array(
             'maintenant' => time(),
             'base' => self::systemeDeBase($joueur),
@@ -25,7 +26,8 @@ class Carte {
             'voisin' => null,
             'stocks' => self::stocks($joueur, $systemes, $destinations),
             'flottes' => self::flottes($joueur, $systemes, $destinations),
-            'enRoute' => self::enRoute($joueur, $destinations),
+            'enRoute' => $enRoute,
+            'enRouteLibelle' => count($enRoute).' '.__('deplacement','deplacements',count($enRoute)),
         );
         foreach($systemes as $systeme){
             array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps));

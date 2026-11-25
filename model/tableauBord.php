@@ -15,9 +15,9 @@ if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
 
 <div class="raccourcis">
     <a class="emplacement" href="?p=carte"><?= Icone::html('carte') ?>Carte</a>
-    <a class="emplacement" href="?p=listePlanete"><?= Icone::html('planetes') ?><?= count(Planete::listeGouvernees($Joueur->id)) ?> colonies</a>
+    <a class="emplacement" href="?p=listePlanete"><?= Icone::html('planetes') ?><?= count(Planete::listeGouvernees($Joueur->id)) ?> <?= __('colonie', 'colonies', count(Planete::listeGouvernees($Joueur->id))) ?></a>
     <a class="emplacement" href="?p=listeVaisseau"><?= Icone::html('fusee') ?><?= Vaisseau::nombreDeplacements($Joueur->id) ?> en route</a>
-    <a class="emplacement" href="?p=listePerso"><?= Icone::html('persos') ?><?= count(Perso::liste($Joueur)) ?> persos</a>
+    <a class="emplacement" href="?p=listePerso"><?= Icone::html('persos') ?><?= count(Perso::liste($Joueur)) ?> <?= __('perso', 'persos', count(Perso::liste($Joueur))) ?></a>
 </div>
 
 <section class="panneau">

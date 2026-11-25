@@ -121,21 +121,21 @@ class Combat {
             if(!$planete->capturer($joueur, $survivants)){
                 return 'La planète a changé de main : les troupes sont perdues.';
             }
-            $message = 'Débarquement réussi : vous gouvernez maintenant '.$planete->nom.' ('.$survivants.' troupe(s) en garnison). La planète est révoltée à '.Planete::CAPTURE_REVOLTE.' %.';
+            $message = 'Débarquement réussi : vous gouvernez maintenant '.$planete->nom.' ('.$survivants.' '.__('troupe','troupes',$survivants).' en garnison). La planète est révoltée à '.Planete::CAPTURE_REVOLTE.' %.';
             $garnison = 0;
         }
         else{
             $abattues = min($planete->troupes, intdiv($attaque, $force));
             $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET troupes=troupes-?, defense_maj=COALESCE(defense_maj, ?) WHERE id=?";
             $db->query($query,$abattues,Tools::now(),$planete->id);
-            $message = 'Débarquement repoussé sur '.$planete->nom.' : vos '.$troupes.' troupe(s) sont perdues, la garnison perd '.$abattues.' troupe(s).';
+            $message = 'Débarquement repoussé sur '.$planete->nom.' : '.($troupes > 1 ? 'vos ' : 'votre ').$troupes.' '.__('troupe','troupes',$troupes).' '.__('perdue','perdues',$troupes).', la garnison perd '.$abattues.' '.__('troupe','troupes',$abattues).'.';
             $garnison = $planete->troupes - $abattues;
         }
         Tools::addMessage($message);
         Tools::addRapport(array(
             'titre' => 'Débarquement sur '.$planete->nom,
             'barres' => array(array('cle' => 'troupes', 'nom' => 'Garnison', 'maximum' => $planete->troupes)),
-            'etapes' => array(array('texte' => $troupes.' troupe(s) d\'assaut : '.$attaque.' de force', 'valeurs' => array('troupes' => $garnison))),
+            'etapes' => array(array('texte' => $troupes.' '.__('troupe','troupes',$troupes).' d\'assaut : '.$attaque.' de force', 'valeurs' => array('troupes' => $garnison))),
             'bilan' => $message,
         ));
         return null;
@@ -197,7 +197,7 @@ class Combat {
         $bilan = 'Les deux flottes sont anéanties.';
         if($vainqueur !== null){
             $epaves = self::valeurEpaves($pertes[self::ADVERSAIRE[$vainqueur]]);
-            $bilan = 'Victoire de '.$camps[$vainqueur]['nom'].' : '.$camps[self::ATTAQUANT]['nom'].' perd '.array_sum($pertes[self::ATTAQUANT]).' vaisseau(x), '.$camps[self::DEFENSEUR]['nom'].' perd '.array_sum($pertes[self::DEFENSEUR]).' vaisseau(x). Épaves récupérées : +'.$epaves.' cr.';
+            $bilan = 'Victoire de '.$camps[$vainqueur]['nom'].' : '.$camps[self::ATTAQUANT]['nom'].' perd '.array_sum($pertes[self::ATTAQUANT]).' '.__('vaisseau','vaisseaux',array_sum($pertes[self::ATTAQUANT])).', '.$camps[self::DEFENSEUR]['nom'].' perd '.array_sum($pertes[self::DEFENSEUR]).' '.__('vaisseau','vaisseaux',array_sum($pertes[self::DEFENSEUR])).'. Épaves récupérées : +'.$epaves.' cr.';
         }
         return array(
             'pertes' => $pertes,

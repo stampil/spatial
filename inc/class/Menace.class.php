@@ -30,7 +30,7 @@ class Menace {
         if($db->lastRowCount !== 1){
             return;
         }
-        Tools::addMessage('Une flotte pirate de '.array_sum(self::flotte($source->slot)).' vaisseau(x), venue de '.$source->nom.', menace '.$planete->nom.' : combattez-la ou laissez-la détourner vos revenus (réponse depuis la page Flottes, sous '.intdiv(self::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h).');
+        Tools::addMessage('Une flotte pirate de '.array_sum(self::flotte($source->slot)).' '.__('vaisseau','vaisseaux',array_sum(self::flotte($source->slot))).', venue de '.$source->nom.', menace '.$planete->nom.' : combattez-la ou laissez-la détourner vos revenus (réponse depuis la page Flottes, sous '.intdiv(self::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h).');
     }
 
     public static function expirer(Joueur $joueur): void {

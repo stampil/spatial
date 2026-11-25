@@ -25,7 +25,7 @@ $defense = $p->bouclier + $p->canon;
         </div>
     </div>
     <div class="pastilles">
-        <?= Vue::pastille($p->slot.' emplacements') ?>
+        <?= Vue::pastille($p->slot.' '.__('emplacement', 'emplacements', $p->slot)) ?>
         <?php if($p->gouverneur === $Joueur->id){ echo Vue::pastille('Votre colonie', 'ok'); } ?>
         <?php if($p->detournement_fin !== null && $p->detournement_fin > Tools::now()){ echo Vue::pastille('Revenus détournés', 'alerte'); } ?>
     </div>
@@ -79,7 +79,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <input type="submit" value="Attaquer avec <?= $escadre ?> vaisseau(x) de combat" />
+            <input type="submit" value="Attaquer avec <?= $escadre ?> <?= __('vaisseau', 'vaisseaux', $escadre) ?> de combat" />
         </form>
     <?php } ?>
     <?php foreach($flottesPresentes as $flotte){ ?>
@@ -88,7 +88,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec la flotte <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> vaisseau(x))" />
+            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec la flotte <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?>)" />
         </form>
     <?php } ?>
     <?php if($debarquement){ ?>
@@ -96,7 +96,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="debarquer" />
             <?= csrfField() ?>
-            <input type="submit" value="Débarquer <?= $troupes ?> troupe(s) d'assaut" />
+            <input type="submit" value="Débarquer <?= $troupes ?> <?= __('troupe', 'troupes', $troupes) ?> d'assaut" />
         </form>
     <?php } ?>
     </div>

@@ -549,7 +549,7 @@
     function ouvrirTrajets() {
         compteurs.length = 0;
         marquerSelection(null);
-        ouvrirFeuille('Flottes en route', DONNEES.enRoute.length + ' déplacement(s)', null);
+        ouvrirFeuille('Flottes en route', DONNEES.enRouteLibelle, null);
         DONNEES.enRoute.forEach((trajet) => {
             const duree = creer('span', {classe: 'carte__valeur'});
             compteurs.push({trajet: trajet, noeud: duree});

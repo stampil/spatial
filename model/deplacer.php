@@ -25,7 +25,8 @@ else{
         Tools::addMessage($erreur ?? $nombre.' × '.$infos['nom'].' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', Vaisseau::dureeTrajet($Joueur, $type, $depart, $destination)).'.');
     }
     if($troupes > $capacite){
-        Tools::addMessage('Les troupes voyagent en barge : '.$troupes.' troupes demandent '.intdiv($troupes + Vaisseau::CAPACITE_BARGE - 1, Vaisseau::CAPACITE_BARGE).' barge(s), '.Vaisseau::CAPACITE_BARGE.' troupes par barge.');
+        $barges = intdiv($troupes + Vaisseau::CAPACITE_BARGE - 1, Vaisseau::CAPACITE_BARGE);
+        Tools::addMessage('Les troupes voyagent en barge : '.$troupes.' '.__('troupe','troupes',$troupes).' '.__('demande','demandent',$troupes).' '.$barges.' '.__('barge','barges',$barges).', '.Vaisseau::CAPACITE_BARGE.' troupes par barge.');
     }
     elseif($ordres === 0){
         Tools::addMessage('Aucun vaisseau choisi.');

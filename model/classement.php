@@ -8,7 +8,7 @@
         <span class="rang__numero"><?= $rang + 1 ?></span>
         <?= Vue::emblemeCamp($classe->id_camp, 32) ?>
         <span class="rang__nom"><?= $classe->getNom() ?></span>
-        <span class="rang__score"><?= $ligne['planetes'] ?> planète(s)<br>flotte <?= $ligne['force'] ?></span>
+        <span class="rang__score"><?= $ligne['planetes'] ?> <?= __('planete', 'planetes', $ligne['planetes']) ?><br>flotte <?= $ligne['force'] ?></span>
     </div>
     <?php } ?>
 </section>

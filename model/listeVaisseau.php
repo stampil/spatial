@@ -20,7 +20,7 @@ if($menace !== null){
 ?>
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html('canon') ?>Menace pirate</h2>
-    <p>Une flotte pirate de <?= array_sum(Menace::flotte($source->slot)) ?> vaisseau(x), venue de <?= $source->getNom() ?>, menace <?= $cible->getNom() ?>. Combattez-la avec vos vaisseaux présents sur la planète, ou laissez-la détourner une part des revenus. Sans réponse sous <?= intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR) ?> h, elle détourne.</p>
+    <p>Une flotte pirate de <?= array_sum(Menace::flotte($source->slot)) ?> <?= __('vaisseau', 'vaisseaux', array_sum(Menace::flotte($source->slot))) ?>, venue de <?= $source->getNom() ?>, menace <?= $cible->getNom() ?>. Combattez-la avec vos vaisseaux présents sur la planète, ou laissez-la détourner une part des revenus. Sans réponse sous <?= intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR) ?> h, elle détourne.</p>
     <div class="md3-actions">
         <?php foreach(array(Menace::ACTION_COMBATTRE => 'Combattre', Menace::ACTION_LAISSER => 'Laisser faire') as $action => $libelle){ ?>
         <form method="POST" action="?p=repondreMenace">

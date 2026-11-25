@@ -23,7 +23,7 @@ foreach(Flotte::liste($Joueur->id) as $ligne){
 <h1 class="titre-vue" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Vue::emblemeCamp($idCamp, 32) ?><?= htmlspecialchars($systeme->nom) ?></h1>
 <div class="pastilles">
     <?= Vue::pastille($nomCamp) ?>
-    <?= Vue::pastille(count($systeme->planetes).' planètes') ?>
+    <?= Vue::pastille(count($systeme->planetes).' '.__('planete', 'planetes', count($systeme->planetes))) ?>
 </div>
 <p><a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $systeme->id ?>">Voir sur la carte</a></p>
 <div class="fiches">
@@ -44,7 +44,7 @@ foreach($systeme->planetes as $p){
             </div>
         </div>
         <div class="pastilles">
-            <?= Vue::pastille($p->slot.' emplacements') ?>
+            <?= Vue::pastille($p->slot.' '.__('emplacement', 'emplacements', $p->slot)) ?>
             <?= Vue::pastille('Bouclier '.$p->bouclier) ?>
             <?= Vue::pastille('Canon '.$p->canon) ?>
             <?= Vue::pastille('Garnison '.$p->troupes) ?>
@@ -53,7 +53,7 @@ foreach($systeme->planetes as $p){
         <?php if(count($stock) > 0 || count($flottes) > 0){ ?>
         <?php if(count($stock) > 0){ echo Vue::composition($stock); } ?>
         <?php foreach($flottes as $flotte){ ?>
-        <p class="md3-secondary">Flotte <?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> vaisseau(x)</p>
+        <p class="md3-secondary">Flotte <?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?></p>
         <?php } ?>
         <div class="md3-actions fiche__actions">
             <a class="md3-button md3-button--tonal" href="?p=carte&ordre=<?= $p->id ?>">Envoyer des vaisseaux</a>

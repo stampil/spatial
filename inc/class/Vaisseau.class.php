@@ -125,7 +125,7 @@ class Vaisseau {
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=id_planete, depart=?, arrivee=?, exploration=1 WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
         $db->query($query,Tools::now(),Tools::nowPlus(self::dureeExpedition($joueur)),$joueur->id,$depart->id,self::RECONNAISSANCE);
         if($db->lastRowCount !== $nombre){
-            return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[self::RECONNAISSANCE]['nom'].'.';
+            return __('seul','seuls',$db->lastRowCount).' '.$db->lastRowCount.' '.__('vaisseau','vaisseaux',$db->lastRowCount).' '.__('disponible','disponibles',$db->lastRowCount).' : '.self::CATALOGUE[self::RECONNAISSANCE]['nom'].'.';
         }
         return null;
     }
@@ -149,7 +149,7 @@ class Vaisseau {
             $planete = new Planete($ligne->id_planete);
             if(random_int(1, self::PERCENT) <= self::EXPLORATION_DECOUVERTE_POURCENT){
                 $systeme = Systeme::decouvrir($joueur, $planete->systeme);
-                Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' : système '.$systeme->nom.' découvert ('.count($systeme->planetes).' planètes).');
+                Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' : système '.$systeme->nom.' découvert ('.count($systeme->planetes).' '.__('planete','planetes',count($systeme->planetes)).').');
             }
             else{
                 Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' sans rien trouver.');
@@ -176,12 +176,12 @@ class Vaisseau {
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, depart=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
         $db->query($query,$destination->id,Tools::now(),$arrivee,$joueur->id,$depart->id,$type);
         if($db->lastRowCount !== $nombre){
-            return 'Seuls '.$db->lastRowCount.' vaisseau(x) étaient disponibles : '.self::CATALOGUE[$type]['nom'].'.';
+            return __('seul','seuls',$db->lastRowCount).' '.$db->lastRowCount.' '.__('vaisseau','vaisseaux',$db->lastRowCount).' '.__('disponible','disponibles',$db->lastRowCount).' : '.self::CATALOGUE[$type]['nom'].'.';
         }
         if($type === self::TRANSPORT_PERSO){
             $passagers = Perso::emmener($joueur, $depart, $destination, $nombre * self::CAPACITE_TRANSPORT_PERSO, $arrivee);
             if($passagers > 0){
-                Tools::addMessage($passagers.' perso(s) voyagent à bord.');
+                Tools::addMessage($passagers.' '.__('perso','persos',$passagers).' '.__('voyage','voyagent',$passagers).' à bord.');
             }
         }
         return null;
@@ -198,7 +198,7 @@ class Vaisseau {
                 $planete = new Planete($ligne->id_destination);
                 Tools::addMessage($nombre.' × '.self::CATALOGUE[$ligne->type]['nom'].' : arrivée sur '.$planete->nom.'.');
                 if($ligne->type === self::RECONNAISSANCE && Decouverte::ajouter($joueur->id, $planete->id_systeme)){
-                    Tools::addMessage('Système '.$planete->systeme->nom.' exploré : '.count($planete->systeme->planetes).' planètes découvertes.');
+                    Tools::addMessage('Système '.$planete->systeme->nom.' exploré : '.count($planete->systeme->planetes).' '.__('planete','planetes',count($planete->systeme->planetes)).' '.__('decouverte','decouvertes',count($planete->systeme->planetes)).'.');
                 }
             }
         }
