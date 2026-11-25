@@ -53,7 +53,7 @@ class Icone {
         if(!isset(self::DESSINS[$nom])){
             throw new UnexpectedValueException("Icône inconnue : ".$nom);
         }
-        return '<svg class="icone" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
+        return '<svg class="icone" width="'.self::VUE.'" height="'.self::VUE.'" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
     }
 
 }
