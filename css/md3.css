@@ -153,6 +153,18 @@ body {
     font-size: 1.5rem;
 }
 
+.musique {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.musique[aria-pressed="true"] .musique__muet,
+.musique[aria-pressed="false"] .musique__son {
+    display: none;
+}
+
 .md3-nav-link:hover,
 .md3-nav-link:focus-visible,
 .md3-icon-link:hover,

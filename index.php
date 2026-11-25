@@ -63,6 +63,9 @@ if(!empty($_SESSION['Sid'])){
         <script src="js/jquery.countdown.min.js"></script>
         <script src="js/main.js"></script>
         <script src="js/rapport.js" defer></script>
+        <?php if(isset($Joueur)){ ?>
+        <script src="js/musique.js" defer></script>
+        <?php } ?>
                 <?php
         if(is_file('js/'.$p.'.js')){
         ?>

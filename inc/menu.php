@@ -19,6 +19,10 @@ $navClasse = isset($Joueur) ? ' md3-top-app-bar__nav--large' : '';
         <a class="md3-icon-link" href="?p=<?= PAGE_PARENTS[$p] ?>" aria-label="Retour">&larr;</a>
         <?php } ?>
         <a class="md3-top-app-bar__title" href="?p=<?= $homePage ?>"><?= APP_TITLE ?></a>
+        <?php if(isset($Joueur)){ ?>
+        <button type="button" class="md3-icon-link musique" aria-label="<?= MUSIQUE_LABEL ?>" aria-pressed="true"><span class="musique__son"><?= Icone::html('son') ?></span><span class="musique__muet"><?= Icone::html('muet') ?></span></button>
+        <audio class="musique__piste" src="<?= MUSIQUE_FICHIER ?>" loop preload="auto"></audio>
+        <?php } ?>
     </div>
     <nav class="md3-top-app-bar__nav<?= $navClasse ?>" aria-label="Navigation principale">
         <?php foreach($menuPages as $page => $label){ ?>
