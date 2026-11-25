@@ -34,6 +34,8 @@ Fait de mon côté : les planètes tournent comme des globes (avec les 26 images
 
 Ta phrase (25/11) : « les prompt tu me les donne 1 par 1 ici ». Compris : je te donne ici, dans la conversation, un prompt complet et prêt à copier (bloc style, bloc magenta si objet, puis le prompt) à chaque message, dans l'ordre du fichier `tools/prompts-images.md`, et le suivant quand tu me le demandes.
 
+Ta phrase (25/11) : « généré, mais ssa fait tres sttarwars la, je veux pas me prendre une flopé d'avocat ». Compris : les 6 premiers prompts donnaient des designs trop proches de Star Wars (coque en coin, troupier à armure blanche, escadre impériale). J'ai réécrit tous les prompts avec un bloc « design original » (ingénierie industrielle réaliste, pas de coque en coin, pas d'armure blanche, pas de cape ni de sabre, aucun nom de franchise) et je repars du prompt 1. Les 6 images déjà générées ne vont pas dans le jeu : à refaire avec les nouveaux prompts. Je ne peux pas garantir l'absence de risque juridique : si une image rappelle clairement une œuvre connue, on la régénère.
+
 À toi : générer les images avec Gemini, les nommer comme indiqué, lancer `python3 tools/detourer-magenta.py <dossier>`, puis me dire de les commiter (ou me donner le dossier). Je n'ai pas pu tester avec de vraies images Gemini, seulement des images factices : si un détourage bave, donne-moi un exemple.
 
 ### 6. Serveurs de test (23/11)
