@@ -5,7 +5,6 @@ class Ia {
     const INTERVALLE_SECONDES = 12 * Planete::SECONDS_PER_HOUR;
     const PROTECTION_SECONDES = Joueur::VISIBILITE_APRES_TUTO_SECONDES;
     const PUISSANCE_PAR_SLOT = 4;
-    const PILLAGE_POURCENT = 10;
     const REVOLTE_EMPIRE = 25;
     const PERCENT = 100;
     const CAMPS_RAIDEURS = array(Camp::PIRATES, Camp::EMPIRE);
@@ -39,6 +38,10 @@ class Ia {
         if($source === null){
             return;
         }
+        if((int) $source->id_camp === Camp::PIRATES){
+            Menace::creer($joueur, $planete, $source);
+            return;
+        }
         $camp = new Camp($source->id_camp);
         $puissance = Combat::alea($source->slot * self::PUISSANCE_PAR_SLOT);
         $navires = Vaisseau::escadre($planete->id, $joueur->id);
@@ -64,7 +67,7 @@ class Ia {
                 $bilan .= ' Vaisseaux détruits : '.array_sum($pertes).'.';
             }
             if($bouclier + $canon === 0){
-                $bilan .= self::consequence($joueur, $planete, $camp);
+                $bilan .= self::agiter($planete);
             }
             array_push($etapes, array('texte' => 'Dégâts infligés : '.$degats, 'valeurs' => array('bouclier' => $bouclier, 'canon' => $canon)));
         }
@@ -91,14 +94,7 @@ class Ia {
         return $ret[0] ?? null;
     }
 
-    private static function consequence(Joueur $joueur, Planete $planete, Camp $camp): string {
-        if($camp->id === Camp::PIRATES){
-            $vol = intdiv($joueur->credits * self::PILLAGE_POURCENT, self::PERCENT);
-            if($vol > 0 && $joueur->payer($vol)){
-                return ' Défense détruite : les Pirates pillent '.$vol.' cr.';
-            }
-            return ' Défense détruite.';
-        }
+    private static function agiter(Planete $planete): string {
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=LEAST(perc_revolte+?, ?) WHERE id=?";
         MyPDO::getInstance()->query($query,self::REVOLTE_EMPIRE,Planete::MAX_REVOLTE - 1,$planete->id);
         return ' Défense détruite : la révolte monte de '.self::REVOLTE_EMPIRE.' points.';

@@ -101,44 +101,6 @@ if($p->gouverneur !== $Joueur->id){
     </div>
 </section>
 <?php
-    if($Joueur->id_camp === Camp::PIRATES){
-        $escadrePirate = array_sum(Vaisseau::escadre($p->id, $Joueur->id));
-        $adversaires = Defi::adversaires($Joueur, $p);
-        $detournee = $p->detournement_fin !== null && $p->detournement_fin > Tools::now();
-?>
-<section class="panneau">
-    <h2 class="panneau__titre"><?= Icone::html('assassin') ?>Pirates</h2>
-    <?php if($p->gouverneur === 0){ ?>
-    <p class="md3-secondary">Cette planète ne produit aucune ressource à détourner.</p>
-    <?php } elseif($detournee){ ?>
-    <p class="md3-secondary">Revenus déjà détournés : prochain détournement possible à <?= htmlspecialchars($p->detournement_fin) ?>.</p>
-    <?php } elseif($escadrePirate === 0){ ?>
-    <p class="md3-secondary">Envoyez des vaisseaux de combat ici pour détourner les revenus.</p>
-    <?php } elseif($defense > 0){ ?>
-    <p class="md3-secondary">Détruisez d'abord la défense planétaire pour détourner les revenus.</p>
-    <?php } else { ?>
-    <form method="POST" action="?p=detourner">
-        <input type="hidden" name="planete" value="<?= $p->id ?>" />
-        <?= csrfField() ?>
-        <input type="submit" value="Détourner les revenus (<?= Detournement::POURCENT ?> % de <?= Detournement::DUREE_HEURES ?> h)" />
-    </form>
-    <?php } ?>
-    <?php foreach($adversaires as $adversaire){ ?>
-    <div class="ligne-jeu">
-        <span class="ligne-jeu__info"><?= Icone::html('canon') ?><?= $adversaire->getNom() ?></span>
-        <?php if($escadrePirate > 0){ ?>
-        <form method="POST" action="?p=defier">
-            <input type="hidden" name="planete" value="<?= $p->id ?>" />
-            <input type="hidden" name="defenseur" value="<?= $adversaire->id ?>" />
-            <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--tonal" value="Défier" />
-        </form>
-        <?php } ?>
-    </div>
-    <?php } ?>
-</section>
-<?php
-    }
 }
 else{
     $planete = $p;

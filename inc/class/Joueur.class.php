@@ -176,7 +176,6 @@ class Joueur {
 
     public function resolveEvents(): void {
         Planete::regenererDefenses();
-        Defi::purger();
         $this->updateCredits();
         foreach(Planete::listeGouvernees($this->id) as $ligne){
             (new Planete($ligne->id))->updateRevolte();
@@ -184,6 +183,7 @@ class Joueur {
         Vaisseau::resolveProduction($this);
         Vaisseau::resolveArrivees($this);
         Tuto::avancer($this);
+        Menace::expirer($this);
         Ia::resoudre($this);
         foreach(Perso::liste($this) as $ligne){
             (new Perso($ligne->id))->resolve($this);

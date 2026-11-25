@@ -244,15 +244,14 @@ CREATE TABLE IF NOT EXISTS `journal` (
   KEY `id_joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `defi` (
+CREATE TABLE IF NOT EXISTS `menace` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `id_attaquant` bigint(20) UNSIGNED NOT NULL,
-  `id_defenseur` bigint(20) UNSIGNED NOT NULL,
+  `id_joueur` bigint(20) UNSIGNED NOT NULL,
   `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `id_source` bigint(20) UNSIGNED NOT NULL,
   `creato` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `duel` (`id_attaquant`,`id_defenseur`,`id_planete`),
-  KEY `id_defenseur` (`id_defenseur`)
+  UNIQUE KEY `joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
@@ -274,7 +273,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('011_defense_pirates_ia'),
 ('012_pirates_jouables'),
 ('013_sans_email'),
-('014_pirates_ia');
+('014_pirates_ia'),
+('015_menaces_pirates');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

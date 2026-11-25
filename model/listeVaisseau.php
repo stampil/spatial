@@ -13,30 +13,24 @@ if(count($posees) === 0 && count($enRoute) === 0 && count($flottes) === 0){
 ?>
 <p><a class="md3-button md3-button--tonal" href="?p=carte">Donner des ordres sur la carte</a></p>
 <?php
-$defisRecus = Defi::recus($Joueur->id);
-$defisEnvoyes = Defi::envoyes($Joueur->id);
-if(count($defisRecus) + count($defisEnvoyes) > 0){
+$menace = Menace::enCours($Joueur->id);
+if($menace !== null){
+    $cible = new Planete($menace->id_planete);
+    $source = new Planete($menace->id_source);
 ?>
 <section class="panneau">
-    <h2 class="panneau__titre"><?= Icone::html('canon') ?>Défis pirates</h2>
-    <?php foreach($defisRecus as $defi){ $adversaire = new Joueur($defi->id_attaquant); $lieu = new Planete($defi->id_planete); ?>
-    <div class="ligne-jeu">
-        <span class="ligne-jeu__info"><?= $adversaire->getNom() ?> vous défie sur <?= $lieu->getNom() ?></span>
-        <div class="md3-actions">
-            <?php foreach(array('accepter' => 'Accepter', 'refuser' => 'Refuser') as $action => $libelle){ ?>
-            <form method="POST" action="?p=repondreDefi">
-                <input type="hidden" name="defi" value="<?= $defi->id ?>" />
-                <input type="hidden" name="action" value="<?= $action ?>" />
-                <?= csrfField() ?>
-                <input type="submit" class="md3-button<?= $action === 'refuser' ? ' md3-button--outlined' : '' ?>" value="<?= $libelle ?>" />
-            </form>
-            <?php } ?>
-        </div>
+    <h2 class="panneau__titre"><?= Icone::html('canon') ?>Menace pirate</h2>
+    <p>Une flotte pirate de <?= array_sum(Menace::flotte($source->slot)) ?> vaisseau(x), venue de <?= $source->getNom() ?>, menace <?= $cible->getNom() ?>. Combattez-la avec vos vaisseaux présents sur la planète, ou laissez-la détourner une part des revenus. Sans réponse sous <?= intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR) ?> h, elle détourne.</p>
+    <div class="md3-actions">
+        <?php foreach(array(Menace::ACTION_COMBATTRE => 'Combattre', Menace::ACTION_LAISSER => 'Laisser faire') as $action => $libelle){ ?>
+        <form method="POST" action="?p=repondreMenace">
+            <input type="hidden" name="menace" value="<?= $menace->id ?>" />
+            <input type="hidden" name="action" value="<?= $action ?>" />
+            <?= csrfField() ?>
+            <input type="submit" class="md3-button<?= $action === Menace::ACTION_LAISSER ? ' md3-button--outlined' : '' ?>" value="<?= $libelle ?>" />
+        </form>
+        <?php } ?>
     </div>
-    <?php } ?>
-    <?php foreach($defisEnvoyes as $defi){ $adversaire = new Joueur($defi->id_defenseur); $lieu = new Planete($defi->id_planete); ?>
-    <p class="md3-secondary">Défi envoyé à <?= $adversaire->getNom() ?> sur <?= $lieu->getNom() ?> : en attente de sa réponse.</p>
-    <?php } ?>
 </section>
 <?php } ?>
 <?php
