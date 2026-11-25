@@ -19,9 +19,10 @@ RATIO_FOND = 16 / 9
 QUALITE_JPEG = 82
 TAILLE_COIN = 8
 DISTANCE_TRANSPARENTE = 30.0
-DISTANCE_OPAQUE = 200.0
-MAGENTA_ROUGE_BLEU_MIN = 170
-MAGENTA_VERT_MAX = 110
+DISTANCE_OPAQUE = 140.0
+FOND_ROUGE_MIN = 200
+FOND_BLEU_MIN = 120
+FOND_VERT_MAX = 110
 SEUIL_OPACITE_CADRAGE = 0.1
 
 
@@ -33,7 +34,7 @@ def couleur_du_fond(pixels):
         pixels[-TAILLE_COIN:, -TAILLE_COIN:].reshape(-1, 3),
     ])
     fond = numpy.median(coins, axis=0)
-    if fond[0] < MAGENTA_ROUGE_BLEU_MIN or fond[2] < MAGENTA_ROUGE_BLEU_MIN or fond[1] > MAGENTA_VERT_MAX:
+    if fond[0] < FOND_ROUGE_MIN or fond[2] < FOND_BLEU_MIN or fond[1] > FOND_VERT_MAX:
         return None
     return fond
 
