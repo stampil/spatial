@@ -11,7 +11,7 @@
 
 
 <fieldset class="factions">
-<legend>Camp *</legend>
+<legend>Choisis ton camp *</legend>
 <?php foreach(Camp::listeJouables() as $ligne){ $camp = new Camp($ligne->id); ?>
 <label class="faction" style="--accent:<?= htmlspecialchars($camp->couleur) ?>">
 <?= Vue::banniereCamp($camp->id) ?>

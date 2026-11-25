@@ -15,6 +15,10 @@ class Vue {
         Camp::REBELLION => '<polygon points="24,4 44,24 24,44 4,24" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="24" r="7" fill="currentColor"/>',
     );
 
+    public static function ressource(string $chemin): string {
+        return $chemin.'?v='.filemtime($chemin);
+    }
+
     public static function visuel(string $dossier, string $cle, ?string $iconeSecours = null): string {
         $chemin = self::DOSSIER_IMAGES.'/'.$dossier.'/'.$cle.'.'.self::EXTENSION_OBJET;
         if(is_file($chemin)){
