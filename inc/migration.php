@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
         <main class="md3-page">
             <h1 class="titre-vue"><?= Icone::html('info') ?><?= MIGRATION_LABEL ?></h1>
             <?php if($message === null){ ?>
-            <p>La base du serveur est celle de l'ancienne version. Le bouton <?= MIGRATION_LABEL ?> importe <code><?= Installation::MIGRATION_FILE ?></code>, supprime les anciens comptes joueurs et recrée l'univers.</p>
+            <p>La base du serveur est celle de l'ancienne version. Le bouton <?= MIGRATION_LABEL ?> importe <code><?= Installation::MIGRATION_FILE ?></code>, supprime les comptes joueurs et recrée l'univers.</p>
             <?php } else { ?>
             <p role="status"><?= htmlspecialchars($message) ?></p>
             <p><a class="md3-button" href="?p=<?= GUEST_HOME_PAGE ?>">Ouvrir le jeu</a></p>

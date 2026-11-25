@@ -4,9 +4,8 @@ class Installation {
 
     const SQL_FILE = 'database/installation.sql';
     const MIGRATION_FILE = 'database/migration_revival.sql';
-    const TABLES_ANCIENNES = array('joueur', 'perso', 'planete', 'systeme', 'production');
-    const MESSAGE_DEJA_MIGREE = "Base déjà migrée : rien à faire.";
-    const MESSAGE_MIGREE = "Migration terminée : anciens comptes supprimés, univers recréé.";
+    const TABLES_DE_JEU = array('joueur', 'perso', 'planete', 'systeme', 'production', 'vaisseau', 'flotte', 'decouverte', 'journal', 'menace');
+    const MESSAGE_MIGREE = "Serveur réinitialisé : comptes supprimés, univers recréé. Inscrivez-vous de nouveau.";
     const MIGRATIONS_DIR = 'database/migrations';
     const LOCK_NAME = 'spatial_installation';
     const LOCK_TIMEOUT_SECONDS = 30;
@@ -37,17 +36,12 @@ class Installation {
     }
 
     public static function migrer(): string {
-        if(!self::ancienneBase()){
-            return self::MESSAGE_DEJA_MIGREE;
-        }
         $bdd = MyPDO::getInstance();
         self::verrouiller();
-        if(!self::ancienneBase()){
-            $bdd->query("SELECT RELEASE_LOCK(?)", self::LOCK_NAME);
-            return self::MESSAGE_DEJA_MIGREE;
+        if(self::ancienneBase()){
+            self::executer(self::MIGRATION_FILE);
         }
-        self::executer(self::MIGRATION_FILE);
-        foreach(self::TABLES_ANCIENNES as $table){
+        foreach(self::TABLES_DE_JEU as $table){
             if($bdd->query("TRUNCATE TABLE " . MyPDO::DB_FLAG . $table) === MyPDO::QUERY_FAILED){
                 exit("La migration a échoué en vidant la table " . $table . " : voir le journal d'erreurs du serveur.");
             }

@@ -24,7 +24,7 @@ const MENU_BAS = array('carte' => 'carte', 'listePlanete' => 'planetes', 'listeV
 const MENU_ICON_LABEL = 'Menu';
 const MIGRATION_PAGE = 'migrer';
 const MIGRATION_LABEL = 'Migration';
-const MIGRATION_CONFIRMATION = 'Supprimer tous les anciens comptes joueurs, leurs planètes et leurs persos, puis migrer la base ? Cette opération est irréversible.';
+const MIGRATION_CONFIRMATION = 'Supprimer tous les comptes joueurs, leurs persos, planètes et vaisseaux, puis recréer l\'univers ? Cette opération est irréversible.';
 const MUSIQUE_LABEL = 'Musique d\'ambiance';
 const MUSIQUE_FICHIER = 'audio/conquete-spatiale.mp3';
 const PAGE_PARENTS = array('afficheSysteme' => 'carte', 'affichePerso' => 'listePerso', 'affichePlanete' => 'listePlanete', 'afficheJoueur' => 'classement');

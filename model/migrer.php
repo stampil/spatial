@@ -2,9 +2,11 @@
 if(!Tools::isValidCsrfToken($_POST[CSRF_KEY] ?? null)){
     exit('Jeton invalide');
 }
-Tools::addMessage(Installation::migrer());
+$message = Installation::migrer();
+unset($_SESSION['Sid']);
+Tools::addMessage($message);
 ?>
 
 <script>
-    location.href='?p=<?= HOME_PAGE ?>';
+    location.href='?p=<?= GUEST_HOME_PAGE ?>';
 </script>
