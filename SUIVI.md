@@ -10,11 +10,13 @@ Ta phrase : « si si tu push with lease et si tu doit reprendree, tu amend ». T
 
 ### 2. Tester avec ta base (23/11)
 
-Avant de tester sur ta base : exécuter `database/migration_revival.sql`. Il ajoute les colonnes et crée les tables des nouvelles fonctions (camps, vaisseaux, flottes, découvertes, persos en voyage, rôles, carte avec coordonnées des systèmes, bonus de planète, départ des trajets, journal des événements, régénération de la défense, détournement, défis pirates, raids de l'IA, Pirates jouables) et note les migrations déjà appliquées. Testé sur l'ancien schéma : le résultat est identique au nouveau `database/systeme.sql`.
+Avant de tester sur ta base : exécuter `database/migration_revival.sql`. Il ajoute les colonnes et crée les tables des nouvelles fonctions (camps, vaisseaux, flottes, découvertes, persos en voyage, rôles, carte avec coordonnées des systèmes, bonus de planète, départ des trajets, journal des événements, régénération de la défense, détournement, défis pirates, raids de l'IA, suppression de l'email) et note les migrations déjà appliquées. Testé sur l'ancien schéma : le résultat est identique au nouveau `database/systeme.sql`.
 
 Vide aussi la table `joueur` (anciens hash `crypt()`, et aucun camp pour les anciens joueurs) et renseigne `inc/config.php`.
 
 Ensuite, peuple l'univers une seule fois : `php database/peupler.php` (16 systèmes : 6 d'Empire, 3 de Pirates, 3 disputés, 4 sans camp). Il refuse de tourner si le jeu est déjà peuplé.
+
+Les joueurs se connectent maintenant avec leur nom (plus d'email) : la migration 013 supprime la colonne `email`, et la 014 remet les Pirates en IA. Les migrations s'appliquent seules à la première visite.
 
 ### 3. Garder l'essence du développeur d'origine (23/11)
 
@@ -23,6 +25,12 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 ### 4. Publication sur InfinityFree (23/11)
 
 Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : les 2 derniers bandeaux (inscription et connexion) et les 3 logos de camps.
+
+### 5. Pirates pilotés par l'IA (25/11)
+
+Ta phrase (25/11) : « par contre les pirates on les choisit pas c'est de l'IA !!! ». Fait : les Pirates ne se choisissent plus à l'inscription (migration 014). Conséquence à trancher : le détournement de ressources et les défis entre pirates, déjà codés, ne servent qu'à des joueurs Pirates ; avec des Pirates pilotés par l'IA ils sont inactifs.
+
+Question en suspens : je retire ces deux fonctions, ou je les transpose à l'IA (les raids des Pirates font déjà piller des crédits) ?
 
 ### 6. Serveurs de test (23/11)
 

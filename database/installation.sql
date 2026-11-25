@@ -92,6 +92,6 @@ CREATE TABLE IF NOT EXISTS `camp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `camp` (`id`, `nom`, `histoire`, `jouable`, `couleur`) VALUES
-(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 1, '#B3261C'),
+(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 0, '#B3261C'),
 (2, 'Empire', 'Un ordre ancien qui a unifié les systèmes par la force de ses flottes. Son industrie de masse produit unités et ressources à moindre coût, mais ses bannières flottent sur chaque planète conquise : l''Empire est toujours visible sur la carte.', 1, '#1565C0'),
 (3, 'Rébellion', 'Des planètes lassées de l''ordre impérial, des mutins et des ingénieurs libres ont choisi la discrétion. Incapable de rivaliser en nombre, la Rébellion gagne en restant invisible tant qu''on ne l''a pas découverte.', 1, '#2E7D32');
