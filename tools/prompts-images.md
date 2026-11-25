@@ -1,6 +1,6 @@
 # Prompts d'images photo-réalistes (Gemini)
 
-34 images à générer : 20 objets sur fond magenta (transformés en PNG transparent par le script) et 14 fonds plein cadre.
+37 images à générer : 23 objets sur fond magenta (transformés en PNG transparent par le script) et 14 fonds plein cadre.
 Les petites icônes de l'interface (menu, barre d'état, boutons) restent en SVG : elles ne se génèrent pas.
 
 Les designs sont volontairement originaux : aucune silhouette, aucun nom ni aucun style reconnaissable d'une franchise existante. Aucune garantie juridique n'est possible, mais ne garde pas une image qui rappelle clairement une œuvre connue : régénère-la.
@@ -100,3 +100,17 @@ Ces images sont affichées en bandeau large et bas (environ 3:1) en haut de chaq
 | `page-listeCamp` | `Wide 16:9 cinematic shot of three distinct fleets side by side in deep space, one ragged with red lights, one orderly blue-grey, one small and green, separated by dark space, the ships in the horizontal middle band.` |
 | `page-inscription` | `Wide 16:9 cinematic shot of a lone recruitment shuttle leaving a space station toward a distant glowing nebula, a feeling of departure and adventure, the shuttle in the horizontal middle band.` |
 | `page-connection` | `Wide 16:9 cinematic shot of a pilot's cockpit view looking out at a star field and a distant planet, soft instrument glow on the edges, calm mood, the horizon in the horizontal middle band.` |
+
+## Logos des camps : `logo-<camp>`
+
+Pour les logos, remplace le bloc STYLE et le bloc DESIGN ORIGINAL par le bloc LOGO ci-dessous, puis ajoute le bloc FOND MAGENTA et le prompt. Les formes reprennent les emblèmes actuels du jeu (cercle croisé, hexagone à triangle, losange à point).
+
+```
+Photorealistic macro photograph of a physical metal badge, ultra detailed, realistic materials (hammered brass, brushed steel, enamel inlay, rivets, micro scratches), physically accurate lighting, sharp focus, shot on a full-frame camera. Completely original emblem, not resembling any existing logo, flag, insignia or franchise emblem: no skull and crossbones, no cog wheel, no bird, no wings, no star. No text, no letters, no watermark. Front view, perfectly flat-on, symmetrical, centered.
+```
+
+| Fichier | Prompt |
+|---|---|
+| `logo-pirates` | `A circular badge with a hammered brass rim and dark iron face, two bold crossed diagonal bars forming a large X in the center, rust-red enamel inlay in the bars, rivets and scratches, worn and scavenged look.` |
+| `logo-empire` | `A hexagonal badge with a brushed silver rim and a polished blue-steel face, a solid raised equilateral triangle in the center with its apex up, fine concentric engraved lines, cold blue enamel, clean and disciplined look.` |
+| `logo-rebellion` | `A diamond-shaped badge (a square rotated by 45 degrees) with a worn bronze rim and forest-green enamel face, a round raised dot in the center, slightly uneven hand-hammered and improvised look, a few rivets.` |

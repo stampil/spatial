@@ -7,7 +7,7 @@ import sys
 import numpy
 from PIL import Image
 
-OBJETS = ('vaisseau', 'batiment', 'role', 'bonus')
+OBJETS = ('vaisseau', 'batiment', 'role', 'bonus', 'logo')
 FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-rebellion': 'camp/rebellion', 'carte': 'carte', 'accueil': 'accueil', 'combat': 'combat'}
 FONDS.update({'page-' + page: 'page/' + page for page in ('tableauBord', 'listePlanete', 'listeVaisseau', 'listePerso', 'classement', 'listeCamp', 'inscription', 'connection')})
 EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')

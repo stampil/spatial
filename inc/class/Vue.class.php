@@ -88,6 +88,10 @@ class Vue {
         if($idCamp === null || !isset(self::EMBLEMES[$idCamp])){
             return '';
         }
+        $logo = self::DOSSIER_IMAGES.'/logo/'.Camp::VISUELS[$idCamp].'.'.self::EXTENSION_OBJET;
+        if(is_file($logo)){
+            return '<img class="embleme embleme--image" src="'.$logo.'" width="'.$taille.'" height="'.$taille.'" alt="">';
+        }
         return '<svg class="embleme" width="'.$taille.'" height="'.$taille.'" viewBox="0 0 '.self::EMBLEME_VUE.' '.self::EMBLEME_VUE.'" aria-hidden="true">'.self::EMBLEMES[$idCamp].'</svg>';
     }
 

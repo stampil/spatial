@@ -258,6 +258,10 @@
     height: 40px;
 }
 
+.embleme--image {
+    object-fit: contain;
+}
+
 .embleme {
     flex: none;
     color: var(--accent, var(--md-sys-color-primary));
