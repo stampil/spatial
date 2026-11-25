@@ -38,7 +38,7 @@ Ta phrase (25/11) : « généré, mais ssa fait tres sttarwars la, je veux pas m
 
 Ta phrase (25/11) : « I can create more images as soon as your limit resets. Check your usage in Settings. => traite les image que tu a deja recu ». Fait : les 32 images reçues (nommées d'après l'ordre des prompts 1 à 32) sont détourées et rangées dans `img/`, branchées dans le jeu et commitées. Les 6 premières images, trop proches de Star Wars, sont écartées.
 
-À toi : quand Gemini te laisse de nouveau générer, il manque 2 images, `page-inscription` (prompt 33) et `page-connection` (prompt 34). Dis-moi alors « généré » et où sont les fichiers, je les traite comme les autres. Je te redonne les deux prompts à ce moment-là.
+Ta phrase (25/11) : « généré le prompt 33 envoi le 34 ». Fait : `page-inscription` est détouré, rangé dans `img/page/` et commité. À toi : générer `page-connection` (prompt 34), puis me dire où est le fichier.
 
 ### 6. Serveurs de test (23/11)
 
