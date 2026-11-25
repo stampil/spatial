@@ -20,15 +20,17 @@ Ensuite, peuple l'univers une seule fois : `php database/peupler.php` (16 systè
 
 Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait. ». Compris : règle pour tout le travail à venir. Le code garde la structure d'origine : une classe par objet (`Joueur`, `Perso`, `Planete`, `Systeme`), `MyPDO::getInstance()->query()` avec `MyPDO::DB_FLAG`, pages dans `model/`, pas de framework. Les idées de gameplay du `Readme.md` (empire, rébellion, pirate, combats en 3 phases, usines à slots) restent la référence : je ne les remplace pas par les miennes.
 
-### 4. Publication sur InfinityFree : base installée par le site (23/11)
+### 4. Publication sur InfinityFree (23/11)
 
-Le code est en ligne et le site installe lui-même sa base à la première visite (tables, 3 camps, 16 systèmes) : plus d'import dans phpMyAdmin. Seul le premier chargement le confirmera sur InfinityFree ; je le regarde dès que tu me donnes l'adresse du site.
+Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite.
 
 ### 7. Un jeu graphique comme un jeu vidéo, avec des prompts d'images photo-réalistes (25/11)
 
 Ta phrase (25/11) : « il faut fairele jeu + graphique comme un jeu vidéo, donner des prompt pour faire generer a une ia d'image des images du jeu et de ses icones, je veux un style photo-réaliste ». Ta phrase (25/11) : « go 5 avec tes recommandation ». Ta phrase (25/11) : « c gemini il sais pas faire de fond transparent, fait lui faire un fond magenta sans degradé ni flou ».
 
-Fait de mon côté : le jeu affiche une image à la place de l'icône SVG dès que le fichier existe (bâtiments, vaisseaux, rôles, bonus, bannières de camps, fond de carte, accueil), et garde l'icône sinon. Les 25 prompts sont dans `tools/prompts-images.md` (fond magenta pur pour les objets) et `tools/detourer-magenta.py` transforme le magenta en transparence, met en 512 px et range dans `img/`.
+Ta phrase (25/11) : « ben go la faut enrichir d'image ! ».
+
+Fait de mon côté : les planètes tournent comme des globes (avec les 26 images déjà là), et le jeu affiche une image à la place de l'icône SVG dès que le fichier existe (bâtiments, vaisseaux, rôles, bonus, bannières de camps, bandeaux de chaque page, fond des combats, fond de carte, accueil), et garde l'icône sinon. Les 34 prompts sont dans `tools/prompts-images.md` (fond magenta pur pour les objets) et `tools/detourer-magenta.py` transforme le magenta en transparence, met en 512 px et range dans `img/`.
 
 À toi : générer les images avec Gemini, les nommer comme indiqué, lancer `python3 tools/detourer-magenta.py <dossier>`, puis me dire de les commiter (ou me donner le dossier). Je n'ai pas pu tester avec de vraies images Gemini, seulement des images factices : si un détourage bave, donne-moi un exemple.
 
