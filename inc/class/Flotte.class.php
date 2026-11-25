@@ -50,6 +50,11 @@ class Flotte {
         return null;
     }
 
+    public static function dissoudreVides(int $joueurId): void {
+        $query = "DELETE FROM " . MyPDO::DB_FLAG . "flotte WHERE id_joueur=? AND id NOT IN (SELECT id_flotte FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_flotte IS NOT NULL)";
+        MyPDO::getInstance()->query($query,$joueurId);
+    }
+
     public function __construct(int $id) {
         $this->bdd = MyPDO::getInstance();
         $this->load($id);

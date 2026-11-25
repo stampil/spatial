@@ -13,6 +13,33 @@ if(count($posees) === 0 && count($enRoute) === 0 && count($flottes) === 0){
 ?>
 <p><a class="md3-button md3-button--tonal" href="?p=carte">Donner des ordres sur la carte</a></p>
 <?php
+$defisRecus = Defi::recus($Joueur->id);
+$defisEnvoyes = Defi::envoyes($Joueur->id);
+if(count($defisRecus) + count($defisEnvoyes) > 0){
+?>
+<section class="panneau">
+    <h2 class="panneau__titre"><?= Icone::html('canon') ?>Défis pirates</h2>
+    <?php foreach($defisRecus as $defi){ $adversaire = new Joueur($defi->id_attaquant); $lieu = new Planete($defi->id_planete); ?>
+    <div class="ligne-jeu">
+        <span class="ligne-jeu__info"><?= $adversaire->getNom() ?> vous défie sur <?= $lieu->getNom() ?></span>
+        <div class="md3-actions">
+            <?php foreach(array('accepter' => 'Accepter', 'refuser' => 'Refuser') as $action => $libelle){ ?>
+            <form method="POST" action="?p=repondreDefi">
+                <input type="hidden" name="defi" value="<?= $defi->id ?>" />
+                <input type="hidden" name="action" value="<?= $action ?>" />
+                <?= csrfField() ?>
+                <input type="submit" class="md3-button<?= $action === 'refuser' ? ' md3-button--outlined' : '' ?>" value="<?= $libelle ?>" />
+            </form>
+            <?php } ?>
+        </div>
+    </div>
+    <?php } ?>
+    <?php foreach($defisEnvoyes as $defi){ $adversaire = new Joueur($defi->id_defenseur); $lieu = new Planete($defi->id_planete); ?>
+    <p class="md3-secondary">Défi envoyé à <?= $adversaire->getNom() ?> sur <?= $lieu->getNom() ?> : en attente de sa réponse.</p>
+    <?php } ?>
+</section>
+<?php } ?>
+<?php
 foreach($flottes as $ligne){
     $flotte = new Flotte($ligne->id);
     $auRepos = $flotte->planeteAuRepos();

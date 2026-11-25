@@ -544,6 +544,10 @@ body.md3-dialog-ouvert {
     background: var(--md-sys-color-error);
 }
 
+.rapport__remplissage--defenseur {
+    background: var(--md-sys-color-error);
+}
+
 .rapport__remplissage--troupes {
     background: var(--md-sys-color-tertiary);
 }

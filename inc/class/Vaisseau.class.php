@@ -57,6 +57,27 @@ class Vaisseau {
         return $stock;
     }
 
+    public static function escadre(int $planeteId, int $joueurId): array {
+        $nombres = array_fill_keys(Combat::ESCADRE, 0);
+        $marques = implode(',', array_fill(0, count(Combat::ESCADRE), '?'));
+        $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_planete=? AND id_joueur=? AND arrivee IS NULL AND type IN ($marques) GROUP BY type";
+        foreach(MyPDO::getInstance()->query($query,$planeteId,$joueurId,...Combat::ESCADRE) as $ligne){
+            $nombres[$ligne->type] = (int) $ligne->nombre;
+        }
+        return $nombres;
+    }
+
+    public static function detruire(int $planeteId, int $joueurId, array $pertes): void {
+        foreach($pertes as $type => $nombre){
+            if($nombre < 1){
+                continue;
+            }
+            $query = "DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL ORDER BY id LIMIT " . $nombre;
+            MyPDO::getInstance()->query($query,$joueurId,$planeteId,$type);
+        }
+        Flotte::dissoudreVides($joueurId);
+    }
+
     public static function nombreDeplacements(int $joueurId): int {
         $query = "SELECT COUNT(DISTINCT id_planete, id_destination, arrivee) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND arrivee IS NOT NULL";
         return (int) MyPDO::getInstance()->query($query,$joueurId)[0]->nombre;

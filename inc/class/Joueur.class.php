@@ -16,6 +16,7 @@ class Joueur {
     public int $id_camp;
     public ?int $id_systeme_voisin;
     public ?string $fin_tuto;
+    public ?string $raid_maj;
 
     public string $IPs;
     
@@ -96,6 +97,7 @@ class Joueur {
         $this->id_camp = $ret[0]->id_camp;
         $this->id_systeme_voisin = $ret[0]->id_systeme_voisin;
         $this->fin_tuto = $ret[0]->fin_tuto;
+        $this->raid_maj = $ret[0]->raid_maj;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 
@@ -177,6 +179,8 @@ class Joueur {
     }
 
     public function resolveEvents(): void {
+        Planete::regenererDefenses();
+        Defi::purger();
         $this->updateCredits();
         foreach(Planete::listeGouvernees($this->id) as $ligne){
             (new Planete($ligne->id))->updateRevolte();
@@ -184,6 +188,7 @@ class Joueur {
         Vaisseau::resolveProduction($this);
         Vaisseau::resolveArrivees($this);
         Tuto::avancer($this);
+        Ia::resoudre($this);
         foreach(Perso::liste($this) as $ligne){
             (new Perso($ligne->id))->resolve($this);
         }

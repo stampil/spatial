@@ -7,7 +7,11 @@ class Combat {
     const BONUS_PHASE_POURCENT = 25;
     const HEROS_BONUS_PAR_ETOILE_POURCENT = 5;
     const EPAVE_CREDITS_PAR_POINT = 10;
+    const EPAVE_VAISSEAU_POURCENT = 50;
     const ESCADRE = array('chasseur', 'fregate', 'capital');
+    const ATTAQUANT = 'attaquant';
+    const DEFENSEUR = 'defenseur';
+    const ADVERSAIRE = array(self::ATTAQUANT => self::DEFENSEUR, self::DEFENSEUR => self::ATTAQUANT);
 
     public static function attaquer(Joueur $joueur, Planete $planete, ?Flotte $flotte = null): ?string {
         if($flotte !== null && $flotte->id_joueur !== $joueur->id){
@@ -48,8 +52,8 @@ class Combat {
         self::noterEtape($etapes, $nombres['capital'], 'capital', $degats, $bouclier, $canon);
 
         $db = MyPDO::getInstance();
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=? WHERE id=? AND bouclier=? AND canon=?";
-        $db->query($query,$bouclier,$canon,$planete->id,$planete->bouclier,$planete->canon);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=?, defense_maj=COALESCE(defense_maj, ?) WHERE id=? AND bouclier=? AND canon=?";
+        $db->query($query,$bouclier,$canon,Tools::now(),$planete->id,$planete->bouclier,$planete->canon);
         if($db->lastRowCount !== 1){
             return 'La situation a changé sur cette planète : recommencez.';
         }
@@ -122,8 +126,8 @@ class Combat {
         }
         else{
             $abattues = min($planete->troupes, intdiv($attaque, $force));
-            $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET troupes=troupes-? WHERE id=?";
-            $db->query($query,$abattues,$planete->id);
+            $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET troupes=troupes-?, defense_maj=COALESCE(defense_maj, ?) WHERE id=?";
+            $db->query($query,$abattues,Tools::now(),$planete->id);
             $message = 'Débarquement repoussé sur '.$planete->nom.' : vos '.$troupes.' troupe(s) sont perdues, la garnison perd '.$abattues.' troupe(s).';
             $garnison = $planete->troupes - $abattues;
         }
@@ -137,7 +141,109 @@ class Combat {
         return null;
     }
 
-    private static function infliger(int $degats, int $principal, int $secondaire): array {
+    public static function bataille(string $titre, array $camps): array {
+        $restants = array();
+        $maximum = array();
+        $pertes = array();
+        $bonusDePhase = array();
+        foreach(self::ADVERSAIRE as $camp => $adversaire){
+            $restants[$camp] = $camps[$camp]['nombres'];
+            $maximum[$camp] = self::forceTotale($restants[$camp]);
+            $pertes[$camp] = array_fill_keys(self::ESCADRE, 0);
+            $bonusDePhase[$camp] = 0;
+        }
+        $etapes = array();
+        foreach(self::ESCADRE as $type){
+            $presents = 0;
+            $degats = array();
+            foreach(self::ADVERSAIRE as $camp => $adversaire){
+                $presents += $restants[$camp][$type];
+                $degats[$camp] = self::puissance($restants[$camp][$type], $type, $camps[$camp]['bonus'] + $bonusDePhase[$camp], 0);
+            }
+            if($presents === 0){
+                continue;
+            }
+            $texte = Vaisseau::CATALOGUE[$type]['nom'].' :';
+            $valeurs = array();
+            foreach(self::ADVERSAIRE as $camp => $adversaire){
+                $texte .= ' '.$camps[$camp]['nom'].' '.$restants[$camp][$type].' ('.$degats[$camp].' de dégâts),';
+                foreach(self::detruire($restants[$adversaire], $degats[$camp]) as $perdu => $nombre){
+                    $pertes[$adversaire][$perdu] += $nombre;
+                }
+                $bonusDePhase[$camp] = 0;
+            }
+            foreach(self::ADVERSAIRE as $camp => $adversaire){
+                $valeurs[$camp] = self::forceTotale($restants[$camp]);
+            }
+            if($degats[self::ATTAQUANT] > $degats[self::DEFENSEUR]){
+                $bonusDePhase[self::ATTAQUANT] = self::BONUS_PHASE_POURCENT;
+            }
+            elseif($degats[self::DEFENSEUR] > $degats[self::ATTAQUANT]){
+                $bonusDePhase[self::DEFENSEUR] = self::BONUS_PHASE_POURCENT;
+            }
+            array_push($etapes, array('texte' => rtrim($texte, ','), 'valeurs' => $valeurs));
+        }
+
+        $forceAttaquant = self::forceTotale($restants[self::ATTAQUANT]);
+        $forceDefenseur = self::forceTotale($restants[self::DEFENSEUR]);
+        $vainqueur = null;
+        if($forceAttaquant > $forceDefenseur){
+            $vainqueur = self::ATTAQUANT;
+        }
+        elseif($forceDefenseur > 0){
+            $vainqueur = self::DEFENSEUR;
+        }
+        $epaves = 0;
+        $bilan = 'Les deux flottes sont anéanties.';
+        if($vainqueur !== null){
+            $epaves = self::valeurEpaves($pertes[self::ADVERSAIRE[$vainqueur]]);
+            $bilan = 'Victoire de '.$camps[$vainqueur]['nom'].' : '.$camps[self::ATTAQUANT]['nom'].' perd '.array_sum($pertes[self::ATTAQUANT]).' vaisseau(x), '.$camps[self::DEFENSEUR]['nom'].' perd '.array_sum($pertes[self::DEFENSEUR]).' vaisseau(x). Épaves récupérées : +'.$epaves.' cr.';
+        }
+        return array(
+            'pertes' => $pertes,
+            'vainqueur' => $vainqueur,
+            'epaves' => $epaves,
+            'bilan' => $bilan,
+            'rapport' => array(
+                'titre' => $titre,
+                'barres' => array(
+                    array('cle' => self::ATTAQUANT, 'nom' => $camps[self::ATTAQUANT]['nom'], 'maximum' => $maximum[self::ATTAQUANT]),
+                    array('cle' => self::DEFENSEUR, 'nom' => $camps[self::DEFENSEUR]['nom'], 'maximum' => $maximum[self::DEFENSEUR]),
+                ),
+                'etapes' => $etapes,
+                'bilan' => $bilan,
+            ),
+        );
+    }
+
+    public static function forceTotale(array $nombres): int {
+        $force = 0;
+        foreach(self::ESCADRE as $type){
+            $force += $nombres[$type] * Vaisseau::CATALOGUE[$type]['force'];
+        }
+        return $force;
+    }
+
+    public static function detruire(array &$nombres, int $degats): array {
+        $perdus = array();
+        foreach(self::ESCADRE as $type){
+            $force = Vaisseau::CATALOGUE[$type]['force'];
+            $perdus[$type] = min($nombres[$type], intdiv($degats, $force));
+            $nombres[$type] -= $perdus[$type];
+            $degats -= $perdus[$type] * $force;
+        }
+        return $perdus;
+    }
+
+    private static function valeurEpaves(array $pertes): int {
+        $prix = 0;
+        foreach($pertes as $type => $nombre){
+            $prix += $nombre * Vaisseau::CATALOGUE[$type]['prix'];
+        }
+        return intdiv($prix * self::EPAVE_VAISSEAU_POURCENT, self::PERCENT);
+    }
+
+    public static function infliger(int $degats, int $principal, int $secondaire): array {
         $surplus = max(0, $degats - $principal);
         return array(max(0, $principal - $degats), max(0, $secondaire - $surplus));
     }
@@ -158,7 +264,7 @@ class Combat {
         ));
     }
 
-    private static function alea(int $force): int {
+    public static function alea(int $force): int {
         return intdiv($force * random_int(self::PERCENT - self::ALEA_POURCENT, self::PERCENT + self::ALEA_POURCENT), self::PERCENT);
     }
 

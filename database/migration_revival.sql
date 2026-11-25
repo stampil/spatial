@@ -13,7 +13,9 @@ ALTER TABLE `planete`
   ADD COLUMN `bouclier` int(11) NOT NULL DEFAULT '0' AFTER `id_camp`,
   ADD COLUMN `canon` int(11) NOT NULL DEFAULT '0' AFTER `bouclier`,
   ADD COLUMN `troupes` int(11) NOT NULL DEFAULT '0' AFTER `canon`,
-  ADD COLUMN `bonus` varchar(16) DEFAULT NULL AFTER `troupes`;
+  ADD COLUMN `bonus` varchar(16) DEFAULT NULL AFTER `troupes`,
+  ADD COLUMN `defense_maj` datetime DEFAULT NULL AFTER `bonus`,
+  ADD COLUMN `detournement_fin` datetime DEFAULT NULL AFTER `defense_maj`;
 
 ALTER TABLE `systeme`
   ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `visible`,
@@ -23,7 +25,8 @@ ALTER TABLE `joueur`
   ADD COLUMN `credits_maj` datetime DEFAULT NULL AFTER `lastco`,
   ADD COLUMN `id_camp` int(11) NOT NULL AFTER `credits_maj`,
   ADD COLUMN `id_systeme_voisin` int(11) DEFAULT NULL AFTER `id_camp`,
-  ADD COLUMN `fin_tuto` datetime DEFAULT NULL AFTER `id_systeme_voisin`;
+  ADD COLUMN `fin_tuto` datetime DEFAULT NULL AFTER `id_systeme_voisin`,
+  ADD COLUMN `raid_maj` datetime DEFAULT NULL AFTER `fin_tuto`;
 
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -72,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `camp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `camp` (`id`, `nom`, `histoire`, `jouable`, `couleur`) VALUES
-(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 0, '#B3261C'),
+(1, 'Pirates', 'Anciens équipages de convoyeurs, mercenaires et déserteurs restés sans employeur quand les routes commerciales se sont effondrées. Sans capitale ni loi, ils vivent des cargaisons qu''ils interceptent et détournent les ressources des planètes sans jamais les conquérir. Ils ne se battent entre eux que pour un partage de butin, et personne ne sait où ils se cachent tant qu''on ne les a pas découverts.', 1, '#B3261C'),
 (2, 'Empire', 'Un ordre ancien qui a unifié les systèmes par la force de ses flottes. Son industrie de masse produit unités et ressources à moindre coût, mais ses bannières flottent sur chaque planète conquise : l''Empire est toujours visible sur la carte.', 1, '#1565C0'),
 (3, 'Rébellion', 'Des planètes lassées de l''ordre impérial, des mutins et des ingénieurs libres ont choisi la discrétion. Incapable de rivaliser en nombre, la Rébellion gagne en restant invisible tant qu''on ne l''a pas découverte.', 1, '#2E7D32');
 
@@ -92,6 +95,17 @@ CREATE TABLE IF NOT EXISTS `journal` (
   KEY `id_joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `defi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_attaquant` bigint(20) UNSIGNED NOT NULL,
+  `id_defenseur` bigint(20) UNSIGNED NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `duel` (`id_attaquant`,`id_defenseur`,`id_planete`),
+  KEY `id_defenseur` (`id_defenseur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(64) NOT NULL,
   PRIMARY KEY (`version`)
@@ -107,9 +121,12 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('007_persos_transport'),
 ('008_roles'),
 ('009_carte'),
-('010_journal');
+('010_journal'),
+('011_defense_pirates_ia'),
+('012_pirates_jouables');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 
 UPDATE `planete` SET `bonus` = ELT(1 + `id` % 5, 'chantier', 'forge', 'marche', 'citadelle', 'relais') WHERE `id_systeme` IN (SELECT `id` FROM `systeme` WHERE `visible` = 1);
 
+UPDATE `planete` SET `defense_maj` = NOW() WHERE `id_camp` IS NOT NULL AND (`bouclier` < `slot` * 2 OR `canon` < `slot`);
