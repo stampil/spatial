@@ -213,7 +213,7 @@ class Systeme {
     }
 
     public function getNom(): string {
-        return '<a href="?p=carte&systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->getIdCamp());
+        return '<a href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->getIdCamp());
     }     
         
 }

@@ -17,7 +17,6 @@ class Carte {
             $voisin = new Systeme($joueur->id_systeme_voisin);
             $destinations[$voisin->id] = $voisin;
         }
-        $gouverneurs = self::nomsGouverneurs($systemes);
 
         $donnees = array(
             'maintenant' => time(),
@@ -29,7 +28,7 @@ class Carte {
             'enRoute' => self::enRoute($joueur, $destinations),
         );
         foreach($systemes as $systeme){
-            array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps, $gouverneurs));
+            array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps));
         }
         if($voisin !== null){
             $donnees['voisin'] = array('id' => $voisin->id, 'x' => $voisin->x, 'y' => $voisin->y, 'planete' => $voisin->planetes[0]->id);
@@ -46,51 +45,15 @@ class Carte {
         return $planete === null ? null : $planete->id_systeme;
     }
 
-    private static function nomsGouverneurs(array $systemes): array {
-        $ids = array();
-        foreach($systemes as $systeme){
-            foreach($systeme->planetes as $planete){
-                if((int) $planete->gouverneur !== 0){
-                    $ids[(int) $planete->gouverneur] = (int) $planete->gouverneur;
-                }
-            }
-        }
-        if(count($ids) === 0){
-            return array();
-        }
-        $marques = implode(',', array_fill(0, count($ids), '?'));
-        $noms = array();
-        foreach(MyPDO::getInstance()->query("SELECT id, nom FROM " . MyPDO::DB_FLAG . "joueur WHERE id IN ($marques)", array_values($ids)) as $ligne){
-            $noms[$ligne->id] = $ligne->nom;
-        }
-        return $noms;
-    }
-
-    private static function systeme(Joueur $joueur, Systeme $systeme, array $camps, array $gouverneurs): array {
+    private static function systeme(Joueur $joueur, Systeme $systeme, array $camps): array {
         $idCamp = $systeme->getIdCamp();
         $planetes = array();
         $moi = false;
         foreach($systeme->planetes as $planete){
-            $estMoi = (int) $planete->gouverneur === $joueur->id;
-            $moi = $moi || $estMoi;
-            $bonus = null;
-            if($planete->bonus !== null){
-                $bonus = array('nom' => Bonus::libelle($planete->bonus), 'description' => Bonus::description($planete->bonus));
+            if((int) $planete->gouverneur === $joueur->id){
+                $moi = true;
             }
-            array_push($planetes, array(
-                'id' => (int) $planete->id,
-                'nom' => $planete->nom,
-                'slot' => (int) $planete->slot,
-                'moi' => $estMoi,
-                'gouverneur' => $gouverneurs[(int) $planete->gouverneur] ?? null,
-                'couleur' => $planete->id_camp === null ? Camp::SANS_CAMP_COULEUR : $camps[$planete->id_camp]->couleur,
-                'camp' => $planete->id_camp === null ? Camp::SANS_CAMP_NOM : $camps[$planete->id_camp]->nom,
-                'bouclier' => (int) $planete->bouclier,
-                'canon' => (int) $planete->canon,
-                'troupes' => (int) $planete->troupes,
-                'revolte' => (int) $planete->perc_revolte,
-                'bonus' => $bonus,
-            ));
+            array_push($planetes, array('id' => (int) $planete->id, 'nom' => $planete->nom));
         }
         return array(
             'id' => $systeme->id,

@@ -57,6 +57,18 @@ class Vue {
         return '<div class="fond" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
     }
 
+    public static function filAriane(array $etapes): string {
+        $html = '<nav class="fil" aria-label="Fil d\'Ariane"><ol>';
+        foreach($etapes as list($libelle, $adresse)){
+            if($adresse === null){
+                $html .= '<li aria-current="page">'.htmlspecialchars($libelle).'</li>';
+                continue;
+            }
+            $html .= '<li><a href="'.htmlspecialchars($adresse).'">'.htmlspecialchars($libelle).'</a></li>';
+        }
+        return $html.'</ol></nav>';
+    }
+
     public static function pastille(string $texte, string $variante = ''): string {
         return '<span class="pastille'.($variante === '' ? '' : ' pastille--'.$variante).'">'.htmlspecialchars($texte).'</span>';
     }

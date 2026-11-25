@@ -33,7 +33,8 @@
     const MILLISECONDES = 1000;
     const SECONDES_MINUTE = 60;
     const SECONDES_HEURE = 3600;
-    const TYPE_TROUPE = 'troupe_assaut';
+    const ADRESSE_CARTE = '?p=carte';
+    const ADRESSE_SYSTEME = '?p=afficheSysteme&id_systeme=';
     const TYPE_RECONNAISSANCE = 'reconnaissance';
     const DESTINATION_EXPLORATION = 'explorer';
     const TOUCHE_ENTREE = 'Enter';
@@ -135,7 +136,7 @@
             corps.append(cle, champs[cle]);
         });
         fetch(adresse, {method: 'POST', body: corps, credentials: 'same-origin'}).then(() => {
-            location.reload();
+            location.replace(ADRESSE_CARTE);
         });
     }
 
@@ -367,22 +368,8 @@
         });
     }
 
-    function planetesDuSysteme(systemeId) {
-        return systemes[systemeId] ? systemes[systemeId].planetes : [];
-    }
-
     function stockDePlanete(planeteId) {
         return DONNEES.stocks.find((stock) => stock.planete === planeteId) || null;
-    }
-
-    function nombreDe(stock, filtre) {
-        let total = 0;
-        stock.vaisseaux.forEach((vaisseau) => {
-            if (filtre(vaisseau)) {
-                total += vaisseau.nombre;
-            }
-        });
-        return total;
     }
 
     function ouvrirFeuille(titre, sousTitre, couleur) {
@@ -405,20 +392,8 @@
         });
     }
 
-    function section(titre) {
-        return creer('h3', {classe: 'carte__titre-section', texte: titre});
-    }
-
     function ligneInfo(texte) {
         return creer('p', {classe: 'md3-secondary', texte: texte});
-    }
-
-    function etiquette(texte, titre) {
-        const noeud = creer('span', {classe: 'md3-chip carte__etiquette', texte: texte});
-        if (titre) {
-            noeud.setAttribute('title', titre);
-        }
-        return noeud;
     }
 
     function stepper(vaisseau) {
@@ -461,78 +436,6 @@
             commencerOrdre({stock: null, flotte: flotte, systeme: flotte.systeme});
         }));
         return bloc;
-    }
-
-    function actionsPlanete(planete) {
-        const actions = creer('div', {classe: 'md3-actions'});
-        if (planete.moi) {
-            return actions;
-        }
-        const stock = stockDePlanete(planete.id);
-        const defense = planete.bouclier + planete.canon;
-        if (stock && defense > 0) {
-            const combattants = nombreDe(stock, (vaisseau) => vaisseau.combat);
-            if (combattants > 0) {
-                actions.appendChild(bouton('Attaquer (' + combattants + ')', 'md3-button', () => {
-                    envoyer('?p=combattre', {planete: planete.id, action: 'attaquer'});
-                }));
-            }
-        }
-        DONNEES.flottes.filter((flotte) => flotte.planete === planete.id && defense > 0).forEach((flotte) => {
-            actions.appendChild(bouton('Attaquer : ' + flotte.nom, 'md3-button md3-button--tonal', () => {
-                envoyer('?p=combattre', {planete: planete.id, action: 'attaquer', flotte: flotte.id});
-            }));
-        });
-        if (stock && defense === 0) {
-            const troupes = nombreDe(stock, (vaisseau) => vaisseau.type === TYPE_TROUPE);
-            if (troupes > 0) {
-                actions.appendChild(bouton('Débarquer (' + troupes + ')', 'md3-button', () => {
-                    envoyer('?p=combattre', {planete: planete.id, action: 'debarquer'});
-                }));
-            }
-        }
-        return actions;
-    }
-
-    function lignePlanete(planete) {
-        const gouverneur = planete.moi ? 'Vous' : (planete.gouverneur || 'Libre');
-        const lien = creer('a', {href: '?p=affichePlanete&id_planete=' + planete.id, texte: planete.nom});
-        const entete = creer('div', {classe: 'carte__planete-nom'}, [
-            creer('span', {classe: 'md3-camp-dot', style: 'background-color:' + planete.couleur}),
-            ' ',
-            lien
-        ]);
-        const bloc = creer('div', {classe: 'carte__bloc'});
-        bloc.appendChild(entete);
-        bloc.appendChild(ligneInfo(planete.camp + ' · ' + gouverneur + ' · ' + planete.slot + ' emplacements · révolte ' + planete.revolte + ' %'));
-        bloc.appendChild(ligneInfo('Défense : bouclier ' + planete.bouclier + ', canon ' + planete.canon + ', garnison ' + planete.troupes));
-        if (planete.bonus) {
-            bloc.appendChild(etiquette('Bonus : ' + planete.bonus.nom, planete.bonus.description));
-            bloc.appendChild(ligneInfo(planete.bonus.description));
-        }
-        bloc.appendChild(actionsPlanete(planete));
-        return bloc;
-    }
-
-    function ouvrirSysteme(systemeId) {
-        const systeme = systemes[systemeId];
-        marquerSelection(systemeId);
-        ouvrirFeuille(systeme.nom, systeme.camp + ' · ' + systeme.planetes.length + ' planètes' + (systeme.moi ? ' · votre système' : ''), systeme.couleur);
-        const stocks = DONNEES.stocks.filter((stock) => stock.systeme === systemeId);
-        const flottes = DONNEES.flottes.filter((flotte) => flotte.systeme === systemeId);
-        if (stocks.length > 0 || flottes.length > 0) {
-            feuilleCorps.appendChild(section('Vos vaisseaux ici'));
-            stocks.forEach((stock) => {
-                feuilleCorps.appendChild(blocStock(stock));
-            });
-            flottes.forEach((flotte) => {
-                feuilleCorps.appendChild(blocFlotte(flotte));
-            });
-        }
-        feuilleCorps.appendChild(section('Planètes'));
-        systeme.planetes.forEach((planete) => {
-            feuilleCorps.appendChild(lignePlanete(planete));
-        });
     }
 
     function secondesDeOrdre(systemeId) {
@@ -611,11 +514,29 @@
         feuilleCorps.appendChild(ligneInfo('Envoyez un vaisseau de reconnaissance : \u00e0 son arriv\u00e9e, le syst\u00e8me sera explor\u00e9.'));
     }
 
+    function ouvrirOrdre(planeteId) {
+        const stock = stockDePlanete(planeteId);
+        const flottes = DONNEES.flottes.filter((flotte) => flotte.planete === planeteId);
+        if (!stock && flottes.length === 0) {
+            return;
+        }
+        const systeme = systemes[stock ? stock.systeme : flottes[0].systeme];
+        centrerSur(systeme.id, ECHELLE_BASE);
+        marquerSelection(systeme.id);
+        ouvrirFeuille('Envoyer des vaisseaux', systeme.nom, systeme.couleur);
+        if (stock) {
+            feuilleCorps.appendChild(blocStock(stock));
+        }
+        flottes.forEach((flotte) => {
+            feuilleCorps.appendChild(blocFlotte(flotte));
+        });
+    }
+
     function toucherSysteme(systemeId) {
         if (ordre) {
             ouvrirDestination(systemeId);
         } else if (systemes[systemeId]) {
-            ouvrirSysteme(systemeId);
+            location.href = ADRESSE_SYSTEME + systemeId;
         } else {
             ouvrirVoisin();
         }
@@ -809,7 +730,10 @@
     }
     if (DONNEES.focus !== null && systemes[DONNEES.focus]) {
         centrerSur(DONNEES.focus, ECHELLE_BASE);
-        ouvrirSysteme(DONNEES.focus);
+        marquerSelection(DONNEES.focus);
+    }
+    if (DONNEES.ordre !== null) {
+        ouvrirOrdre(DONNEES.ordre);
     }
     tic();
     setInterval(tic, MILLISECONDES);

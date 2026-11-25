@@ -15,6 +15,7 @@ $map_planete=$id_planete%27;
 if(!$map_planete) $map_planete = 1;
 $defense = $p->bouclier + $p->canon;
 ?>
+<?= Vue::filAriane(array(array(PAGES_TITRES['carte'], '?p=carte&systeme='.$p->id_systeme), array($p->systeme->nom, '?p=afficheSysteme&id_systeme='.$p->id_systeme), array($p->nom, null))) ?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
     <div class="fiche__tete fiche__tete--hero">
         <div class="avatar avatar--planete avatar--planete-grand" style="background-image:url(img/planete/<?= $map_planete ?>.jpg)"></div>
