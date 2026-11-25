@@ -36,7 +36,9 @@ Ta phrase (25/11) : « les prompt tu me les donne 1 par 1 ici ». Compris : je t
 
 Ta phrase (25/11) : « généré, mais ssa fait tres sttarwars la, je veux pas me prendre une flopé d'avocat ». Compris : les 6 premiers prompts donnaient des designs trop proches de Star Wars (coque en coin, troupier à armure blanche, escadre impériale). J'ai réécrit tous les prompts avec un bloc « design original » (ingénierie industrielle réaliste, pas de coque en coin, pas d'armure blanche, pas de cape ni de sabre, aucun nom de franchise) et je repars du prompt 1. Les 6 images déjà générées ne vont pas dans le jeu : à refaire avec les nouveaux prompts. Je ne peux pas garantir l'absence de risque juridique : si une image rappelle clairement une œuvre connue, on la régénère.
 
-À toi : générer les images avec Gemini, les nommer comme indiqué, lancer `python3 tools/detourer-magenta.py <dossier>`, puis me dire de les commiter (ou me donner le dossier). Je n'ai pas pu tester avec de vraies images Gemini, seulement des images factices : si un détourage bave, donne-moi un exemple.
+Ta phrase (25/11) : « I can create more images as soon as your limit resets. Check your usage in Settings. => traite les image que tu a deja recu ». Fait : les 32 images reçues (nommées d'après l'ordre des prompts 1 à 32) sont détourées et rangées dans `img/`, branchées dans le jeu et commitées. Les 6 premières images, trop proches de Star Wars, sont écartées.
+
+À toi : quand Gemini te laisse de nouveau générer, il manque 2 images, `page-inscription` (prompt 33) et `page-connection` (prompt 34). Dis-moi alors « généré » et où sont les fichiers, je les traite comme les autres. Je te redonne les deux prompts à ce moment-là.
 
 ### 6. Serveurs de test (23/11)
 
