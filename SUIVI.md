@@ -10,7 +10,7 @@ Ta phrase : « si si tu push with lease et si tu doit reprendree, tu amend ». T
 
 ### 2. Tester avec ta base (23/11)
 
-Avant de tester sur ta base : exécuter `database/migration_revival.sql`. Il ajoute les colonnes et crée les tables des nouvelles fonctions (camps, vaisseaux, flottes, découvertes, persos en voyage, rôles, carte avec coordonnées des systèmes, bonus de planète, départ des trajets, journal des événements) et note les migrations déjà appliquées. Testé sur l'ancien schéma : le résultat est identique au nouveau `database/systeme.sql`.
+Avant de tester sur ta base : exécuter `database/migration_revival.sql`. Il ajoute les colonnes et crée les tables des nouvelles fonctions (camps, vaisseaux, flottes, découvertes, persos en voyage, rôles, carte avec coordonnées des systèmes, bonus de planète, départ des trajets, journal des événements, régénération de la défense, détournement, défis pirates, raids de l'IA, Pirates jouables) et note les migrations déjà appliquées. Testé sur l'ancien schéma : le résultat est identique au nouveau `database/systeme.sql`.
 
 Vide aussi la table `joueur` (anciens hash `crypt()`, et aucun camp pour les anciens joueurs) et renseigne `inc/config.php`.
 
@@ -24,9 +24,22 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 Le code est en ligne et le site installe lui-même sa base à la première visite (tables, 3 camps, 16 systèmes) : plus d'import dans phpMyAdmin. Seul le premier chargement le confirmera sur InfinityFree ; je le regarde dès que tu me donnes l'adresse du site.
 
-### 5. Hors noyau dur, pour plus tard (24/11)
+### 7. Un jeu graphique comme un jeu vidéo, avec des prompts d'images photo-réalistes (25/11)
 
-Ta phrase (24/11) : « go fini le noyau dur ». Le noyau dur est fini. Ce qui reste est hors noyau et attend ton « go » : détournement de ressources par les pirates, combats entre pirates validés à la main, IA des camps (flottes et attaques des Pirates et de l'Empire), régénération de la défense des planètes.
+Ta phrase (25/11) : « il faut fairele jeu + graphique comme un jeu vidéo, donner des prompt pour faire generer a une ia d'image des images du jeu et de ses icones, je veux un style photo-réaliste ». Compris : (a) rendre l'interface plus visuelle, comme un jeu vidéo (images de planètes, de vaisseaux, de bâtiments, de camps, fond de carte galactique), (b) te donner les prompts pour que tu fasses générer ces images et ces icônes par une IA d'image, en photo-réaliste. Rien n'est codé pour ce point avant ton « go ».
+
+Questions en suspens pour ce point :
+- Une photo ne se lit pas à 24 px (menu, barre d'état, boutons). Je propose : les petites icônes restent en SVG, les images photo-réalistes servent aux grands visuels (planètes, vaisseaux, bâtiments, emblèmes et bannières de camps, héros, fond de carte). Ou tu veux tout remplacer, petites icônes comprises ?
+- Format des fichiers que tu me rendras : je propose PNG, carré 512 × 512 pour les objets (fond transparent si ton IA sait le faire), 1600 × 900 pour les fonds et bannières, rangés dans `img/`. Ça te va ?
+
+### 8. Musique d'ambiance « Conquête Spatiale » (25/11)
+
+Ta phrase (25/11) : « télécharge la musique conquete spatail que j'ai généré et integre la comme musique d'ambiance ». Compris : le fichier est déjà sur ta machine, `/home/sgd/Téléchargements/Conquête Spatiale.mp3` (3,8 Mo, 25/11 15:49), donc rien à télécharger ; je le copie dans le dépôt (`audio/`) et je le joue en boucle comme musique de fond du jeu, avec un bouton son/muet dans la barre du haut. Les autres mp3 de ce dossier (Camp de la Légion, Briefing Tactique…) ne sont pas touchés. Rien n'est codé pour ce point avant ton « go ».
+
+Question en suspens pour ce point :
+- Le fichier de 3,8 Mo entrera dans l'historique git pour toujours (et dans la publication InfinityFree). Je le commite dans le dépôt ?
+
+À savoir (contrainte des navigateurs, pas un choix) : aucun navigateur ne laisse un site lancer du son seul ; la musique démarre au premier clic ou toucher de l'utilisateur, et le bouton son/muet retient son choix.
 
 ### 6. Serveurs de test (23/11)
 
