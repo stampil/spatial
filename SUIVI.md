@@ -34,6 +34,14 @@ Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur
 
 Ta phrase : « 1 planètes j'ai horreur quand tu fait ça, un pauvre ternaire ou un if sa mange pas de pain, mais gere ce pluriel ! ». Compris : sur la page système, « 1 planètes » s'affiche au singulier incorrect. À faire : une fonction unique `Tools::pluriel($nombre, $singulier, $pluriel)` (« 0 » et « 1 » au singulier, comme en français), côté PHP, et son équivalent côté `carte.js`. Je l'applique à tous les endroits du jeu qui ont le même défaut, pas seulement la page système : « planète(s) » (classement, fiche joueur), « planètes » et « emplacements » (pages système, planète, colonies), « vaisseau(x) », « troupe(s) » (y compris l'accord du verbe : « sont perdues »), « perso(s) », « déplacement(s) » de la carte, et les messages de combat/expédition. Le `(s)` entre parenthèses disparaît partout.
 
+Ta correction : « non enrichi la collone de traduction et en 2ieme param c le mot au pluriel ». Compris à moitié : le pluriel est le **2ᵉ paramètre** (le mot déjà au pluriel, donné par le code appelant) et il ne se déduit pas du singulier. « La colonne de traduction » : il n'en existe aucune dans Novarche (aucun `t()`, aucun fichier de langue, aucune table de libellés) ; je ne sais pas ce que tu veux enrichir : voir la question Q1.
+
 ## Questions en suspens
 
-Aucune. Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
+Ta réponse : « __() ». Compris : la fonction de traduction s'appelle `__()` et le pluriel s'y passe en 2ᵉ paramètre. Vérifié : `__()` n'existe pas dans Novarche, et je ne l'ai trouvée ni dans `ehophpframework` ni dans `ehoaccountmanager` (recherche PHP).
+
+**Q1 (bloquante).** Où est la `__()` à enrichir ?
+- (a) Dans un autre dépôt Ého : dis-moi lequel, je l'ouvre et j'en reprends la signature telle quelle avant de coder.
+- (b) Elle n'existe pas encore : je crée `__(string $singulier, string $pluriel, int $nombre)` dans `inc/functions.php`, sans dictionnaire (le code appelant donne les deux mots), appelée ainsi : `__('planète', 'planètes', $nombre)` (ma reco si tu n'as rien à me montrer).
+
+Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
