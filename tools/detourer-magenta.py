@@ -14,6 +14,7 @@ EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
 COTE_OBJET = 512
 MARGE_OBJET = 24
 LARGEUR_FOND = 1600
+RATIO_FOND = 16 / 9
 QUALITE_JPEG = 82
 TAILLE_COIN = 8
 DISTANCE_TRANSPARENTE = 30.0
@@ -79,6 +80,10 @@ def traiter(chemin, nom, destination):
         return True
     if base in FONDS:
         image = Image.open(chemin).convert('RGB')
+        hauteur_voulue = round(image.width / RATIO_FOND)
+        if image.height > hauteur_voulue:
+            haut = (image.height - hauteur_voulue) // 2
+            image = image.crop((0, haut, image.width, haut + hauteur_voulue))
         image = image.resize((LARGEUR_FOND, round(image.height * LARGEUR_FOND / image.width)), Image.LANCZOS)
         sortie = os.path.join(destination, FONDS[base] + '.jpg')
         os.makedirs(os.path.dirname(sortie), exist_ok=True)
