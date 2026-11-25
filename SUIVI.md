@@ -26,6 +26,12 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : le nouveau style des boutons et l'expédition de reconnaissance.
 
+### 5. Nom du jeu (25/11)
+
+Ta phrase (25/11) : « si spacequest n'est pas deja prit rempalce Spatial par Spacequest, si deja utilisé, propose des nom ». Résultat : « Space Quest » est la célèbre série de jeux de Sierra (1986-1995), et le nom est enregistré comme marque aux États-Unis ; je ne renomme donc pas. Propositions faites : Novarche, Galaxarch, Orbitrion, Conquête Spatiale. Aucune n'est une garantie juridique : une recherche de marque (INPI, EUIPO, USPTO) et de nom de domaine reste à faire avant de choisir.
+
+Question en suspens : quel nom je mets à la place de « Spatial » ?
+
 ### 6. Serveurs de test (23/11)
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872` restent lancés jusqu'à ta demande.
