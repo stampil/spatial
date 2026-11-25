@@ -24,13 +24,7 @@ Ta phrase : « garde la structure du code l'essence du développeur qui l'a fait
 
 ### 4. Publication sur InfinityFree (23/11)
 
-Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : les 2 derniers bandeaux (inscription et connexion) et les 3 logos de camps.
-
-### 5. Pirates pilotés par l'IA (25/11)
-
-Ta phrase (25/11) : « par contre les pirates on les choisit pas c'est de l'IA !!! ». Fait : les Pirates ne se choisissent plus à l'inscription (migration 014). Conséquence à trancher : le détournement de ressources et les défis entre pirates, déjà codés, ne servent qu'à des joueurs Pirates ; avec des Pirates pilotés par l'IA ils sont inactifs.
-
-Question en suspens : je retire ces deux fonctions, ou je les transpose à l'IA (les raids des Pirates font déjà piller des crédits) ?
+Ta phrase (25/11) : « tu n'aura pas l'adresse du site, juste tu publie quand je te le demande, sans poser de question ». Compris : je ne demande plus l'adresse du site et je ne vérifie plus le site en ligne. Publier = pousser `revival` avec `--force-with-lease` (le workflow Publish envoie le site par FTP), uniquement quand tu me le demandes, sans te poser de question avant ni après. Le site installe lui-même sa base à la première visite. Pas encore publiés : l'inscription sans email avec le camp en premier, la connexion par le nom, les Pirates en IA et les menaces pirates validées par le joueur.
 
 ### 6. Serveurs de test (23/11)
 
