@@ -32,15 +32,6 @@ Questions en suspens pour ce point :
 - Une photo ne se lit pas à 24 px (menu, barre d'état, boutons). Je propose : les petites icônes restent en SVG, les images photo-réalistes servent aux grands visuels (planètes, vaisseaux, bâtiments, emblèmes et bannières de camps, héros, fond de carte). Ou tu veux tout remplacer, petites icônes comprises ?
 - Format des fichiers que tu me rendras : je propose PNG, carré 512 × 512 pour les objets (fond transparent si ton IA sait le faire), 1600 × 900 pour les fonds et bannières, rangés dans `img/`. Ça te va ?
 
-### 8. Musique d'ambiance « Conquête Spatiale » (25/11)
-
-Ta phrase (25/11) : « télécharge la musique conquete spatail que j'ai généré et integre la comme musique d'ambiance ». Compris : le fichier est déjà sur ta machine, `/home/sgd/Téléchargements/Conquête Spatiale.mp3` (3,8 Mo, 25/11 15:49), donc rien à télécharger ; je le copie dans le dépôt (`audio/`) et je le joue en boucle comme musique de fond du jeu, avec un bouton son/muet dans la barre du haut. Les autres mp3 de ce dossier (Camp de la Légion, Briefing Tactique…) ne sont pas touchés. Rien n'est codé pour ce point avant ton « go ».
-
-Question en suspens pour ce point :
-- Le fichier de 3,8 Mo entrera dans l'historique git pour toujours (et dans la publication InfinityFree). Je le commite dans le dépôt ?
-
-À savoir (contrainte des navigateurs, pas un choix) : aucun navigateur ne laisse un site lancer du son seul ; la musique démarre au premier clic ou toucher de l'utilisateur, et le bouton son/muet retient son choix.
-
 ### 6. Serveurs de test (23/11)
 
 Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur `127.0.0.1:19873` et la base privée sur `127.0.0.1:19872` restent lancés jusqu'à ta demande.
