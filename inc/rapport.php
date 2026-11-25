@@ -1,5 +1,6 @@
 <div class="md3-dialog" role="dialog" aria-modal="true" aria-label="<?= htmlspecialchars($rapport['titre']) ?>" hidden>
     <div class="md3-dialog__fenetre">
+        <?= Vue::bandeau('combat') ?>
         <h2><?= htmlspecialchars($rapport['titre']) ?></h2>
         <div class="rapport__barres"></div>
         <ol class="rapport__journal" aria-live="polite"></ol>

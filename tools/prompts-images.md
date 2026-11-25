@@ -1,6 +1,6 @@
 # Prompts d'images photo-réalistes (Gemini)
 
-25 images à générer : 20 objets sur fond magenta (transformés en PNG transparent par le script) et 5 fonds plein cadre.
+34 images à générer : 20 objets sur fond magenta (transformés en PNG transparent par le script) et 14 fonds plein cadre.
 Les petites icônes de l'interface (menu, barre d'état, boutons) restent en SVG : elles ne se génèrent pas.
 
 ## Mode d'emploi
@@ -76,3 +76,19 @@ Chaque bâtiment est posé sur une petite plateforme plate, sans décor autour.
 | `camp-rebellion` | `Wide 16:9 cinematic shot of a hidden rebel base: small mismatched ships landed in a camouflaged hangar carved into a forested moon cliff, soft green light, mist, a secretive and hopeful mood.` |
 | `carte` | `Wide 16:9 deep-space backdrop: a dark star field with a subtle nebula in deep indigo and teal, very low contrast and mostly dark so that map markers drawn on top stay readable, evenly distributed, no planets, no ships, no text.` |
 | `accueil` | `Wide 16:9 epic cinematic key art: three fleets of different styles converging over a ringed planet, dramatic lighting and vast scale, the central area calmer and darker to leave room for a title written on top.` |
+| `combat` | `Wide 16:9 cinematic space battle: fighters and frigates exchanging laser fire in front of a burning planet, explosions and debris, dramatic orange and blue lighting, the action in the horizontal middle band.` |
+
+## Bandeaux de pages (sans magenta, 16:9, bloc STYLE seulement)
+
+Ces images sont affichées en bandeau large et bas (environ 3:1) en haut de chaque page : le sujet doit être dans la bande horizontale du milieu, le haut et le bas restent calmes.
+
+| Fichier | Prompt |
+|---|---|
+| `page-tableauBord` | `Wide 16:9 cinematic shot of a futuristic command center bridge with a large holographic star map and officers at consoles, cool blue light, the subject in the horizontal middle band.` |
+| `page-listePlanete` | `Wide 16:9 cinematic shot of a colony world seen from orbit at the day-night line, glowing city lights and a thin blue atmosphere, the planet horizon crossing the horizontal middle band.` |
+| `page-listeVaisseau` | `Wide 16:9 cinematic shot of a long row of docked warships and fighters in a vast hangar bay, perspective lines, warm work lights, the ships in the horizontal middle band.` |
+| `page-listePerso` | `Wide 16:9 cinematic shot of a briefing room where an envoy, a commander and a hooded operative stand around a table with a holographic map, dim moody light, the group in the horizontal middle band.` |
+| `page-classement` | `Wide 16:9 cinematic shot of a grand hall of fame in space: rows of illuminated trophies and banners without any emblem, golden light, symmetry, the trophies in the horizontal middle band.` |
+| `page-listeCamp` | `Wide 16:9 cinematic shot of three distinct fleets side by side in deep space, one ragged with red lights, one pristine white and blue, one small and green, separated by dark space, the ships in the horizontal middle band.` |
+| `page-inscription` | `Wide 16:9 cinematic shot of a lone recruitment shuttle leaving a space station toward a distant glowing nebula, a feeling of departure and adventure, the shuttle in the horizontal middle band.` |
+| `page-connection` | `Wide 16:9 cinematic shot of a pilot's cockpit view looking out at a star field and a distant planet, soft instrument glow on the edges, calm mood, the horizon in the horizontal middle band.` |

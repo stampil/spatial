@@ -37,6 +37,14 @@ class Vue {
         return '<div class="banniere" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
     }
 
+    public static function bandeau(string $nom): string {
+        $chemin = self::DOSSIER_IMAGES.'/'.$nom.'.'.self::EXTENSION_FOND;
+        if(!is_file($chemin)){
+            return '';
+        }
+        return '<div class="bandeau" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
+    }
+
     public static function fond(string $nom): string {
         $chemin = self::DOSSIER_IMAGES.'/'.$nom.'.'.self::EXTENSION_FOND;
         if(!is_file($chemin)){
@@ -52,7 +60,7 @@ class Vue {
     public static function composition(array $nombres): string {
         $html = '<div class="composition">';
         foreach($nombres as $type => $nombre){
-            $html .= '<span class="composition__element">'.Icone::html(Vaisseau::CATALOGUE[$type]['icone']).$nombre.' × '.htmlspecialchars(Vaisseau::CATALOGUE[$type]['nom']).'</span>';
+            $html .= '<span class="composition__element">'.self::visuel('vaisseau', $type, Vaisseau::CATALOGUE[$type]['icone']).$nombre.' × '.htmlspecialchars(Vaisseau::CATALOGUE[$type]['nom']).'</span>';
         }
         return $html.'</div>';
     }

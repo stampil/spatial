@@ -16,8 +16,8 @@ if(!$map_planete) $map_planete = 1;
 $defense = $p->bouclier + $p->canon;
 ?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
-    <div class="fiche__tete">
-        <div class="avatar avatar--planete" style="background-image:url(img/planete/<?= $map_planete ?>.jpg)"></div>
+    <div class="fiche__tete fiche__tete--hero">
+        <div class="avatar avatar--planete avatar--planete-grand" style="background-image:url(img/planete/<?= $map_planete ?>.jpg)"></div>
         <div>
             <h1 class="fiche__nom"><?= htmlspecialchars($p->nom) ?></h1>
             <p class="md3-secondary">Système <?= $p->systeme->getNom() ?></p>

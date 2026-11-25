@@ -19,6 +19,7 @@
 <legend>Camp *</legend>
 <?php foreach(Camp::listeJouables() as $ligne){ $camp = new Camp($ligne->id); ?>
 <label class="faction" style="--accent:<?= htmlspecialchars($camp->couleur) ?>">
+<?= Vue::banniereCamp($camp->id) ?>
 <input type="radio" name="camp" value="<?= $camp->id ?>" required />
 <?= Vue::emblemeCamp($camp->id, 48) ?>
 <span class="faction__nom"><?= htmlspecialchars($camp->nom) ?></span>

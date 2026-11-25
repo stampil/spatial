@@ -210,10 +210,52 @@
 }
 
 .avatar--planete {
-    width: 64px;
-    height: 64px;
-    background-size: 140px;
+    --taille: 64px;
+    width: var(--taille);
+    height: var(--taille);
+    background-repeat: repeat-x;
+    background-size: auto var(--taille);
     box-shadow: inset 10px 0 24px 4px rgb(0, 0, 0), inset -2px 0 4px 1px rgba(255, 255, 255, 0.2);
+    animation: planete-rotation 90s linear infinite;
+}
+
+.avatar--planete-grand {
+    --taille: 160px;
+    box-shadow: inset 24px 0 56px 10px rgb(0, 0, 0), inset -4px 0 10px 2px rgba(255, 255, 255, 0.2), 0 0 32px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+@keyframes planete-rotation {
+    to {
+        background-position-x: calc(var(--taille) * -2);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avatar--planete {
+        animation: none;
+    }
+}
+
+.fiche__tete--hero {
+    flex-direction: column;
+    text-align: center;
+}
+
+.bandeau {
+    height: 140px;
+    margin-bottom: 16px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    background-position: center;
+    background-size: cover;
+}
+
+.faction .banniere {
+    grid-column: 1 / -1;
+}
+
+.composition__element .visuel {
+    width: 40px;
+    height: 40px;
 }
 
 .embleme {

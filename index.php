@@ -96,6 +96,7 @@ if(!empty($_SESSION['Sid'])){
     foreach(Tools::takeRapports() as $rapport){
         require 'inc/rapport.php';
     }
+    echo Vue::bandeau('page/'.$p);
 
     try{
         if(is_file('model/'.$p.'.php')){

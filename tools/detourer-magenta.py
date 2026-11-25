@@ -8,7 +8,8 @@ import numpy
 from PIL import Image
 
 OBJETS = ('vaisseau', 'batiment', 'role', 'bonus')
-FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-rebellion': 'camp/rebellion', 'carte': 'carte', 'accueil': 'accueil'}
+FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-rebellion': 'camp/rebellion', 'carte': 'carte', 'accueil': 'accueil', 'combat': 'combat'}
+FONDS.update({'page-' + page: 'page/' + page for page in ('tableauBord', 'listePlanete', 'listeVaisseau', 'listePerso', 'classement', 'listeCamp', 'inscription', 'connection')})
 EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
 COTE_OBJET = 512
 MARGE_OBJET = 24
