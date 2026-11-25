@@ -34,14 +34,20 @@ Ta réponse à « Je coupe les serveurs de test ? » : « Laisse-les ». PHP sur
 
 Ta phrase : « 1 planètes j'ai horreur quand tu fait ça, un pauvre ternaire ou un if sa mange pas de pain, mais gere ce pluriel ! ». Compris : sur la page système, « 1 planètes » s'affiche au singulier incorrect. À faire : une fonction unique `Tools::pluriel($nombre, $singulier, $pluriel)` (« 0 » et « 1 » au singulier, comme en français), côté PHP, et son équivalent côté `carte.js`. Je l'applique à tous les endroits du jeu qui ont le même défaut, pas seulement la page système : « planète(s) » (classement, fiche joueur), « planètes » et « emplacements » (pages système, planète, colonies), « vaisseau(x) », « troupe(s) » (y compris l'accord du verbe : « sont perdues »), « perso(s) », « déplacement(s) » de la carte, et les messages de combat/expédition. Le `(s)` entre parenthèses disparaît partout.
 
-Ta correction : « non enrichi la collone de traduction et en 2ieme param c le mot au pluriel ». Compris à moitié : le pluriel est le **2ᵉ paramètre** (le mot déjà au pluriel, donné par le code appelant) et il ne se déduit pas du singulier. « La colonne de traduction » : il n'en existe aucune dans Novarche (aucun `t()`, aucun fichier de langue, aucune table de libellés) ; je ne sais pas ce que tu veux enrichir : voir la question Q1.
+Ta correction : « non enrichi la collone de traduction et en 2ieme param c le mot au pluriel ». Ta précision : « __() ». Vérifié dans `ehowww` (`src/attic/…/locales/lang.php`) : `__($key)` renvoie `$GLOBALS['langs'][$key]`, les traductions étant la colonne de `lang.fr.php` (clé => texte). Compris : Novarche reçoit le même mécanisme, un fichier de traduction français (clé => mot, `planete` => `planète`, `planetes` => `planètes`, `emplacement`, `emplacements`, `vaisseau`, `vaisseaux`, `troupe`, `troupes`, `perso`, `persos`, `deplacement`, `deplacements`…) et `__($cle, $clePluriel, $nombre)` : le 2ᵉ paramètre est la clé du mot au pluriel, choisi quand `$nombre` > 1 (« 0 » et « 1 » au singulier). Appel : `__('planete', 'planetes', $nombre)`. Côté `carte.js`, le dictionnaire est passé par le PHP dans les données de la carte. Je ne crée pas de fichier de langue anglais (aucun besoin exprimé).
+
+### 7. Bouton Migration dans le menu du haut (25/11)
+
+Ta phrase : « j'execute rien sur le serveur, fait dnas le menu header un btn migration et au clique sa lance ton sql ». Compris : plus aucune commande à passer sur le serveur ; un bouton « Migration » lance `database/migration_revival.sql` (puis la suite d'installation : migrations 011 à 016, univers). Remplace la consigne du point 2 (« exécuter `database/migration_revival.sql` », vider `joueur`, `php database/peupler.php`).
+
+Ta phrase : « je t'ia donner les acces db il me semble, tu peut pas attauqer la db du serveur ? ». Vérifié : non. Le seul mot de passe de la base du serveur est celui que `tools/connect-hosting.sh` envoie directement dans les secrets GitHub (`DB_PASSWORD`) : il ne se relit pas, je ne l'ai jamais vu. Le `inc/config.php` d'ici pointe sur une base locale de test. Je n'ai donc aucun accès à la base du serveur, d'où le bouton. Ta phrase : « quoi que » : je n'ai pas compris ce que tu voulais dire.
+
+Ta réponse à « supprimer les anciens comptes ? » : « Q1 oui y a que emoi qui test pour l'instant surle serveur ». Compris : le bouton supprime tous les anciens comptes joueurs (et ce qui en dépend) puis migre, avec une confirmation. Ta réponse sur la visibilité : « Q2 laissse le sans logique de suppression mais au prochain commit tu l'lelve ». Compris : le bouton reste affiché en permanence, sans logique qui le masque, et le **prochain commit le supprime** (bouton, page minimale et code de migration) une fois que tu auras migré. Garde-fou que je garde malgré tout, côté action et non côté affichage : un clic sur une base déjà migrée ne supprime rien et ne rejoue rien (message « Base déjà migrée »), sinon un clic de trop effacerait les vrais comptes.
+
+Deux pièges que j'ai vus et que je traite :
+- **Le menu n'existe pas encore.** Sur la base d'avant (table `joueur` présente, pas de table `camp`), `index.php` s'arrête avec « La base est incomplète : importer database/migration_revival.sql » avant d'afficher quoi que ce soit : ni menu, ni connexion possible. Le bouton doit donc vivre dans une page minimale (barre du haut + bouton) affichée à la place de ce message.
+- **Le SQL n'est pas rejouable** (`ADD COLUMN` deux fois = échec). Le bouton ne doit exister que tant que la base est ancienne, et tourner sous le verrou d'installation.
 
 ## Questions en suspens
 
-Ta réponse : « __() ». Compris : la fonction de traduction s'appelle `__()` et le pluriel s'y passe en 2ᵉ paramètre. Vérifié : `__()` n'existe pas dans Novarche, et je ne l'ai trouvée ni dans `ehophpframework` ni dans `ehoaccountmanager` (recherche PHP).
-
-**Q1 (bloquante).** Où est la `__()` à enrichir ?
-- (a) Dans un autre dépôt Ého : dis-moi lequel, je l'ouvre et j'en reprends la signature telle quelle avant de coder.
-- (b) Elle n'existe pas encore : je crée `__(string $singulier, string $pluriel, int $nombre)` dans `inc/functions.php`, sans dictionnaire (le code appelant donne les deux mots), appelée ainsi : `__('planète', 'planètes', $nombre)` (ma reco si tu n'as rien à me montrer).
-
-Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
+Aucune. Règle permanente. Ta phrase : « ne me demande plus de valider, je reveiendra si sa va pas ». Compris : je ne demande plus de validation sur les choix de détail ; je les applique et tu reviens si un choix ne va pas.
