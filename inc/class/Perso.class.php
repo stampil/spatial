@@ -22,6 +22,12 @@ class Perso {
         self::ROLE_HEROS => array('nom' => 'Héros', 'icone' => 'heros', 'prix' => 300),
         self::ROLE_ASSASSIN => array('nom' => 'Assassin', 'icone' => 'assassin', 'prix' => 200),
     );
+    const PRENOMS = array('Aldric', 'Maëlle', 'Soren', 'Ysolde', 'Corentin', 'Naëlle', 'Matthias', 'Liora', 'Evander', 'Thaïs', 'Kaelen', 'Ondine',
+        'Raphaël', 'Isaure', 'Dorian', 'Mirelle', 'Tancrède', 'Séléné', 'Lazare', 'Anouk', 'Baptiste', 'Cassia', 'Gaspard', 'Elowen',
+        'Ivar', 'Marguerite', 'Octave', 'Nolwenn', 'Valentin', 'Zoé', 'Hector', 'Calista', 'Orlan', 'Perrine', 'Silas', 'Tiphaine');
+    const NOMS = array('Valcourt', 'Marenne', 'Dorsay', 'Kestrel', 'Blanchefort', 'Orsini', 'Vasseur', 'Delorme', 'Thorne', 'Quenet', 'Ravel', 'Montclar',
+        'Sauvageot', 'Lemaire', 'Ashgrove', 'Varga', 'Beaulieu', 'Okafor', 'Reyes', 'Lindqvist', 'Petrov', 'Haddad', 'Castellane', 'Morvan',
+        'Aubrac', 'Delacroix-Ney', 'Faucheux', 'Grimaldi', 'Hallewyn', 'Ibarra', 'Jourdan', 'Kovacs', 'Lacombe', 'Maillard', 'Nerval', 'Tavernier');
     const ETAT_MORT = 'mort';
     const ETAT_PRISON = 'prison';
     const ETAT_VOYAGE = 'voyage';
@@ -84,10 +90,21 @@ class Perso {
 
         
     public static function recruter(Joueur $Joueur, Planete $Planete, string $role): int {
-        $nom = self::ROLES[$role]['nom'].' '.(count(self::liste($Joueur)) + 1);
+        $nom = self::nomAleatoire($Joueur);
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,role,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,?,now()) ";
         MyPDO::getInstance()->query($query,$Joueur->id,$nom,$role,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$Planete->id);
         return MyPDO::getInstance()->lastInsertId();
+    }
+
+    private static function nomAleatoire(Joueur $Joueur): string {
+        $pris = array($Joueur->nom);
+        foreach(self::liste($Joueur) as $ligne){
+            array_push($pris, $ligne->nom);
+        }
+        do{
+            $nom = self::PRENOMS[random_int(0, count(self::PRENOMS) - 1)].' '.self::NOMS[random_int(0, count(self::NOMS) - 1)];
+        }while(in_array($nom, $pris, true));
+        return $nom;
     }
 
     public static function liste(Joueur $Joueur): array {
