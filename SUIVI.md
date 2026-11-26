@@ -2,13 +2,7 @@
 
 ## À faire
 
-### 1. Sprites des vaisseaux par camp (26/11)
-
-Ta phrase : « genere des sprites les vaisseaux doivent avoir leur propre look par rapport au faction. les pirates c'est des vaisseau bricoler de bric et de broc, les rebelle des vieux vaisseau, et les imperiale, une ligne propre avec un design un peu univfer entre toute leur game de vaisseau ». Ta phrase : « il faut un look photorealsite mais de sc-fi ».
-
-Compris : je ne génère pas d'images moi-même ; comme pour les premières, je rédige les prompts Gemini (fond magenta uni, design original, pas de ressemblance avec des licences existantes), un par un dans le chat, et je traite les images que tu génères (détourage). 7 types de vaisseaux × 3 camps = 21 images, rangées par camp. Pirates : bricolés, rafistolés de pièces disparates. Rébellion : vieux vaisseaux usés. Empire : lignes propres, un même langage de design pour toute la gamme. Photoréaliste de science-fiction. Voir Q1.
-
-### 1bis. Aperçu des vaisseaux à l'inscription (26/11)
+### 1. Aperçu des vaisseaux à l'inscription (26/11)
 
 Ta phrase : « limite atteinte, traite les image deja recu, a l'iscription dans le choix des camps, pour chaque camps met le vaisseau de debarquement avec la troupe a coté pour qu'on choisisse aussi ledesign que l'on souhaite jouer ». Compris : sur la page d'inscription, chaque carte de camp jouable (Empire, Rébellion ; les Pirates restent une IA) affiche la barge de débarquement et le soldat de ce camp côte à côte, pour choisir aussi le design. Le soldat impérial n'est pas encore généré : en attendant, l'image générique s'affiche à sa place.
 
