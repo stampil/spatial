@@ -8,7 +8,7 @@ import numpy
 from PIL import Image
 
 OBJETS = ('vaisseau', 'batiment', 'role', 'bonus', 'logo', 'icone')
-FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-rebellion': 'camp/rebellion', 'carte': 'carte', 'accueil': 'accueil', 'combat': 'combat', 'combat-terrestre': 'combat-terrestre', 'evenement-rejoint': 'evenement-rejoint', 'evenement-revolte': 'evenement-revolte', 'evenement-conquise': 'evenement-conquise'}
+FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-rebellion': 'camp/rebellion', 'carte': 'carte', 'accueil': 'accueil', 'combat': 'combat', 'combat-terrestre': 'combat-terrestre', 'evenement-rejoint': 'evenement-rejoint', 'evenement-revolte': 'evenement-revolte', 'evenement-conquise': 'evenement-conquise', 'evenement-decouverte': 'evenement-decouverte', 'evenement-rien': 'evenement-rien', 'evenement-perdu': 'evenement-perdu', 'evenement-analyse': 'evenement-analyse'}
 FONDS.update({'page-' + page: 'page/' + page for page in ('tableauBord', 'listePlanete', 'listeVaisseau', 'listePerso', 'classement', 'listeCamp', 'inscription', 'connection')})
 EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
 COTE_OBJET = 512
