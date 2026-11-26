@@ -44,7 +44,7 @@ class Batiment {
             foreach(Perso::ROLES as $infosRole){
                 array_push($roles, $infosRole['nom']);
             }
-            $texte = 'Recrute des persos ('.implode(', ', $roles).'). '.$texte.' Chaque académie autorise '.self::TROUPES_PAR_ACADEMIE.' troupes présentes sur la planète.';
+            $texte = 'Recrute des persos ('.implode(', ', $roles).'). '.$texte.' Chaque académie autorise '.self::TROUPES_PAR_ACADEMIE.' '.__('troupe_presente', 'troupes_presentes', self::TROUPES_PAR_ACADEMIE).' sur la planète.';
         }
         return $texte;
     }

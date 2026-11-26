@@ -19,7 +19,7 @@ class Flotte {
     public static function creer(Joueur $joueur, Planete $planete, array $vaisseauxIds): ?string {
         $ids = array_values(array_unique(array_map('intval', $vaisseauxIds)));
         if(count($ids) < self::VAISSEAUX_MINIMUM){
-            return 'Une flotte demande au moins '.self::VAISSEAUX_MINIMUM.' vaisseaux.';
+            return 'Une flotte demande au moins '.self::VAISSEAUX_MINIMUM.' '.__('vaisseau', 'vaisseaux', self::VAISSEAUX_MINIMUM).'.';
         }
         $db = MyPDO::getInstance();
         $marquesIds = implode(',', array_fill(0, count($ids), '?'));

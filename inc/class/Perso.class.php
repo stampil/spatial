@@ -481,12 +481,12 @@ class Perso {
         if(random_int(1, self::MAX_PERCENT) <= self::PRISON_SHARE_PERCENT){
             $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_prison=? WHERE id=?";
             $this->bdd->query($query,Tools::nowPlus(self::PRISON_SECONDS),$this->id);
-            Tools::addMessage($this->nom.' a échoué et a été emprisonné pendant '.intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE).' minutes.');
+            Tools::addMessage($this->nom.' a échoué et a été emprisonné pendant '.intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE).' '.__('minute', 'minutes', intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE)).'.');
             return;
         }
         $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=? WHERE id=?";
         $this->bdd->query($query,Tools::nowPlus(self::RESPAWN_SECONDS),$this->id);
-        Tools::addMessage($this->nom.' a échoué et a été tué. Un nouveau perso arrivera dans '.intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE).' minutes.');
+        Tools::addMessage($this->nom.' a échoué et a été tué. Un nouveau perso arrivera dans '.intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE).' '.__('minute', 'minutes', intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE)).'.');
     }
 
     private function respawn(): void {

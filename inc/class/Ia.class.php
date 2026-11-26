@@ -97,7 +97,7 @@ class Ia {
     private static function agiter(Planete $planete): string {
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=LEAST(perc_revolte+?, ?) WHERE id=?";
         MyPDO::getInstance()->query($query,self::REVOLTE_EMPIRE,Planete::MAX_REVOLTE - 1,$planete->id);
-        return ' Défense détruite : la révolte monte de '.self::REVOLTE_EMPIRE.' points.';
+        return ' Défense détruite : la révolte monte de '.self::REVOLTE_EMPIRE.' '.__('point', 'points', self::REVOLTE_EMPIRE).'.';
     }
 
 }

@@ -252,7 +252,7 @@ class Combat {
             $abattues = min($planete->troupes, intdiv($attaque, $force));
             $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET troupes=troupes-?, defense_maj=COALESCE(defense_maj, ?) WHERE id=?";
             $db->query($query,$abattues,Tools::now(),$planete->id);
-            $message = 'Débarquement repoussé sur '.$planete->nom.' : '.($troupes > 1 ? 'vos ' : 'votre ').$troupes.' '.__('troupe','troupes',$troupes).' '.__('perdue','perdues',$troupes).', la garnison perd '.$abattues.' '.__('troupe','troupes',$abattues).'.';
+            $message = 'Débarquement repoussé sur '.$planete->nom.' : '.__('votre', 'vos', $troupes).' '.$troupes.' '.__('troupe','troupes',$troupes).' '.__('perdue','perdues',$troupes).', la garnison perd '.$abattues.' '.__('troupe','troupes',$abattues).'.';
             $garnison = $planete->troupes - $abattues;
         }
         Tools::addMessage($message);
