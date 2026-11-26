@@ -56,7 +56,25 @@ Ce que je comprends :
 - Nouveau type « Restrictor » produit à l'usine lourde (comme le capital). Tant qu'il est vivant dans une bataille, les vaisseaux ADVERSES ne peuvent pas fuir.
 - Quand une bataille est très déséquilibrée et qu'un camp a subi des pertes très lourdes, ses survivants fuient vers la planète alliée ou neutre la plus proche, sauf si un Restrictor adverse est encore en vie.
 
+### 6. Images du Restrictor pour chaque camp (26/11)
+
+Ta phrase : « fait generer les images our les restrictor de chaque camps ».
+
+Ce que je comprends : des prompts Gemini pour le Restrictor, dans le même format que les autres vaisseaux : 1 image générique (`vaisseau-restrictor`) et 1 par camp (`vaisseau-pirates-restrictor`, `vaisseau-rebellion-restrictor`, `vaisseau-empire-restrictor`), donnés un par un avec un bouton « ok », puis importés par moi depuis tes Téléchargements. Un Restrictor est un lourd porteur d'émetteurs de champ (anneau de pylônes et grandes antennes) : pirates bricolés, rebelles vétérans, Empire angulaire et froid.
+
+### 7. Tutoriel : détruire une flotte réduite avec un Restrictor (26/11)
+
+Ta phrase : « fait un tuto dessus pour attaquer une flotte reduite et l'aneantir via un restrictor dans al flotte ».
+
+Ce que je comprends : une nouvelle étape de tutoriel après « Répondre à une menace pirate » : on te montre une flotte pirate réduite stationnée près de chez toi ; sans Restrictor elle s'enfuirait. Il faut produire un Restrictor (usine lourde), l'ajouter à ta flotte avec les autres vaisseaux, puis attaquer : elle ne peut plus fuir et elle est anéantie. Le tutoriel finit ensuite (étape finale décalée d'un cran).
+
+Constat à signaler (fait aujourd'hui, point 3) : avec 1 chasseur IA sur la planète pirate du tutoriel, mon script de test (1 seule tentative d'assaut) réussit environ 2 fois sur 3 ; le chasseur IA tue 1 de tes chasseurs avant l'assaut de la défense. Un joueur peut recommencer, mais c'est moins fiable qu'avant.
+
 ## Questions en suspens
+
+Point 7 (tutoriel Restrictor) et constat :
+17. La planète pirate du tutoriel d'assaut n'a PAS de chasseur IA (assaut aussi fiable qu'avant) ; la flotte IA réduite n'apparaît qu'à l'étape Restrictor. D'accord (sinon je garde 1 chasseur et l'assaut peut échouer) ?
+18. Étape Restrictor : une prime de crédits couvre l'usine lourde et le Restrictor (comme l'étape de préparation), et la flotte réduite (3 chasseurs IA) apparaît sur une planète pirate voisine ; d'accord ?
 
 Point 4 (combat à l'arrivée) :
 9. Le combat à l'arrivée ne se déclenche que si le groupe qui arrive contient des vaisseaux de combat (chasseurs, frégates, capitaux) ; les vaisseaux non armés (reconnaissance, transports) arrivent en paix. D'accord ?
