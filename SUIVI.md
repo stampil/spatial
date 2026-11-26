@@ -31,6 +31,11 @@ Ta demande suivante (26/11) : « fait pouvoir construire des structure canon orb
 3. Assassiner le gouverneur (assassin recruté, amené sur la planète 2).
 4. Saboter le générateur de bouclier, puis enchaîner le tutoriel (débarquement possible sur la planète 2, etc.).
 
+### 6. Planète capturée : garnison, production ralentie, retour au neutre (26/11)
+Ta demande suivante : « Planète capturée et tenue.  explique que il n'y a pas besoin de diplomatie et de mettre la planete a notre cause, tant qu'il y a une garnison, les batiments produiront avec un leger malus de temps. si la garnison part ou est detruite, la planete passe neutre avec 50% de chance d'elire un gouverneur et se reconstuera ses défense ».
+- Texte du tutoriel (étape qui suit la capture) : pas besoin de diplomatie ni de rallier la planète tant que la garnison y est ; ses bâtiments produisent avec un léger malus de temps.
+- Règle : une planète prise par la force est « occupée » ; tant qu'elle a une garnison, ses usines produisent avec un malus de durée. Si la garnison disparaît (détruite ou partie), la planète redevient neutre (bâtiments perdus), élit un gouverneur PNJ avec 50 % de chances, et reconstruit sa défense (bouclier, canon, garnison) avec le temps.
+
 ## Questions en suspens
 
 Pour te laisser dire « go » d'un coup, voici mes propositions par défaut :
@@ -41,3 +46,5 @@ Pour te laisser dire « go » d'un coup, voici mes propositions par défaut :
 25. Sabotage : action de l'assassin sur n'importe quel bâtiment de la planète où il se trouve ; chance basée sur sa force, mêmes risques de capture ; détruit un exemplaire du bâtiment choisi.
 26. Structures : Canon orbital et Bouclier planétaire à 300 cr chacun, maintenance 6 cr/h, plusieurs par planète dans la limite des emplacements ; chacune ajoute à la planète l'équivalent d'un emplacement de base (+1 × `BOUCLIER_PAR_SLOT` de bouclier maximum, ou +1 × `CANON_PAR_SLOT` de canon maximum) ; elles ne comptent pas dans les emplacements « vides » ; les planètes IA d'au moins 6 emplacements ont 1 bouclier planétaire et 1 canon orbital ; un bouclier planétaire suffit à interdire le débarquement.
 27. Tutoriel : 4 nouvelles étapes entre le débarquement et l'assassin ; la planète n° 2 a un gouverneur PNJ, 1 chasseur IA et un générateur de bouclier ; les joueurs en cours de tutoriel voient leur étape décalée par une migration ; un transport de persos est fourni pour amener l'assassin.
+28. Malus de production des planètes occupées : +20 % de durée.
+29. Retour au neutre : vérifié à chaque affichage (garnison à 0 sur une planète occupée) ; la planète perd ses bâtiments, repart à 0 de bouclier, canon et garnison, qui se reconstituent comme pour les autres planètes (10 % par heure).
