@@ -10,6 +10,8 @@ Lu (rien codé) : dans la liste, chaque ligne affiche une vignette de 72 px (`im
 
 Correction du 26/11 : « evite de dire juste ship bordel, fait des prompt hyper detaillé je veux pas voir de bateau » (capture : un navire de guerre au lieu d'un vaisseau spatial) : prompts des structures refaits en détail, vaisseau spatial décrit pièce par pièce avec une interdiction explicite de tout bateau.
 
+Correction du 26/11 : « généré mais sa fait pas sc phy sa » (l'usine moyenne ressemblait à une usine du XXe siècle avec cheminées, grue et avion) : prompts refaits dans le langage de la station orbitale du jeu (modules cylindriques, treillis, radiateurs, réservoirs), avec interdiction des cheminées, grues, avions et bateaux.
+
 Ce que je comprends : les 7 structures (3 usines, ferme, académie, bouclier planétaire, canon orbital) ont une petite icône de 28 px au même endroit, toutes du même style duotone blanc et gris foncé ; le clic sur l'icône ouvre toujours la fenêtre de détails avec la grande image. Les mêmes icônes servent aussi pour les pastilles d'emplacements et les titres des sections d'usines.
 
 ## Questions en suspens
