@@ -3,6 +3,8 @@
 class Perso {
 
     const MAX_STARS = 5;
+    const NB_CARACTERISTIQUES = 3;
+    const POINTS_REPARTIS = 10;
     const DIPLOMATIE_SECONDS = 120;
     const ACTION_CONQUETE = 1;
     const ACTION_APAISER = 2;
@@ -76,9 +78,19 @@ class Perso {
     
 
     
+    public static function etoilesAleatoires(): array {
+        $places = range(0, self::NB_CARACTERISTIQUES * self::MAX_STARS - 1);
+        shuffle($places);
+        $etoiles = array_fill(0, self::NB_CARACTERISTIQUES, 0);
+        foreach(array_slice($places, 0, self::POINTS_REPARTIS) as $place){
+            $etoiles[intdiv($place, self::MAX_STARS)]++;
+        }
+        return $etoiles;
+    }
+
     public static function create(Joueur $Joueur): int {
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$Joueur->id,$Joueur->nom,rand(1,5),rand(1,5),rand(1,5),0);
+        MyPDO::getInstance()->query($query,...array_merge(array($Joueur->id,$Joueur->nom),self::etoilesAleatoires(),array(0)));
 
         $id_perso =  MyPDO::getInstance()->lastInsertId();
         
@@ -92,7 +104,7 @@ class Perso {
     public static function recruter(Joueur $Joueur, Planete $Planete, string $role): int {
         $nom = self::nomAleatoire($Joueur);
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,role,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$Joueur->id,$nom,$role,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$Planete->id);
+        MyPDO::getInstance()->query($query,...array_merge(array($Joueur->id,$nom,$role),self::etoilesAleatoires(),array($Planete->id)));
         return MyPDO::getInstance()->lastInsertId();
     }
 
@@ -400,7 +412,7 @@ class Perso {
     private function respawn(): void {
         $planeteId = Planete::premiereGouvernee($this->joueur->id) ?? $this->sur_planete->id;
         $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=NULL, fin_prison=NULL, embarque=0, PV=?, FO=?, diplomatie=?, sur_planete=? WHERE id=? AND fin_mort IS NOT NULL";
-        $this->bdd->query($query,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$planeteId,$this->id);
+        $this->bdd->query($query,...array_merge(self::etoilesAleatoires(),array($planeteId,$this->id)));
         if($this->bdd->lastRowCount === 1){
             Tools::addMessage('Un nouveau perso, '.$this->nom.', est arrivé.');
         }
