@@ -38,9 +38,9 @@ if($Joueur->etape_tuto==1){
             </div>
         </div>
     </div>
-    <?= Vue::jauge('Force', $o->FO, Perso::MAX_STARS, 'force') ?>
-    <?= Vue::jauge('Endurance', $o->PV, Perso::MAX_STARS, 'endurance') ?>
-    <?= Vue::jauge('Diplomatie', $o->diplomatie, Perso::MAX_STARS, 'diplomatie') ?>
+    <?= Vue::etoiles('Force', $o->FO, Perso::MAX_STARS, 'force') ?>
+    <?= Vue::etoiles('Endurance', $o->PV, Perso::MAX_STARS, 'endurance') ?>
+    <?= Vue::etoiles('Diplomatie', $o->diplomatie, Perso::MAX_STARS, 'diplomatie') ?>
 </section>
 
 <section class="panneau">

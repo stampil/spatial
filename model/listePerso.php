@@ -23,9 +23,9 @@ foreach(Perso::liste($Joueur) as $ligne){
                 </div>
             </div>
         </div>
-        <?= Vue::jauge('Force', $perso->FO, Perso::MAX_STARS, 'force') ?>
-        <?= Vue::jauge('Endurance', $perso->PV, Perso::MAX_STARS, 'endurance') ?>
-        <?= Vue::jauge('Diplomatie', $perso->diplomatie, Perso::MAX_STARS, 'diplomatie') ?>
+        <?= Vue::etoiles('Force', $perso->FO, Perso::MAX_STARS, 'force') ?>
+        <?= Vue::etoiles('Endurance', $perso->PV, Perso::MAX_STARS, 'endurance') ?>
+        <?= Vue::etoiles('Diplomatie', $perso->diplomatie, Perso::MAX_STARS, 'diplomatie') ?>
         <?php if($perso->sur_planete !== null){ ?>
         <p class="md3-secondary">Sur <?= $perso->sur_planete->getNom() ?></p>
         <?php } ?>
