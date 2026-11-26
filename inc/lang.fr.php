@@ -27,6 +27,8 @@ return array(
     'voyagent' => 'voyagent',
     'demande' => 'demande',
     'demandent' => 'demandent',
+    'restant' => 'restant',
+    'restants' => 'restants',
     'decouverte' => 'découverte',
     'decouvertes' => 'découvertes',
 );

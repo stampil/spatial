@@ -127,7 +127,8 @@ foreach($posees as $planeteId => $types){
 <?php
 $productionsEnCours = array();
 foreach($gouvernees as $ligne){
-    foreach(Vaisseau::enProduction($ligne->id) as $production){
+    foreach(Vaisseau::enFile($ligne->id) as $production){
+        $production['planete'] = $ligne->nom;
         array_push($productionsEnCours, $production);
     }
 }
@@ -136,7 +137,7 @@ if(count($productionsEnCours) > 0){
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html('usine_legere') ?>Production en cours</h2>
     <?php foreach($productionsEnCours as $production){ ?>
-    <?= Vue::progression(Vaisseau::CATALOGUE[$production->type]['nom'].' · '.(new Planete($production->id_planete))->nom, strtotime($production->fin) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$production->type]['duree']), Vaisseau::CATALOGUE[$production->type]['icone']) ?>
+    <?= Vue::progression(Vaisseau::CATALOGUE[$production['type']]['nom'].' · '.$production['restants'].' '.__('restant', 'restants', $production['restants']).' · '.$production['planete'], strtotime($production['fin']) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$production['type']]['duree']), Vaisseau::CATALOGUE[$production['type']]['icone']) ?>
     <?php } ?>
 </section>
 <?php } ?>

@@ -7,6 +7,7 @@ class Batiment {
     const USINE_LOURDE = 'nb_usine_vaiss_lourd';
     const FERME = 'nb_usine_ressource';
     const ACADEMIE = 'nb_academie';
+    const TROUPES_PAR_ACADEMIE = 10;
     const BASE_INCOME = 10;
     const FERME_INCOME = 25;
     const REFUND_PERCENT = 50;
@@ -33,9 +34,13 @@ class Batiment {
             foreach(Perso::ROLES as $infosRole){
                 array_push($roles, $infosRole['nom']);
             }
-            $texte = 'Recrute des persos ('.implode(', ', $roles).'). '.$texte;
+            $texte = 'Recrute des persos ('.implode(', ', $roles).'). '.$texte.' Chaque académie autorise '.self::TROUPES_PAR_ACADEMIE.' troupes présentes sur la planète.';
         }
         return $texte;
+    }
+
+    public static function capaciteTroupes(Planete $planete): int {
+        return $planete->nombre(self::ACADEMIE) * self::TROUPES_PAR_ACADEMIE;
     }
 
     public static function remboursement(string $batiment): int {

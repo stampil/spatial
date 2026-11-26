@@ -4,9 +4,10 @@ if(!Tools::isValidCsrfToken($_POST[CSRF_KEY] ?? null)){
 }
 $planete = new Planete((int) ($_POST['planete'] ?? 0));
 $type = giveInputString($_POST, 'type');
+$nombre = (int) giveInputString($_POST, 'nombre');
 
-$erreur = Vaisseau::produire($Joueur, $planete, $type);
-Tools::addMessage($erreur ?? 'Production lancée : '.Vaisseau::CATALOGUE[$type]['nom'].' sur '.$planete->nom.'.');
+$erreur = Vaisseau::produire($Joueur, $planete, $type, $nombre);
+Tools::addMessage($erreur ?? 'Production lancée : '.$nombre.' × '.Vaisseau::CATALOGUE[$type]['nom'].' sur '.$planete->nom.'.');
 
 ?>
 

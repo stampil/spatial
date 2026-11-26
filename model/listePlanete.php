@@ -14,7 +14,7 @@ foreach($gouvernees as $ligne){
     $couleur = $p->id_camp === null ? Camp::SANS_CAMP_COULEUR : (new Camp($p->id_camp))->couleur;
     $map_planete = $p->id % 27;
     if(!$map_planete) $map_planete = 1;
-    $productions = Vaisseau::enProduction($p->id);
+    $file = Vaisseau::enFile($p->id);
     $stock = Vaisseau::stock($p->id, $Joueur->id);
 ?>
     <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
@@ -32,8 +32,8 @@ foreach($gouvernees as $ligne){
             <?php if($p->perc_revolte >= Planete::REVOLTE_ALERTE){ echo Vue::pastille('Révolte élevée', 'alerte'); } ?>
         </div>
         <?= Vue::jauge('Révolte', $p->perc_revolte, Planete::MAX_REVOLTE, 'revolte', 'revolte') ?>
-        <?php foreach($productions as $production){ ?>
-        <?= Vue::progression(Vaisseau::CATALOGUE[$production->type]['nom'], strtotime($production->fin) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$production->type]['duree']), Vaisseau::CATALOGUE[$production->type]['icone']) ?>
+        <?php foreach($file as $ligneFile){ ?>
+        <?= Vue::progression(Vaisseau::CATALOGUE[$ligneFile['type']]['nom'].' · '.$ligneFile['restants'].' '.__('restant', 'restants', $ligneFile['restants']), strtotime($ligneFile['fin']) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$ligneFile['type']]['duree']), Vaisseau::CATALOGUE[$ligneFile['type']]['icone']) ?>
         <?php } ?>
         <?php if(count($stock) > 0){ echo Vue::composition($stock); } ?>
     </section>

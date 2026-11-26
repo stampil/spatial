@@ -204,34 +204,74 @@ class Vaisseau {
         }
     }
 
-    public static function produire(Joueur $joueur, Planete $planete, string $type): ?string {
+    public static function produire(Joueur $joueur, Planete $planete, string $type, int $nombre): ?string {
         if(!isset(self::CATALOGUE[$type])){
             return 'Type de vaisseau inconnu.';
         }
         if($planete->gouverneur !== $joueur->id){
             return 'Vous ne gouvernez pas cette planète.';
         }
+        if($nombre < 1){
+            return 'Choisissez au moins une unité.';
+        }
         $infos = self::CATALOGUE[$type];
         $usine = $infos['usine'];
         if($planete->nombre($usine) < 1){
             return "Cette planète n'a pas l'usine nécessaire.";
         }
-        $types = self::typesDeLUsine($usine);
-        $marques = implode(',', array_fill(0, count($types), '?'));
-        $db = MyPDO::getInstance();
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "production (id_joueur,id_planete,type,fin)
-            SELECT ?,?,?,? FROM " . MyPDO::DB_FLAG . "planete
-            WHERE id=? AND gouverneur=? AND $usine > (SELECT COUNT(*) FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=? AND type IN ($marques))";
-        $db->query($query,$joueur->id,$planete->id,$type,Tools::nowPlus($joueur->dureeEffective($infos['duree'])),$planete->id,$joueur->id,$planete->id,...$types);
-        if($db->lastRowCount !== 1){
-            return 'Toutes les usines de ce type sont occupées.';
+        if($type === self::TROUPE){
+            $place = self::placeTroupes($planete, $joueur->id);
+            if($nombre > $place){
+                return "L'académie ne permet plus que ".$place.' '.__('troupe','troupes',$place).' sur cette planète.';
+            }
         }
-        $reservation = (int) $db->lastInsertId();
-        if(!$joueur->payer($joueur->prixVaisseau($type))){
-            $db->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id=?",$reservation);
+        if(!$joueur->payer($nombre * $joueur->prixVaisseau($type))){
             return 'Crédits insuffisants.';
         }
+        foreach(self::finsDeFile($planete, $usine, $nombre, $joueur->dureeEffective($infos['duree'])) as $fin){
+            MyPDO::getInstance()->query("INSERT INTO " . MyPDO::DB_FLAG . "production (id_joueur,id_planete,type,fin) VALUES (?,?,?,?)",$joueur->id,$planete->id,$type,$fin);
+        }
         return null;
+    }
+
+    public static function enFile(int $planeteId): array {
+        $file = array();
+        foreach(self::enProduction($planeteId) as $ligne){
+            if(!isset($file[$ligne->type])){
+                $file[$ligne->type] = array('type' => $ligne->type, 'restants' => 0, 'fin' => $ligne->fin);
+            }
+            $file[$ligne->type]['restants']++;
+        }
+        return array_values($file);
+    }
+
+    public static function placeTroupes(Planete $planete, int $joueurId): int {
+        return max(0, Batiment::capaciteTroupes($planete) - self::troupesSurPlanete($planete->id, $joueurId));
+    }
+
+    private static function troupesSurPlanete(int $planeteId, int $joueurId): int {
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL";
+        $presentes = (int) MyPDO::getInstance()->query($query,$joueurId,$planeteId,self::TROUPE)[0]->nombre;
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "production WHERE id_joueur=? AND id_planete=? AND type=?";
+        return $presentes + (int) MyPDO::getInstance()->query($query,$joueurId,$planeteId,self::TROUPE)[0]->nombre;
+    }
+
+    private static function finsDeFile(Planete $planete, string $usine, int $nombre, int $duree): array {
+        $types = self::typesDeLUsine($usine);
+        $marques = implode(',', array_fill(0, count($types), '?'));
+        $query = "SELECT fin FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=? AND type IN ($marques) ORDER BY fin";
+        $voies = array_fill(0, $planete->nombre($usine), time());
+        foreach(MyPDO::getInstance()->query($query,$planete->id,...$types) as $ligne){
+            sort($voies);
+            $voies[0] = max($voies[0], strtotime($ligne->fin));
+        }
+        $fins = array();
+        for($i = 0; $i < $nombre; $i++){
+            sort($voies);
+            $voies[0] += $duree;
+            array_push($fins, Tools::formatDate($voies[0]));
+        }
+        return $fins;
     }
 
     public static function resolveProduction(Joueur $joueur): void {
