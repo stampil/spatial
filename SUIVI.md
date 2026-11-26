@@ -19,17 +19,12 @@ Codé (à valider, non publié) dans `js/main.js` et `js/carte.js` :
 
 ### 3. Bouton diplomatie : erreur 404 (26/11)
 
-Ta phrase : « sa affiche erreur 404 pour le btn diplomatie », puis « 404 sur erreur /errors/404/ ».
+Tes phrases : « sa affiche erreur 404 pour le btn diplomatie », « 404 sur erreur /errors/404/ », puis la capture de l'onglet Réseau (Request URL `https://4x.gamer.free/[object%20HTMLInputElement]`, POST, 302) et « ton ajax c de la merde ».
 
-Lu (rien codé) :
-- `/errors/404/` est l'adresse FINALE : l'hébergeur a redirigé la requête vers sa propre page d'erreur 404. Mon message n'affiche que cette adresse finale, pas celle demandée au départ : je ne sais donc toujours pas si c'est le POST vers `?p=faireDiplomatie` ou le rafraîchissement.
-- Mon `.htaccess` (`tools/package.sh`) refuse `inc/`, `model/`, `database/` en accès direct : cela donnerait un 403, pas un 404.
-- Mon PHP ne renvoie jamais 404 : seul l'hébergeur le fait.
+Cause trouvée (ma faute, rien codé) : `js/main.js` poste vers `formulaire.action`. Quand le formulaire contient un champ nommé `action`, le navigateur renvoie ce champ (un `<input>`) au lieu de l'adresse : l'adresse devient `[object HTMLInputElement]`, l'hébergeur la redirige vers `/errors/404/`. Vérifié dans le code : 9 formulaires ont un champ `name="action"` : diplomatie (conquête, apaiser), embarquer, descendre (`affichePerso.php`), combattre, laisser, dissoudre (`listeVaisseau.php`), attaquer, débarquer (`affichePlanete.php`). Tous échouent en ajax depuis que j'ai introduit l'ajax ; les formulaires sans ce champ (construire, produire…) marchent.
 
-Proposition (rien codé) : en cas de redirection, le message donne les deux adresses (demandée et finale), ex. « erreur HTTP 404 sur /errors/404/ (demandé : /?p=faireDiplomatie) ».
+Proposition (rien codé) : poster vers `formulaire.getAttribute('action')` (l'attribut écrit dans le HTML, résolu par le navigateur). Une seule ligne de `js/main.js`.
 
 ## Questions en suspens
 
-1. Les autres boutons (construire, produire) marchent-ils en ligne ?
-2. La diplomatie démarre-t-elle quand même (compte à rebours après rechargement) ?
-3. Quelle adresse as-tu dans la barre du navigateur quand tu cliques (je n'ai pas l'adresse du site) ?
+Aucune.
