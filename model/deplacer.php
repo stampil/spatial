@@ -19,7 +19,11 @@ else{
     foreach(is_array($_POST['flotte'] ?? null) ? $_POST['flotte'] : array() as $flotteId){
         array_push($flottes, new Flotte((int) $flotteId));
     }
-    $erreur = Vaisseau::ordonner($Joueur, $depart, new Planete((int) ($_POST['destination'] ?? 0)), $choix, $flottes);
+    $vaisseaux = array();
+    if(!empty($_POST['vaisseau'])){
+        array_push($vaisseaux, (int) $_POST['vaisseau']);
+    }
+    $erreur = Vaisseau::ordonner($Joueur, $depart, new Planete((int) ($_POST['destination'] ?? 0)), $choix, $flottes, $vaisseaux);
     if($erreur !== null){
         Tools::addMessage($erreur);
     }

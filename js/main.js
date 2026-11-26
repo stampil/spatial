@@ -223,6 +223,10 @@ $(function(){
         });
     });
 
+    $(document).on('input', '.curseur__piste', function() {
+        $(this).siblings('.curseur__valeur').text(this.value);
+    });
+
     $(document).on('click', '[data-popin]', function() {
         document.getElementById($(this).data('popin')).showModal();
     });

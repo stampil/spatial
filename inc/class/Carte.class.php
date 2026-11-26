@@ -28,21 +28,37 @@ class Carte {
         return $donnees;
     }
 
-    public static function ordreDeLaRequete(array $requete): ?array {
+    public static function ordreDeLaRequete(Joueur $joueur, array $requete): ?array {
         if(!isset($requete['ordre'])){
             return null;
         }
-        $nombres = array();
-        foreach(is_array($requete['nombre'] ?? null) ? $requete['nombre'] : array() as $type => $nombre){
-            if(isset(Vaisseau::CATALOGUE[$type])){
-                $nombres[$type] = (int) $nombre;
+        $ordre = array('planete' => (int) $requete['ordre'], 'nombres' => array(), 'flottes' => array(), 'vaisseau' => null, 'libelle' => '');
+        if(isset($requete['vaisseau'])){
+            $query = "SELECT id, type, nom FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id=? AND id_joueur=? AND nom IS NOT NULL";
+            $lignes = MyPDO::getInstance()->query($query,(int) $requete['vaisseau'],$joueur->id);
+            if(count($lignes) === 0){
+                return null;
             }
+            $ordre['vaisseau'] = (int) $lignes[0]->id;
+            $ordre['nombres'][$lignes[0]->type] = 1;
+            $ordre['libelle'] = $lignes[0]->nom;
         }
-        $flottes = array();
-        foreach(is_array($requete['flotte'] ?? null) ? $requete['flotte'] : array() as $flotteId){
-            array_push($flottes, (int) $flotteId);
+        elseif(isset($requete['flotte'])){
+            $flotte = new Flotte((int) $requete['flotte']);
+            if($flotte->id_joueur !== $joueur->id){
+                return null;
+            }
+            $ordre['flottes'] = array($flotte->id);
+            $ordre['libelle'] = $flotte->nom;
         }
-        return array('planete' => (int) $requete['ordre'], 'nombres' => $nombres, 'flottes' => $flottes);
+        elseif(isset($requete['type']) && is_string($requete['type']) && isset(Vaisseau::CATALOGUE[$requete['type']])){
+            $ordre['nombres'][$requete['type']] = 1;
+            $ordre['libelle'] = Vaisseau::CATALOGUE[$requete['type']]['nom'];
+        }
+        else{
+            return null;
+        }
+        return $ordre;
     }
 
     private static function systemeDeBase(Joueur $joueur): ?int {

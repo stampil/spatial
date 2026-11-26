@@ -37,10 +37,6 @@
     const MESSAGE_ECHEC_ENVOI_AVANT = 'Ordre non confirmé (';
     const MESSAGE_ECHEC_ENVOI_APRES = ') : vérifiez la page Flottes avant de recommencer.';
     const ADRESSE_SYSTEME = '?p=afficheSysteme&id_systeme=';
-    const TYPE_RECONNAISSANCE = 'reconnaissance';
-    const TYPE_TROUPE = 'troupe_assaut';
-    const TYPE_CHASSEUR = 'chasseur';
-    const DESTINATION_EXPLORATION = 'explorer';
     const TOUCHE_ENTREE = 'Enter';
     const TOUCHE_ESPACE = ' ';
     const TOUCHE_ECHAP = 'Escape';
@@ -61,7 +57,6 @@
     const feuilleCorps = document.getElementById('carte-feuille-corps');
     const bandeau = document.getElementById('carte-bandeau');
     const bandeauTexte = document.getElementById('carte-bandeau-texte');
-    const boutonExplorer = document.getElementById('carte-explorer');
     const boutonTrajets = document.getElementById('carte-trajets');
 
     const systemes = {};
@@ -369,54 +364,42 @@
     }
 
     function secondesDeOrdre(systemeId) {
-        const embarques = [TYPE_TROUPE];
-        if (systemeId !== ordre.systeme) {
-            embarques.push(TYPE_CHASSEUR);
-        }
-        let convoi = 0;
-        let toutes = 0;
+        let secondes = 0;
         const vaisseaux = ordre.stock ? ordre.stock.vaisseaux : [];
         vaisseaux.forEach((vaisseau) => {
-            if (!ordre.nombres[vaisseau.type]) {
-                return;
-            }
-            toutes = Math.max(toutes, vaisseau.secondes[systemeId]);
-            if (!embarques.includes(vaisseau.type)) {
-                convoi = Math.max(convoi, vaisseau.secondes[systemeId]);
+            if (ordre.nombres[vaisseau.type]) {
+                secondes = Math.max(secondes, vaisseau.secondes[systemeId]);
             }
         });
         ordre.flottes.forEach((flotte) => {
-            toutes = Math.max(toutes, flotte.secondes[systemeId]);
-            convoi = Math.max(convoi, flotte.secondes[systemeId]);
+            secondes = Math.max(secondes, flotte.secondes[systemeId]);
         });
-        return convoi > 0 ? convoi : toutes;
+        return secondes;
     }
 
     function confirmerOrdre(planeteId, declencheur) {
         const champs = {depart: ordre.planete, destination: planeteId, 'flotte[]': ordre.flottes.map((flotte) => flotte.id)};
-        Object.keys(ordre.nombres).forEach((type) => {
-            if (ordre.nombres[type] > 0) {
-                champs['nombre[' + type + ']'] = ordre.nombres[type];
-            }
-        });
+        if (ordre.vaisseau) {
+            champs.vaisseau = ordre.vaisseau;
+        } else {
+            Object.keys(ordre.nombres).forEach((type) => {
+                if (ordre.nombres[type] > 0) {
+                    champs['nombre[' + type + ']'] = ordre.nombres[type];
+                }
+            });
+        }
         envoyer('?p=deplacer', champs, declencheur);
-    }
-
-    function explorer(evenement) {
-        const champs = {depart: ordre.planete, destination: DESTINATION_EXPLORATION};
-        champs['nombre[' + TYPE_RECONNAISSANCE + ']'] = ordre.nombres[TYPE_RECONNAISSANCE];
-        envoyer('?p=deplacer', champs, evenement.currentTarget);
     }
 
     function ouvrirDestination(systemeId) {
         const duree = secondesDeOrdre(systemeId);
         marquerSelection(systemeId);
         const systeme = systemes[systemeId];
-        ouvrirFeuille('Envoyer vers ' + systeme.nom, 'Trajet : ' + formaterDuree(duree), systeme.couleur);
+        ouvrirFeuille('Voyager vers ' + systeme.nom, 'Trajet : ' + formaterDuree(duree), systeme.couleur);
         systeme.planetes.filter((planete) => planete.id !== ordre.planete).forEach((planete) => {
             feuilleCorps.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
                 creer('span', {texte: planete.nom}),
-                bouton('Envoyer ici', 'md3-button', (noeud) => confirmerOrdre(planete.id, noeud))
+                bouton('Voyager ici', 'md3-button', (noeud) => confirmerOrdre(planete.id, noeud))
             ]));
         });
     }
@@ -424,9 +407,7 @@
     function commencerOrdre(nouvelOrdre) {
         ordre = nouvelOrdre;
         fermerFeuille();
-        const exploration = Boolean(ordre.nombres[TYPE_RECONNAISSANCE]);
-        bandeauTexte.textContent = exploration ? 'Touchez le système de destination, ou Explorer : le vaisseau part dans l’inconnu et peut ne pas revenir.' : 'Touchez le système de destination.';
-        boutonExplorer.hidden = !exploration;
+        bandeauTexte.textContent = ordre.libelle + ' : touchez le système de destination.';
         bandeau.hidden = false;
     }
 
@@ -452,7 +433,7 @@
         }
         const systemeId = stock ? stock.systeme : flottes[0].systeme;
         centrerSur(systemeId, ECHELLE_BASE);
-        commencerOrdre({planete: demande.planete, systeme: systemeId, stock: stock, nombres: nombres, flottes: flottes});
+        commencerOrdre({planete: demande.planete, systeme: systemeId, stock: stock, nombres: nombres, flottes: flottes, vaisseau: demande.vaisseau, libelle: demande.libelle});
     }
 
     function toucherSysteme(systemeId) {
@@ -615,7 +596,6 @@
     });
     document.getElementById('carte-fermer').addEventListener('click', fermerFeuille);
     document.getElementById('carte-annuler').addEventListener('click', annulerOrdre);
-    boutonExplorer.addEventListener('click', explorer);
     document.addEventListener('keydown', (evenement) => {
         if (evenement.key !== TOUCHE_ECHAP) {
             return;

@@ -79,6 +79,10 @@ class Flotte {
         return $composition;
     }
 
+    public function vaisseaux(): array {
+        return $this->bdd->query("SELECT id, type, nom FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_flotte=? ORDER BY id",$this->id);
+    }
+
     public function planeteAuRepos(): ?int {
         $query = "SELECT id_planete, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_flotte=? AND arrivee IS NULL GROUP BY id_planete";
         $lignes = $this->bdd->query($query,$this->id);
@@ -109,11 +113,15 @@ class Flotte {
         foreach(array_keys($this->composition()) as $type){
             $duree = max($duree, Vaisseau::dureeTrajet($joueur, $type, new Planete($depart), $destination));
         }
+        $heureDepart = Tools::now();
+        $arrivee = Tools::nowPlus($duree);
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, depart=?, arrivee=? WHERE id_flotte=? AND arrivee IS NULL";
-        $this->bdd->query($query,$destination->id,Tools::now(),Tools::nowPlus($duree),$this->id);
+        $this->bdd->query($query,$destination->id,$heureDepart,$arrivee,$this->id);
         if($this->bdd->lastRowCount === 0){
             return 'La flotte '.$this->nom.' est déjà en déplacement.';
         }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau e JOIN " . MyPDO::DB_FLAG . "vaisseau h ON h.id=e.id_hote SET e.id_destination=?, e.depart=?, e.arrivee=? WHERE h.id_flotte=? AND e.arrivee IS NULL";
+        $this->bdd->query($query,$destination->id,$heureDepart,$arrivee,$this->id);
         Tools::addMessage('Flotte '.$this->nom.' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', $duree).'.');
         return null;
     }

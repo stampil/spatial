@@ -65,6 +65,7 @@ class Combat {
             $db->query($query,$joueur->id,$planete->id,$type,$flotteId);
             array_push($rapport, $perdus.' × '.Vaisseau::CATALOGUE[$type]['nom']);
         }
+        Vaisseau::libererOrphelins();
         $message = 'Combat sur '.$planete->nom.' : défense restante, bouclier '.$bouclier.' et canon '.$canon.'. Pertes : '.(count($rapport) > 0 ? implode(', ', $rapport) : 'aucune').'.';
         if($resistance > 0){
             $message .= ' Citadelle : défense +'.$resistance.' %.';

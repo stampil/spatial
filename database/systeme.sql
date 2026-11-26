@@ -200,10 +200,14 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `depart` datetime DEFAULT NULL,
   `exploration` tinyint(1) NOT NULL DEFAULT '0',
   `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
+  `numero` int(11) UNSIGNED DEFAULT NULL,
+  `nom` varchar(32) DEFAULT NULL,
+  `id_hote` bigint(20) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
   KEY `id_planete` (`id_planete`),
-  KEY `id_flotte` (`id_flotte`)
+  KEY `id_flotte` (`id_flotte`),
+  KEY `id_hote` (`id_hote`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `flotte` (
@@ -285,7 +289,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('014_pirates_ia'),
 ('015_menaces_pirates'),
 ('016_exploration_risquee'),
-('017_connexion_automatique');
+('017_connexion_automatique'),
+('018_vaisseaux_nommes_embarques');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

@@ -97,8 +97,9 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
             <input type="hidden" name="type" value="<?= $type ?>" />
             <?= csrfField() ?>
-            <input type="number" class="md3-number" name="nombre" min="1" max="<?= $type === Vaisseau::TROUPE ? max(1, Vaisseau::placeTroupes($planete, $Joueur->id)) : max(1, intdiv($Joueur->credits, $Joueur->prixVaisseau($type))) ?>" value="1" aria-label="Nombre à produire" />
-            <input type="submit" class="md3-button md3-button--tonal" value="Produire" />
+            <?php $maximum = $type === Vaisseau::TROUPE ? Vaisseau::placeTroupes($planete, $Joueur->id) : intdiv($Joueur->credits, $Joueur->prixVaisseau($type)); ?>
+            <?= Vue::curseur('nombre', $maximum, min(1, $maximum), 'Nombre à produire : '.$infos['nom']) ?>
+            <input type="submit" class="md3-button md3-button--tonal" value="Produire"<?= $maximum === 0 ? ' disabled' : '' ?> />
         </form>
     </div>
     <?php } ?>

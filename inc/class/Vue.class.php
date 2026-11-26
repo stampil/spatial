@@ -116,6 +116,13 @@ class Vue {
             .'</div>';
     }
 
+    public static function curseur(string $nom, int $maximum, int $valeur, string $libelle): string {
+        return '<span class="curseur">'
+            .'<input type="range" class="curseur__piste" name="'.htmlspecialchars($nom).'" min="0" max="'.$maximum.'" step="1" value="'.$valeur.'"'.($maximum === 0 ? ' disabled' : '').' aria-label="'.htmlspecialchars($libelle).'" />'
+            .'<output class="curseur__valeur">'.$valeur.'</output><span class="curseur__maximum">/ '.$maximum.'</span>'
+            .'</span>';
+    }
+
     public static function emblemeCamp(?int $idCamp, int $taille = self::EMBLEME_TAILLE): string {
         if($idCamp === null || !isset(self::EMBLEMES[$idCamp])){
             return '';

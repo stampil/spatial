@@ -10,7 +10,6 @@
     <div class="carte__bandeau" id="carte-bandeau" hidden role="status">
         <span id="carte-bandeau-texte"></span>
         <span class="md3-actions">
-            <button type="button" class="md3-button md3-button--tonal" id="carte-explorer" hidden>Explorer</button>
             <button type="button" class="md3-button md3-button--outlined" id="carte-annuler">Annuler</button>
         </span>
     </div>
@@ -29,6 +28,6 @@
 <?php
 $donnees = Carte::donnees($Joueur);
 $donnees['focus'] = isset($_GET['systeme']) ? (int) $_GET['systeme'] : null;
-$donnees['ordre'] = Carte::ordreDeLaRequete($_GET);
+$donnees['ordre'] = Carte::ordreDeLaRequete($Joueur, $_GET);
 ?>
 <script type="application/json" id="carte-donnees"><?= json_encode($donnees, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>
