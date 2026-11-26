@@ -2,14 +2,16 @@
 
 ## À faire
 
-### 1. Avatar des persos : cacher la coupure du buste (26/11)
+### 1. Caractéristiques des persos en demi-étoiles (26/11)
 
-Ta phrase : « on voit le bust coupé agrandi l'image et decalle ver slebas qu'on voiyent pas la coupure » (avec une capture : l'avatar rond du perso, le bas du buste coupé à plat bien visible dans le cercle).
+Ta phrase : « pour les etoiles sa peut etre des demis etoile dans la repartition des caract de perso ».
 
-Lu (rien codé) : l'image du rôle (`img/role/*.png`, 512 px) est affichée entière et centrée (`background-size: contain`) dans le cercle de 72 px (`.avatar .visuel`, `css/jeu.css`) : la coupure plate du bas du buste tombe donc à l'intérieur du cercle.
+Lu (rien codé) : à la création d'un perso, `Perso::etoilesAleatoires` répartit 10 points entiers sur Force, Endurance et Diplomatie (5 au plus chacune), stockés en entiers (colonnes `PV`, `FO`, `diplomatie`). Ces valeurs entières servent aux formules : chance d'assassinat et de sabotage (Force), durée et chance de diplomatie, apaisement de la révolte (Diplomatie), et au texte « N/5 étoiles » de la fiche. Une demi-étoile n'existe donc pas aujourd'hui.
 
-Ce que je comprends : on agrandit l'image dans le cercle et on l'aligne sur le bas, pour que la coupure plate sorte du cercle et ne se voie plus, sans couper la tête. Concerne les 3 rôles (diplomate, assassin, héros), sur la fiche et la liste des persos.
+Ce que je comprends : la répartition se fait par pas d'une demi-étoile (par exemple 2,5 ou 3,5 étoiles), et les étoiles affichées montrent une étoile entière, une moitié ou une vide.
 
 ## Questions en suspens
 
-1. Agrandissement à 125 % aligné sur le bas du cercle ; je vérifie sur les trois rôles que la tête n'est pas coupée en haut, et j'ajuste si besoin. Je recommande cela.
+1. Données : les valeurs deviennent des demi-étoiles (0 à 10 par caractéristique, total de 20 demi-points = les mêmes 10 étoiles qu'avant). Les formules lisent la valeur en étoiles (demi-points ÷ 2), donc l'équilibre ne change pas. Je recommande cela.
+2. Persos déjà créés : une migration double leurs valeurs (3 étoiles deviennent 6 demi-étoiles, donc toujours 3 étoiles), pour qu'aucun perso ne change de force. Je recommande oui.
+3. Affichage : « 2,5/5 étoiles » dans le texte de la fiche, étoile à moitié remplie dans la rangée. Je recommande oui.
