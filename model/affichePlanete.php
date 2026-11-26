@@ -57,7 +57,7 @@ $analyse = $proprietaire ? null : Analyse::derniere($Joueur->id, $p->id);
     <?= Vue::jauge('Bouclier', $bouclier, max($p->bouclierMax(), $bouclier), 'bouclier', 'bouclier') ?>
     <?= Vue::jauge('Canon', $canon, max($p->canonMax(), $canon), 'canon', 'canon') ?>
     <?= Vue::jauge('Garnison', $troupes, max(Planete::troupesDeBase($p->slot), $troupes), 'persos', 'troupes') ?>
-    <p class="md3-secondary"><?= $boucliers ?> <?= __('bouclier', 'boucliers', $boucliers) ?> planétaire(s) · <?= $canons ?> <?= __('canon', 'canons', $canons) ?> orbital(aux)</p>
+    <p class="md3-secondary"><?= $boucliers ?> <?= __('bouclier_planetaire', 'boucliers_planetaires', $boucliers) ?> · <?= $canons ?> <?= __('canon_orbital', 'canons_orbitaux', $canons) ?></p>
     <?php if(count($flotteStationnee) > 0){ ?>
     <p class="md3-secondary">Flotte en orbite :</p>
     <?= Vue::composition($flotteStationnee, $p->id_camp) ?>
