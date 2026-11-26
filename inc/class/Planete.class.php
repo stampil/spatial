@@ -26,6 +26,7 @@ class Planete {
     const CAPTURE_REVOLTE = 50;
     const REVOLTE_ALERTE = 40;
     const SEUIL_INDEPENDANCE = 51;
+    const TEXTURES = 47;
     const ILLUSTRATION_REJOINT = 'evenement-rejoint';
     const ILLUSTRATION_REVOLTE = 'evenement-revolte';
     const ILLUSTRATION_CONQUISE = 'evenement-conquise';
@@ -465,6 +466,10 @@ class Planete {
     public function apaiser(int $points): void {
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=GREATEST(perc_revolte-?,0) WHERE id=?";
         $this->bdd->query($query,$points,$this->id);
+    }
+
+    public function numeroTexture(): int {
+        return $this->id % self::TEXTURES + 1;
     }
 
     public function estOccupee(): bool {

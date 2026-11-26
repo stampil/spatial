@@ -31,14 +31,12 @@ foreach(Flotte::liste($Joueur->id) as $ligne){
 foreach($systeme->planetes as $p){
     $couleurPlanete = $p->id_camp === null ? Camp::SANS_CAMP_COULEUR : (new Camp($p->id_camp))->couleur;
     $releve = Analyse::releve($Joueur, $p);
-    $map_planete = $p->id % 27;
-    if(!$map_planete) $map_planete = 1;
     $stock = $posees[$p->id] ?? array();
     $flottes = $flottesAuRepos[$p->id] ?? array();
 ?>
     <section class="panneau fiche--lien" style="--accent:<?= htmlspecialchars($couleurPlanete) ?>">
         <div class="fiche__tete">
-            <div class="avatar avatar--planete" style="background-image:url(img/planete/<?= $map_planete ?>.jpg)"></div>
+            <div class="avatar avatar--planete" style="background-image:url(img/planete/<?= $p->numeroTexture() ?>.jpg)"></div>
             <div>
                 <h2 class="fiche__nom"><a href="?p=affichePlanete&id_planete=<?= $p->id ?>"><?= htmlspecialchars($p->nom) ?></a></h2>
                 <p class="md3-secondary"><?= Camp::libelle($p->id_camp) ?> · <?= $p->gouverneur === $Joueur->id ? 'Votre colonie' : ($p->gouverneur === 0 ? 'Libre' : $p->getGouverneurNom()) ?></p>
