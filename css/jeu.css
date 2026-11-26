@@ -67,6 +67,7 @@
 }
 
 .mission {
+    position: relative;
     margin: 0 0 16px;
     border-left: 4px solid var(--md-sys-color-primary);
     border-radius: var(--md-sys-shape-corner-small);
@@ -91,6 +92,22 @@
 .mission__texte {
     margin: 0;
     padding: 0 16px 16px;
+}
+
+.mission__fermer {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.mission__croix {
+    width: 48px;
+    height: 48px;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
 .mission__texte a {

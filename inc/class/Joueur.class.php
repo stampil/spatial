@@ -16,6 +16,7 @@ class Joueur {
     public ?int $id_systeme_voisin;
     public ?string $fin_tuto;
     public ?string $raid_maj;
+    public bool $aide_icones_masquee;
 
     public string $IPs;
     
@@ -127,6 +128,7 @@ class Joueur {
         $this->id_systeme_voisin = $ret[0]->id_systeme_voisin;
         $this->fin_tuto = $ret[0]->fin_tuto;
         $this->raid_maj = $ret[0]->raid_maj;
+        $this->aide_icones_masquee = (bool) $ret[0]->aide_icones_masquee;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 

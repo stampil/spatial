@@ -8,7 +8,13 @@
     </form>
     <?php } ?>
 </details>
+<?php if(!$Joueur->aide_icones_masquee){ ?>
 <details class="mission">
     <summary><?= Icone::html('info') ?>Les icônes du haut</summary>
     <p class="mission__texte"><?= Tuto::texteIcones() ?></p>
+    <form class="mission__fermer" method="POST" action="?p=masquerAideIcones">
+        <?= csrfField() ?>
+        <button type="submit" class="mission__croix" aria-label="Ne plus afficher cette aide" title="Ne plus afficher cette aide">&times;</button>
+    </form>
 </details>
+<?php } ?>
