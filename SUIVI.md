@@ -24,6 +24,12 @@ Ce que je comprends : je fais un outil de raccord (\`tools/raccorder-planete.py\
 
 Ajout du 26/11 : « rajoute une planete cité ville hyper industrialisé » : une 13e texture (`planete-39`) : une planète-ville entière, mégalopole industrielle continue (usines, cheminées, raffineries, réseaux, lumières orange, scories en fusion, brume de pollution), générée juste après les plaines de sel.
 
+### 3. Planètes de type Terre avec des continents différents (26/11)
+
+Ta phrase : « fait des planete earth like, eau, terre de foret sable neige, mais des continent different ».
+
+Ce que je comprends : de nouvelles textures de monde habitable (océans, forêts, sable, neige) dont le dessin des continents est différent d'une planète à l'autre, pas des variantes de la même carte. Prompts prêts dans `tools/prompts-images.md` : `planete-40` à `planete-45`, un par disposition : supercontinent en croissant, trois continents très différents, monde-océan avec îles annulaires, continent en bande équatoriale, monde froid boisé et enneigé, monde sec avec mer intérieure. Elles passent par le même raccord sans couture, et le même rendu du raccord t'est montré à chaque image.
+
 ## Questions en suspens
 
 
@@ -34,3 +40,4 @@ Ajout du 26/11 : « rajoute une planete cité ville hyper industrialisé » : un
    Ta précision du 26/11 : « la prochaine essaye sans ref sa consomme des token » : à partir de la texture 3, plus d'image de référence envoyée ni à joindre : le prompt seul, sans la phrase sur l'image jointe. Je ne renvoie une référence que si le rendu est raté.
    Ta précision du 26/11 : « affiche moi le rendu du raccord tu verifie a chaque img généré » : à chaque texture importée, je t'affiche le rendu du raccord (le bord droit collé au bord gauche, et deux copies côte à côte) avec la mesure de couture, avant de passer à la suivante.
 4. Je passe aussi l'outil sur les 8 textures existantes à couture visible (2, 12, 16, 5, 8, 18, 15, 10), pour que le défilement soit propre partout. Chacune perd environ 10 % de sa largeur, sans effet visible. Je recommande oui.
+5. Combien : 6 textures Terre (40 à 45), après la planète-ville en cours. Je recommande 6.
