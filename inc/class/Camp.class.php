@@ -14,7 +14,7 @@ class Camp {
         self::REBELLION => 'Invisible sur la carte tant qu\'on ne l\'a pas découverte.',
     );
     const VISUELS = array(self::PIRATES => 'pirates', self::EMPIRE => 'empire', self::REBELLION => 'rebellion');
-    const SANS_CAMP_NOM = 'Sans camp';
+    const SANS_CAMP_NOM = 'Neutre';
     const SANS_CAMP_COULEUR = '#79747E';
 
     private MyPDO $bdd;
