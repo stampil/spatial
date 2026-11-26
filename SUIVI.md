@@ -22,6 +22,8 @@ Précision du 26/11 : « il fau sassurer que sa fasse pas un trait au defilement
 
 Ce que je comprends : je fais un outil de raccord (\`tools/raccorder-planete.py\`) qui fond la fin de l'image dans son début sur une bande, pour que le dernier pixel se prolonge naturellement dans le premier ; il tourne automatiquement à l'import de chaque nouvelle texture, et je vérifie ensuite par la mesure que la couture n'est plus plus marquée qu'entre deux colonnes voisines. Aucune texture ne sera importée sans raccord vérifié.
 
+Ajout du 26/11 : « rajoute une planete cité ville hyper industrialisé » : une 13e texture (`planete-39`) : une planète-ville entière, mégalopole industrielle continue (usines, cheminées, raffineries, réseaux, lumières orange, scories en fusion, brume de pollution), générée juste après les plaines de sel.
+
 ## Questions en suspens
 
 
