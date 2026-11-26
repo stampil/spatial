@@ -249,6 +249,16 @@ $(function(){
         majCreationFlotte($(this).closest('.panneau'));
     });
 
+    $(document).on('click', '[data-bascule]', function() {
+        var bloc = $(this).closest('[data-bloc]');
+        var panneau = bloc.children('[data-panneau="' + $(this).data('bascule') + '"]');
+        var ouvrir = panneau.prop('hidden');
+        bloc.children('[data-panneau]').prop('hidden', true);
+        bloc.find('[data-bascule]').attr('aria-expanded', 'false');
+        panneau.prop('hidden', !ouvrir);
+        $(this).attr('aria-expanded', ouvrir ? 'true' : 'false');
+    });
+
     $(document).on('input', '.curseur__piste', function() {
         $(this).siblings('.curseur__valeur').text(this.value);
     });

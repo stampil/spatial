@@ -2,8 +2,9 @@
 $infos = Vaisseau::CATALOGUE[$vaisseau->type];
 $embarques = Vaisseau::embarques((int) $vaisseau->id);
 $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHASSEUR => Vaisseau::CAPACITE_CHASSEURS);
+$peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPACITE_CHASSEURS] > 0;
 ?>
-<div class="vaisseau-nomme">
+<div class="vaisseau-nomme" data-bloc>
     <div class="ligne-jeu">
         <div class="ligne-jeu__info">
             <?php if($avecCase){ ?>
@@ -17,12 +18,25 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
                 <?php } ?>
             </div>
         </div>
-        <?php if($avecVoyage){ ?>
-        <?= Vue::lienAction('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager', 'hors-creation') ?>
-        <?php } ?>
+        <div class="actions-icones hors-creation">
+            <?php if($avecVoyage){ ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager') ?>
+            <?php } ?>
+            <?php if($peutEmbarquer){ ?>
+            <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal') ?>
+            <?php } ?>
+            <?php if(array_sum($embarques) > 0){ ?>
+            <form method="POST" action="?p=debarquer">
+                <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
+                <?= csrfField() ?>
+                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal') ?>
+            </form>
+            <?php } ?>
+            <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer', false, 'md3-button--tonal') ?>
+        </div>
     </div>
-    <details class="systeme-details hors-creation">
-        <summary>Embarquer</summary>
+    <?php if($peutEmbarquer){ ?>
+    <div class="panneau-action hors-creation" data-panneau="embarquer" hidden>
         <div class="systeme-details__corps">
             <?php foreach($capacites as $typeEmbarque => $cle){ if($infos[$cle] === 0){ continue; } $place = max(0, min($infos[$cle] - ($embarques[$typeEmbarque] ?? 0), $libres[$typeEmbarque] ?? 0)); ?>
             <form method="POST" action="?p=embarquer">
@@ -36,17 +50,10 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
                 </div>
             </form>
             <?php } ?>
-            <?php if(array_sum($embarques) > 0){ ?>
-            <form method="POST" action="?p=debarquer">
-                <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
-                <?= csrfField() ?>
-                <?= Vue::boutonAction('decharger', 'Débarquer', 'md3-button--outlined') ?>
-            </form>
-            <?php } ?>
         </div>
-    </details>
-    <details class="systeme-details hors-creation">
-        <summary>Renommer</summary>
+    </div>
+    <?php } ?>
+    <div class="panneau-action hors-creation" data-panneau="renommer" hidden>
         <form class="systeme-details__corps" method="POST" action="?p=renommerVaisseau">
             <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
             <?= csrfField() ?>
@@ -55,5 +62,5 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
                 <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
             </div>
         </form>
-    </details>
+    </div>
 </div>

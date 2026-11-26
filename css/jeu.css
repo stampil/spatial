@@ -931,6 +931,18 @@
     border-top: 0;
 }
 
+.actions-icones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions-icones--flotte {
+    margin: 8px 0;
+    gap: 12px;
+}
+
 .panneau__tete {
     display: flex;
     flex-wrap: wrap;

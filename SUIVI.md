@@ -2,18 +2,26 @@
 
 ## À faire
 
-### 1. Page Flottes : visuel refait avec des icônes d'action et images générées (26/11)
+### 1. Page Flottes : 3 images d'icônes d'action à régénérer (26/11)
 
-Ta phrase : « ameliore le visu d ela page flotte..  utilise le premier affichage des vaisseaux de la flotte pour leur attriubuer des petites icones d'acion ( edit pour renommé ,  et embarqué pareil voyagé, carte et dissoudre des icone ( en peu plus grosse puisque relatif a l aflotte et pas au vaisseau qui la compose, fait généré image ».
+Ta phrase d'origine : « ameliore le visu d ela page flotte.. utilise le premier affichage des vaisseaux de la flotte pour leur attriubuer des petites icones d'acion ( edit pour renommé , et embarqué pareil voyagé, carte et dissoudre des icone ( en peu plus grosse puisque relatif a l aflotte et pas au vaisseau qui la compose, fait généré image ».
 
-Lu (rien codé) : dans le panneau d'une flotte, les actions sont des boutons icône + mot (Voyager, Carte, Dissoudre), puis des panneaux dépliables « Renommer » (flotte) ; chaque vaisseau membre montre son sprite, son nom et ses capacités, puis deux blocs dépliables texte « Embarquer » et « Renommer » (et « Débarquer »). Les icônes d'action n'existent qu'en SVG de repli (voyager, dissoudre, renommer, embarquer, décharger, attaquer…), pas en images.
+Fait : page refaite, 9 images importées sur 12. Le script a refusé voyager, embarquer et laisser : un cadre clair ou blanc sur les bords, le fond n'est pas un magenta uni. Ces 3 boutons gardent l'icône SVG de repli en attendant. Reste : les régénérer en insistant sur le fond (même prompt, plus la phrase « the magenta background must fill the entire image to all four edges, no frame, no border, no margin, no white edge »), puis les importer.
 
-Ce que je comprends :
-- Chaque ligne de vaisseau membre (la première ligne visible : sprite, nom, capacités) reçoit à droite de petites icônes seules : crayon (renommer), embarquer, décharger (si des unités sont embarquées), voyager (hors flotte seulement). Un clic ouvre le même panneau (curseur, champ de nom) sous la ligne.
-- La ligne d'actions de la flotte (voyager, carte, dissoudre, renommer) passe en icônes seules plus grosses (48 px au lieu de 36 px), avec infobulle et nom accessible, plus de mot.
-- Les icônes sont générées par Gemini dans le style duotone des 24 précédentes, puis importées par moi : 12 prompts, un par un avec bouton « ok » : voyager, dissoudre, renommer, embarquer, décharger, chercher, reconnaître, attaquer, attaquer en flotte, débarquer (troupes), combattre, laisser. (« carte » existe déjà.) Les boutons déjà passés en « icône + mot » (combat, Flottes) gardent leur mot sauf sur la page Flottes.
+### 2. Tuto : afficher les icônes des actions demandées (26/11)
+
+Ta phrase : « ok dans le tuto tu affiche les icones relatives aux aciton demandé ».
+
+Lu (rien codé) : les textes des étapes du tuto (`inc/class/Tuto.class.php`) nomment encore les actions avec des mots (« Chercher » (la loupe), « Embarquer », « Combattre »…) alors que les boutons de la page Flottes sont maintenant des icônes seules. Ce que je comprends : dans chaque étape, chaque action citée s'affiche avec son icône en ligne, au même rendu que le bouton (loupe, crayon, missile…), pour qu'on reconnaisse le bouton à toucher.
+
+### 3. Vue mobile de tout ce chantier (26/11)
+
+Ta phrase : « gere la vue mobile aussi c important ».
+
+Lu : sur téléphone (375 px), les icônes de chaque vaisseau passent sous son nom, alignées à gauche, en 40 px, sous les 48 px recommandés pour un doigt. Ce que je comprends : la page Flottes (vaisseaux, flotte, groupes sans nom, panneaux embarquer et renommer) et les icônes du tuto doivent être conçus et vérifiés en 375 px, pas seulement sur ordinateur.
 
 ## Questions en suspens
 
-1. Sur la page Flottes, icônes seules (infobulle) pour tous les boutons d'action, ou icône + mot court pour la flotte (plus gros) et icône seule pour les vaisseaux ? Je propose : icône seule partout, 48 px pour la flotte, 36 px pour les vaisseaux.
-2. Les 12 icônes : OK pour le périmètre (toutes les actions des boutons déjà passés en icône) ?
+1. Tuto : icône + mot (« [loupe] Chercher ») ou icône seule dans le texte ? Je recommande icône + mot : on apprend le nom de l'action et on retrouve l'icône.
+2. Tuto : toutes les étapes qui citent une action (chercher, créer une flotte, embarquer, attaquer en flotte, débarquer, combattre…), pas seulement les nouvelles ? Je recommande toutes.
+3. Mobile : icônes des vaisseaux en 48 px sur écran tactile (la flotte reste en 56 px), sous le nom, avec un écart de 8 px ? Je recommande oui.

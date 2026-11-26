@@ -64,15 +64,16 @@ class Icone {
         'inscription' => '<circle cx="10" cy="8" r="4"/><path d="M3 20c0-4 3-6 7-6M18 8v6M15 11h6"/>',
     );
 
-    public static function html(string $nom): string {
+    public static function html(string $nom, ?int $taille = null): string {
         if(!isset(self::DESSINS[$nom])){
             throw new UnexpectedValueException("Icône inconnue : ".$nom);
         }
         $chemin = Vue::DOSSIER_IMAGES.'/'.self::DOSSIER_IMAGES.'/'.$nom.'.'.Vue::EXTENSION_OBJET;
         if(is_file($chemin)){
-            return '<span class="icone icone--image" style="width:'.self::VUE.'px;height:'.self::VUE.'px;-webkit-mask-image:url('.$chemin.');mask-image:url('.$chemin.')" aria-hidden="true"></span>';
+            return '<span class="icone icone--image" style="width:'.($taille ?? self::VUE).'px;height:'.($taille ?? self::VUE).'px;-webkit-mask-image:url('.$chemin.');mask-image:url('.$chemin.')" aria-hidden="true"></span>';
         }
-        return '<svg class="icone" width="'.self::VUE.'" height="'.self::VUE.'" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
+        $style = $taille === null ? '' : ' style="width:'.$taille.'px;height:'.$taille.'px"';
+        return '<svg class="icone"'.$style.' width="'.self::VUE.'" height="'.self::VUE.'" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
     }
 
 }

@@ -250,6 +250,19 @@ body {
     height: 20px;
 }
 
+.md3-button--icone {
+    --coupe: 8px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+}
+
+.md3-button--icone-flotte {
+    --coupe: 12px;
+    width: 56px;
+    height: 56px;
+}
+
 .md3-page .md3-button {
     color: var(--md-sys-color-on-primary);
     text-decoration: none;

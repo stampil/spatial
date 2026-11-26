@@ -44,27 +44,29 @@ foreach($flottes as $ligne){
     <?= Vue::composition($flotte->composition(), $Joueur->id_camp) ?>
     <?php if($auRepos !== null){ $planete = new Planete($auRepos); $libres = Vaisseau::stockLibre($planete->id, $Joueur->id); ?>
     <p>Au repos sur <?= $planete->getNom() ?></p>
-    <div class="md3-actions">
-        <?= Vue::lienAction('?p=carte&ordre='.$planete->id.'&flotte='.$flotte->id, 'voyager', 'Voyager') ?>
-        <?= Vue::lienAction('?p=carte&systeme='.$planete->id_systeme, 'carte', 'Carte', 'md3-button--tonal') ?>
-        <form method="POST" action="?p=gererFlotte">
-            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
-            <input type="hidden" name="action" value="dissoudre" />
-            <?= csrfField() ?>
-            <?= Vue::boutonAction('dissoudre', 'Dissoudre', 'md3-button--outlined') ?>
-        </form>
+    <div data-bloc>
+        <div class="actions-icones actions-icones--flotte">
+            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&flotte='.$flotte->id, 'voyager', 'Voyager', true) ?>
+            <?= Vue::lienIcone('?p=carte&systeme='.$planete->id_systeme, 'carte', 'Carte', true, 'md3-button--tonal') ?>
+            <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer la flotte', true, 'md3-button--tonal') ?>
+            <form method="POST" action="?p=gererFlotte">
+                <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+                <input type="hidden" name="action" value="dissoudre" />
+                <?= csrfField() ?>
+                <?= Vue::boutonIcone('dissoudre', 'Dissoudre la flotte', true, 'md3-button--tonal') ?>
+            </form>
+        </div>
+        <div class="panneau-action" data-panneau="renommer" hidden>
+            <form class="systeme-details__corps" method="POST" action="?p=renommerFlotte">
+                <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+                <?= csrfField() ?>
+                <div class="ligne-jeu">
+                    <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($flotte->nom) ?>" required aria-label="Nom de la flotte" />
+                    <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
+                </div>
+            </form>
+        </div>
     </div>
-    <details class="systeme-details">
-        <summary>Renommer</summary>
-        <form class="systeme-details__corps" method="POST" action="?p=renommerFlotte">
-            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
-            <?= csrfField() ?>
-            <div class="ligne-jeu">
-                <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($flotte->nom) ?>" required aria-label="Nom de la flotte" />
-                <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
-            </div>
-        </form>
-    </details>
     <?php foreach($flotte->vaisseaux() as $vaisseau){ $avecVoyage = false; $avecCase = false; require 'inc/vaisseauNomme.php'; } ?>
     <?php } elseif($trajet !== null){ ?>
     <?php $destination = new Planete($trajet->id_destination); ?>
@@ -117,18 +119,18 @@ foreach(array_keys($posees) as $planeteId){
     <?php foreach($types as $type => $nombre){ if(Vaisseau::estNomme($type) || $type === Vaisseau::TROUPE){ continue; } ?>
     <div class="ligne-jeu hors-creation">
         <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type]['nom'] ?> × <?= $nombre ?></span>
-        <div class="md3-actions">
+        <div class="actions-icones">
             <?php if($type === Vaisseau::RECONNAISSANCE){ ?>
             <form method="POST" action="?p=deplacer">
                 <input type="hidden" name="depart" value="<?= $planete->id ?>" />
                 <input type="hidden" name="destination" value="<?= Vaisseau::DESTINATION_EXPLORATION ?>" />
                 <input type="hidden" name="nombre[<?= Vaisseau::RECONNAISSANCE ?>]" value="1" />
                 <?= csrfField() ?>
-                <?= Vue::boutonAction('chercher', 'Chercher', 'md3-button--tonal') ?>
+                <?= Vue::boutonIcone('chercher', 'Chercher', false, 'md3-button--tonal') ?>
             </form>
-            <?= Vue::lienAction('?p=carte&ordre='.$planete->id.'&type='.$type, 'reconnaitre', 'Reconnaître') ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&type='.$type, 'reconnaitre', 'Reconnaître') ?>
             <?php } else { ?>
-            <?= Vue::lienAction('?p=carte&ordre='.$planete->id.'&type='.$type, 'voyager', 'Voyager') ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&type='.$type, 'voyager', 'Voyager') ?>
             <?php } ?>
         </div>
     </div>
