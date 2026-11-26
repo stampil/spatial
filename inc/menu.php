@@ -2,9 +2,6 @@
 if(isset($Joueur)){
     $homePage = HOME_PAGE;
     $menuPages = MENU_PLAYER;
-    if($Joueur->etape_tuto == 0){
-        $menuPages = array();
-    }
 }
 else{
     $homePage = GUEST_HOME_PAGE;
@@ -29,7 +26,7 @@ $navClasse = isset($Joueur) ? ' md3-top-app-bar__nav--large' : '';
         <?php foreach($menuPages as $page => $label){ ?>
         <a class="md3-nav-link<?= $page === $activePage ? ' md3-nav-link--active' : '' ?>" href="?p=<?= $page ?>"<?= $page === $activePage ? ' aria-current="page"' : '' ?>><?= $label ?></a>
         <?php } ?>
-        <?php if(isset($Joueur) && count($menuPages) > 0){ echo Vue::boutonReset(); } ?>
+        <?php if(isset($Joueur)){ echo Vue::boutonReset(); } ?>
         <?php if(isset($Joueur)){ ?>
         <a class="md3-nav-link" href="?p=<?= LOGOUT_PAGE ?>"><?= LOGOUT_LABEL ?></a>
         <?php } ?>
@@ -42,14 +39,14 @@ $navClasse = isset($Joueur) ? ' md3-top-app-bar__nav--large' : '';
                 <?php foreach(array_diff_key($menuPages, MENU_BAS) as $page => $label){ ?>
                 <a href="?p=<?= $page ?>"><?= $label ?></a>
                 <?php } ?>
-                <?php if(count($menuPages) > 0){ echo Vue::boutonReset(); } ?>
+                <?php echo Vue::boutonReset(); ?>
                 <a href="?p=<?= LOGOUT_PAGE ?>"><?= LOGOUT_LABEL ?></a>
             </div>
         </details>
     </div>
     <?php } ?>
 </header>
-<?php if(isset($Joueur) && count($menuPages) > 0){ ?>
+<?php if(isset($Joueur)){ ?>
 <nav class="md3-navigation-bar" aria-label="Navigation principale">
     <?php foreach(MENU_BAS as $page => $icone){ ?>
     <a class="md3-navigation-bar__item<?= $page === $activePage ? ' md3-navigation-bar__item--active' : '' ?>" href="?p=<?= $page ?>"<?= $page === $activePage ? ' aria-current="page"' : '' ?>>

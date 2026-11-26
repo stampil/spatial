@@ -76,7 +76,7 @@ if(!empty($_SESSION['Sid'])){
         <?php } ?>
         <title><?= htmlspecialchars(APP_TITLE.(isset(PAGES_TITRES[$p]) ? ' · '.PAGES_TITRES[$p] : '')) ?></title>
     </head>
-    <body<?= isset($Joueur) && $Joueur->etape_tuto != 0 ? ' class="md3-avec-barre"' : '' ?>>
+    <body<?= isset($Joueur) ? ' class="md3-avec-barre"' : '' ?>>
     <?php
     require 'inc/menu.php';
     echo '<div class="sante-bandeau" id="sante-bandeau" role="alert" hidden></div>';
