@@ -26,7 +26,7 @@ Lu dans le code (rien codé) :
 - Mon code ne renvoie jamais de statut 404 : pas de `http_response_code(404)`, pas de `.htaccess`. Une page inconnue répond 200 avec le texte « 404 - Page … non trouvée ».
 - Donc le 404 vient de l'hébergeur (ou d'une autre adresse que celle que je crois), pas de mon PHP. Je ne sais pas encore si c'est le POST ou le rafraîchissement qui suit : le message actuel ne donne pas l'adresse.
 
-Proposition (rien codé) : le message indique aussi l'adresse en échec (ex. « erreur HTTP 404 sur ?p=faireDiplomatie »), pour trancher POST ou rafraîchissement à la prochaine occurrence.
+Codé (à valider, non publié) : `js/main.js`, le message d'erreur indique l'adresse en échec, ex. « erreur HTTP 404 sur /?p=faireDiplomatie » ou « échec réseau sur /?p=… ». À la prochaine occurrence, le message dit si c'est le POST ou le rafraîchissement.
 
 ## Questions en suspens
 

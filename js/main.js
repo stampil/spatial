@@ -43,13 +43,19 @@ window.Occupation = (function() {
 window.Requete = (function() {
     var CAUSE_RESEAU = 'échec réseau';
     var CAUSE_STATUT = 'erreur HTTP ';
+    var SEPARATEUR_ADRESSE = ' sur ';
+
+    function adresseCourte(adresse) {
+        var url = new URL(adresse, location.href);
+        return url.pathname + url.search;
+    }
 
     function demander(adresse, options) {
         return fetch(adresse, options).catch(function() {
-            throw new Error(CAUSE_RESEAU);
+            throw new Error(CAUSE_RESEAU + SEPARATEUR_ADRESSE + adresseCourte(adresse));
         }).then(function(reponse) {
             if (!reponse.ok) {
-                throw new Error(CAUSE_STATUT + reponse.status);
+                throw new Error(CAUSE_STATUT + reponse.status + SEPARATEUR_ADRESSE + adresseCourte(reponse.url));
             }
             return reponse;
         });
