@@ -371,6 +371,14 @@ class Planete {
         $this->bdd->query($query,$points,$this->id);
     }
 
+    public function estOccupee(): bool {
+        if($this->troupes > 0){
+            return true;
+        }
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL";
+        return (int) $this->bdd->query($query,$this->gouverneur,$this->id,Vaisseau::TROUPE)[0]->nombre > 0;
+    }
+
     public function updateRevolte(): void {
         if($this->gouverneur === 0){
             return;
@@ -385,8 +393,10 @@ class Planete {
         if($heures < 1){
             return;
         }
-        $revolteMax = $this->troupes > 0 ? self::MAX_REVOLTE - 1 : self::MAX_REVOLTE;
-        $revolte = min($this->perc_revolte + $heures * self::REVOLTE_PER_HOUR, $revolteMax);
+        $revolte = $this->perc_revolte;
+        if(!$this->estOccupee()){
+            $revolte = min($revolte + $heures * self::REVOLTE_PER_HOUR, self::MAX_REVOLTE);
+        }
         $nouvelleMaj = Tools::formatDate($depuis + $heures * self::SECONDS_PER_HOUR);
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=?, revolte_maj=? WHERE id=? AND revolte_maj=?";
         $this->bdd->query($query,$revolte,$nouvelleMaj,$this->id,$this->revolte_maj);
