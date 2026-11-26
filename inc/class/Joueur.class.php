@@ -19,7 +19,7 @@ class Joueur {
 
     public string $IPs;
     
-    const TUTO_END_STEP = 10;
+    const TUTO_END_STEP = 14;
     const TUTO_DIVISEUR_DUREES = 5;
     const JETON_OCTETS = 32;
     const JETON_DUREE_SECONDES = 90 * 24 * 3600;

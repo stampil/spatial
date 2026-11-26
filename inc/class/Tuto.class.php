@@ -10,6 +10,12 @@ class Tuto {
     const ETAPE_ENVOI = 7;
     const ETAPE_ASSAUT = 8;
     const ETAPE_ASSASSIN = 9;
+    const ETAPE_HEROS = 10;
+    const ETAPE_BONUS = 11;
+    const ETAPE_DEMOLITION = 12;
+    const ETAPE_MENACE = 13;
+    const ETAPES_A_VALIDER = array(self::ETAPE_BONUS, self::ETAPE_DEMOLITION);
+    const PRIME_HEROS = 350;
     const PRIME_CREDITS = 800;
     const PRIME_ASSASSIN = 250;
     const CHASSEURS_REQUIS = 3;
@@ -22,12 +28,35 @@ class Tuto {
             Univers::creerVoisin($joueur, $idPlanete === null ? null : (new Planete($idPlanete))->systeme);
         }
         while($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && self::objectifAtteint($joueur)){
-            $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET etape_tuto=etape_tuto+1 WHERE id=? AND etape_tuto=?";
-            MyPDO::getInstance()->query($query,$joueur->id,$joueur->etape_tuto);
-            if(MyPDO::getInstance()->lastRowCount === 1){
-                self::entrerDansEtape($joueur, $joueur->etape_tuto + 1);
-            }
-            $joueur->load($joueur->id);
+            self::passerALEtapeSuivante($joueur);
+        }
+    }
+
+    public static function valider(Joueur $joueur): void {
+        if($joueur->enTuto() && in_array($joueur->etape_tuto, self::ETAPES_A_VALIDER, true)){
+            self::passerALEtapeSuivante($joueur);
+            self::avancer($joueur);
+        }
+    }
+
+    private static function passerALEtapeSuivante(Joueur $joueur): void {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET etape_tuto=etape_tuto+1 WHERE id=? AND etape_tuto=?";
+        MyPDO::getInstance()->query($query,$joueur->id,$joueur->etape_tuto);
+        if(MyPDO::getInstance()->lastRowCount === 1){
+            self::entrerDansEtape($joueur, $joueur->etape_tuto + 1);
+        }
+        $joueur->load($joueur->id);
+    }
+
+    private static function lancerMenace(Joueur $joueur): void {
+        $idPlanete = Planete::premiereGouvernee($joueur->id);
+        if($idPlanete === null){
+            return;
+        }
+        $planete = new Planete($idPlanete);
+        $source = Ia::sourceLaPlusProche($joueur, $planete, array(Camp::PIRATES));
+        if($source !== null){
+            Menace::creer($joueur, $planete, $source);
         }
     }
 
@@ -36,13 +65,20 @@ class Tuto {
             $joueur->crediter(self::PRIME_CREDITS);
             Tools::addMessage('Tutoriel : étape réussie, prime de '.self::PRIME_CREDITS.' crédits pour préparer l\'assaut.');
         }
+        elseif($etape === self::ETAPE_HEROS){
+            $joueur->crediter(self::PRIME_HEROS);
+            Tools::addMessage('Tutoriel : prime de '.self::PRIME_HEROS.' crédits pour recruter un héros.');
+        }
+        elseif($etape === self::ETAPE_MENACE){
+            self::lancerMenace($joueur);
+        }
         elseif($etape === self::ETAPE_ASSASSIN){
             $joueur->crediter(self::PRIME_ASSASSIN);
             Tools::addMessage('Tutoriel : planète capturée, prime de '.self::PRIME_ASSASSIN.' crédits pour recruter un assassin.');
         }
         elseif($etape === Joueur::TUTO_END_STEP){
             MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET fin_tuto=? WHERE id=?",Tools::now(),$joueur->id);
-            Tools::addMessage('Tutoriel terminé : planète des Pirates capturée, assassin recruté.');
+            Tools::addMessage('Tutoriel terminé : vous avez appris toutes les mécaniques du jeu.');
         }
         else{
             Tools::addMessage('Tutoriel : étape réussie.');
@@ -64,8 +100,11 @@ class Tuto {
                 $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "flotte WHERE id_joueur=?";
                 return $db->query($query,$joueur->id)[0]->nombre > 0;
             case self::ETAPE_ASSASSIN:
-                $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND role=?";
-                return $db->query($query,$joueur->id,Perso::ROLE_ASSASSIN)[0]->nombre > 0;
+                return self::possedePerso($joueur, Perso::ROLE_ASSASSIN);
+            case self::ETAPE_HEROS:
+                return self::possedePerso($joueur, Perso::ROLE_HEROS);
+            case self::ETAPE_MENACE:
+                return Menace::enCours($joueur->id) === null;
             case self::ETAPE_PREPARATION:
                 $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? GROUP BY type";
                 return self::atteint($db->query($query,$joueur->id), self::requis());
@@ -76,6 +115,11 @@ class Tuto {
                 return self::planeteCible($joueur)->gouverneur === $joueur->id;
         }
         return false;
+    }
+
+    private static function possedePerso(Joueur $joueur, string $role): bool {
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND role=?";
+        return MyPDO::getInstance()->query($query,$joueur->id,$role)[0]->nombre > 0;
     }
 
     private static function requis(): array {
@@ -118,6 +162,14 @@ class Tuto {
                 return 'Prendre et tenir la planète pirate';
             case self::ETAPE_ASSASSIN:
                 return 'Recruter un assassin';
+            case self::ETAPE_HEROS:
+                return 'Recruter un héros';
+            case self::ETAPE_BONUS:
+                return 'Les bonus de planète';
+            case self::ETAPE_DEMOLITION:
+                return 'Démolir un bâtiment';
+            case self::ETAPE_MENACE:
+                return 'Répondre à une menace pirate';
         }
         return '';
     }
@@ -144,9 +196,25 @@ class Tuto {
             case self::ETAPE_ASSAUT:
                 return 'Votre flotte est arrivée. Ouvrez la fiche de '.self::planeteCible($joueur)->getNom().' : attaquez avec vos vaisseaux pour détruire sa défense, puis débarquez vos troupes. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
             case self::ETAPE_ASSASSIN:
-                return 'Planète capturée et tenue. Dernière mécanique : l\'assassinat. Recrutez un assassin à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_ASSASSIN]['prix'].' cr) : il peut éliminer un perso adverse présent sur la même planète (chance de base '.Perso::ASSASSINAT_BASE_PERCENT.' %, '.Perso::ASSASSINAT_PER_STAR_PERCENT.' % par étoile d\'écart entre sa force et l\'endurance de la cible). Les diplomates annexent les planètes pacifiquement, les héros renforcent la planète où ils se trouvent.';
+                return 'Planète capturée et tenue. Recrutez un assassin à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_ASSASSIN]['prix'].' cr) : il peut éliminer un perso adverse présent sur la même planète (chance de base '.Perso::ASSASSINAT_BASE_PERCENT.' %, '.Perso::ASSASSINAT_PER_STAR_PERCENT.' % par étoile d\'écart entre sa force et l\'endurance de la cible).';
+            case self::ETAPE_HEROS:
+                return 'Recrutez maintenant un héros à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_HEROS]['prix'].' cr). Présent sur une planète, il ajoute '.Perso::HEROS_SUCCESS_PER_STAR_PERCENT.' % de chances de réussite par étoile de diplomatie aux diplomates qui s\'y trouvent, et '.Combat::HEROS_BONUS_PAR_ETOILE_POURCENT.' % de défense par étoile de force face aux menaces pirates.';
+            case self::ETAPE_BONUS:
+                return 'Certaines planètes portent un bonus, visible sur leur fiche, qui profite à leur gouverneur : '.self::texteBonus().' Quand vous avez compris, validez.';
+            case self::ETAPE_DEMOLITION:
+                return 'Sur la fiche d\'une de vos planètes, « Démolir » supprime un bâtiment et rembourse '.Batiment::REFUND_PERCENT.' % de son prix : l\'emplacement redevient libre. C\'est impossible tant qu\'une production occupe toutes les usines de ce type. Quand vous avez compris, validez.';
+            case self::ETAPE_MENACE:
+                return 'Une flotte pirate menace '.$planete->getNom().'. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : « Combattre » l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; « Laisser faire » laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour terminer le tutoriel.';
         }
         return '';
+    }
+
+    private static function texteBonus(): string {
+        $bonus = array();
+        foreach(array_keys(Bonus::CATALOGUE) as $cle){
+            array_push($bonus, Bonus::libelle($cle).' ('.Bonus::description($cle).')');
+        }
+        return implode(' ; ', $bonus).'.';
     }
 
     public static function texteIcones(): string {

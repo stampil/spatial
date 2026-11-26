@@ -83,14 +83,14 @@ class Ia {
         ));
     }
 
-    private static function sourceLaPlusProche(Joueur $joueur, Planete $cible): ?object {
-        $marques = implode(',', array_fill(0, count(self::CAMPS_RAIDEURS), '?'));
+    public static function sourceLaPlusProche(Joueur $joueur, Planete $cible, array $camps = self::CAMPS_RAIDEURS): ?object {
+        $marques = implode(',', array_fill(0, count($camps), '?'));
         $query = "SELECT p.id, p.nom, p.slot, p.id_camp FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "systeme s ON s.id=p.id_systeme
             WHERE p.gouverneur=0 AND p.id_camp IN ($marques) AND p.id_camp<>? AND p.bouclier+p.canon>0
             ORDER BY (s.x-?)*(s.x-?)+(s.y-?)*(s.y-?), p.id LIMIT 1";
         $x = $cible->systeme->x;
         $y = $cible->systeme->y;
-        $ret = MyPDO::getInstance()->query($query,...array_merge(self::CAMPS_RAIDEURS, array($joueur->id_camp, $x, $x, $y, $y)));
+        $ret = MyPDO::getInstance()->query($query,...array_merge($camps, array($joueur->id_camp, $x, $x, $y, $y)));
         return $ret[0] ?? null;
     }
 
