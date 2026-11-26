@@ -162,7 +162,10 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('020_flotte_numero'),
 ('021_flotte_ia'),
 ('022_tuto_restrictor'),
-('023_gouverneurs_structures_analyse');
+('023_gouverneurs_structures_analyse'),
+('024_perso_demi_etoiles');
+
+UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

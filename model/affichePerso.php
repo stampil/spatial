@@ -21,7 +21,7 @@ if($Joueur->etape_tuto==1){
     <?php } else { ?>
     <p class="mission__texte"><strong>La diplomatie est en cours :</strong> attendez la fin du compte à rebours dans la section Statut, la page se met à jour toute seule.</p>
     <?php } ?>
-    <p class="mission__texte">Les caractéristiques de votre perso : il a <?= $o->diplomatie ?>/<?= Perso::MAX_STARS ?> étoile<?= $o->diplomatie > 1 ? 's' : '' ?> en diplomatie. Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions. Dans ce tuto, nous n'irons pas dans ces extrêmes. Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra.</p>
+    <p class="mission__texte">Les caractéristiques de votre perso : il a <?= Perso::etoilesTexte($o->diplomatie) ?>/<?= Perso::MAX_STARS ?> <?= __('etoile', 'etoiles', intdiv($o->diplomatie + Perso::DEMIS_PAR_ETOILE - 1, Perso::DEMIS_PAR_ETOILE)) ?> en diplomatie. Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions. Dans ce tuto, nous n'irons pas dans ces extrêmes. Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra.</p>
 </details>
 <?php   
 }

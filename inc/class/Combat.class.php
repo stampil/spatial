@@ -38,7 +38,7 @@ class Combat {
             return "Cette planète n'a plus de défense.";
         }
 
-        $bonusHeros = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE) * self::HEROS_BONUS_PAR_ETOILE_POURCENT;
+        $bonusHeros = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE, self::HEROS_BONUS_PAR_ETOILE_POURCENT);
         $resistance = $planete->bonus === Bonus::CITADELLE ? Bonus::pourcent(Bonus::CITADELLE) : 0;
         $pertesBataille = array_fill_keys(self::ESCADRE, 0);
         $bilanBataille = '';
@@ -122,7 +122,7 @@ class Combat {
     }
 
     private static function bataillePlanete(Joueur $joueur, Planete $planete, array $nombres, array $defenseurs, string $titre): array {
-        $bonusHeros = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE) * self::HEROS_BONUS_PAR_ETOILE_POURCENT;
+        $bonusHeros = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE, self::HEROS_BONUS_PAR_ETOILE_POURCENT);
         $bataille = self::bataille($titre, array(
             self::ATTAQUANT => array('nom' => $joueur->nom, 'nombres' => $nombres, 'bonus' => $bonusHeros, 'fuite' => $planete->refugePour($joueur) !== null),
             self::DEFENSEUR => array('nom' => self::nomDefenseur($planete), 'nombres' => $defenseurs, 'bonus' => self::bonusDefenseur($planete), 'fuite' => $planete->gouverneur === 0 && $planete->refugeIA() !== null),

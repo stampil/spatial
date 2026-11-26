@@ -359,6 +359,11 @@
     stroke: var(--md-sys-color-primary);
 }
 
+.etoile__moitie {
+    fill: var(--md-sys-color-primary);
+    stroke: none;
+}
+
 @media (min-width: 600px) {
     .jauge {
         max-width: 360px;

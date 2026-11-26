@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `perso` (
 --
 
 INSERT INTO `perso` (`id`, `id_joueur`, `nom`, `PV`, `FO`, `diplomatie`, `sur_planete`, `fin_diplomatie`, `fin_voyage_planetaire`, `creato`) VALUES
-(5, 3, 'Vartus', 1, 5, 4, 36, '2022-12-19 10:34:07', NULL, '2022-12-19 10:21:18');
+(5, 3, 'Vartus', 2, 10, 8, 36, '2022-12-19 10:34:07', NULL, '2022-12-19 10:21:18');
 
 -- --------------------------------------------------------
 
@@ -311,7 +311,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('020_flotte_numero'),
 ('021_flotte_ia'),
 ('022_tuto_restrictor'),
-('023_gouverneurs_structures_analyse');
+('023_gouverneurs_structures_analyse'),
+('024_perso_demi_etoiles');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

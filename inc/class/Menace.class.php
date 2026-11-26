@@ -82,7 +82,7 @@ class Menace {
     }
 
     public static function bonusDefense(Joueur $joueur, Planete $planete): int {
-        $bonus = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE) * Combat::HEROS_BONUS_PAR_ETOILE_POURCENT;
+        $bonus = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE, Combat::HEROS_BONUS_PAR_ETOILE_POURCENT);
         if($planete->bonus === Bonus::CITADELLE){
             $bonus += Bonus::pourcent(Bonus::CITADELLE);
         }

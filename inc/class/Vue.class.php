@@ -11,6 +11,7 @@ class Vue {
     const ICONE_TEXTE_TAILLE = 20;
     const ETOILE_VUE = 24;
     const ETOILE_DESSIN = 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z';
+    const ETOILE_MOITIE_DESSIN = 'M12 3L9.4 8.6 3.3 9.3 7.8 13.5 6.6 19.5 12 16.5z';
     const DOSSIER_IMAGES = 'img';
     const EXTENSION_OBJET = 'png';
     const EXTENSION_FOND = 'jpg';
@@ -111,12 +112,15 @@ class Vue {
             .'</div>';
     }
 
-    public static function etoiles(string $nom, int $valeur, int $maximum, string $icone): string {
+    public static function etoiles(string $nom, int $demiEtoiles, int $maximum, string $icone): string {
         $rangee = '';
         for($rang = 1; $rang <= $maximum; $rang++){
-            $rangee .= '<svg class="etoile'.($rang <= $valeur ? ' etoile--pleine' : '').'" width="'.self::ETOILE_VUE.'" height="'.self::ETOILE_VUE.'" viewBox="0 0 '.self::ETOILE_VUE.' '.self::ETOILE_VUE.'" aria-hidden="true"><path d="'.self::ETOILE_DESSIN.'"/></svg>';
+            $demisDuRang = $rang * Perso::DEMIS_PAR_ETOILE;
+            $classe = $demiEtoiles >= $demisDuRang ? ' etoile--pleine' : '';
+            $moitie = $demiEtoiles === $demisDuRang - 1 ? '<path class="etoile__moitie" d="'.self::ETOILE_MOITIE_DESSIN.'"/>' : '';
+            $rangee .= '<svg class="etoile'.$classe.'" width="'.self::ETOILE_VUE.'" height="'.self::ETOILE_VUE.'" viewBox="0 0 '.self::ETOILE_VUE.' '.self::ETOILE_VUE.'" aria-hidden="true"><path d="'.self::ETOILE_DESSIN.'"/>'.$moitie.'</svg>';
         }
-        return '<div class="etoiles" role="img" aria-label="'.htmlspecialchars($nom).' : '.$valeur.' / '.$maximum.'">'
+        return '<div class="etoiles" role="img" aria-label="'.htmlspecialchars($nom).' : '.Perso::etoilesTexte($demiEtoiles).' / '.$maximum.'">'
             .'<span class="jauge__nom">'.Icone::html($icone).' '.htmlspecialchars($nom).'</span>'
             .'<span class="etoiles__rangee">'.$rangee.'</span>'
             .'</div>';
