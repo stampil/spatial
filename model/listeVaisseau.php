@@ -44,7 +44,16 @@ foreach($flottes as $ligne){
     <?= Vue::composition($flotte->composition(), $Joueur->id_camp) ?>
     <?php if($auRepos !== null){ $planete = new Planete($auRepos); $libres = Vaisseau::stockLibre($planete->id, $Joueur->id); ?>
     <p>Au repos sur <?= $planete->getNom() ?></p>
-    <?php foreach($flotte->vaisseaux() as $vaisseau){ $avecVoyage = false; $avecCase = false; require 'inc/vaisseauNomme.php'; } ?>
+    <div class="md3-actions">
+        <a class="md3-button" href="?p=carte&ordre=<?= $planete->id ?>&flotte=<?= $flotte->id ?>">Voyager</a>
+        <a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a>
+        <form method="POST" action="?p=gererFlotte">
+            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+            <input type="hidden" name="action" value="dissoudre" />
+            <?= csrfField() ?>
+            <input type="submit" class="md3-button md3-button--outlined" value="Dissoudre" />
+        </form>
+    </div>
     <details class="systeme-details">
         <summary>Renommer</summary>
         <form class="systeme-details__corps" method="POST" action="?p=renommerFlotte">
@@ -56,16 +65,7 @@ foreach($flottes as $ligne){
             </div>
         </form>
     </details>
-    <div class="md3-actions">
-        <a class="md3-button" href="?p=carte&ordre=<?= $planete->id ?>&flotte=<?= $flotte->id ?>">Voyager</a>
-        <a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a>
-        <form method="POST" action="?p=gererFlotte">
-            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
-            <input type="hidden" name="action" value="dissoudre" />
-            <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--outlined" value="Dissoudre" />
-        </form>
-    </div>
+    <?php foreach($flotte->vaisseaux() as $vaisseau){ $avecVoyage = false; $avecCase = false; require 'inc/vaisseauNomme.php'; } ?>
     <?php } elseif($trajet !== null){ ?>
     <?php $destination = new Planete($trajet->id_destination); ?>
     <p class="md3-secondary">De <?= (new Planete($trajet->id_planete))->getNom() ?> vers <?= $destination->systeme->estConnuDe($Joueur->id) ? $destination->getNom() : 'un secteur inconnu' ?></p>
