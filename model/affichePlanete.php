@@ -102,7 +102,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <?= Vue::boutonAction('attaque', 'Attaquer') ?>
+            <?= Vue::boutonIcone('attaque', 'Attaquer') ?>
             <span class="md3-secondary"><?= $escadre ?> <?= __('vaisseau', 'vaisseaux', $escadre) ?></span>
         </form>
     <?php } ?>
@@ -112,7 +112,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="flotte" value="<?= $presente['flotte']->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <?= Vue::boutonAction('attaque_flotte', 'Attaquer', 'md3-button--tonal') ?>
+            <?= Vue::boutonIcone('attaque_flotte', 'Attaquer avec la flotte', false, 'md3-button--tonal') ?>
             <span class="md3-secondary"><?= htmlspecialchars($presente['flotte']->nom) ?> · <?= $presente['engages'] ?> <?= __('vaisseau', 'vaisseaux', $presente['engages']) ?></span>
         </form>
     <?php } ?>
@@ -121,7 +121,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="debarquer" />
             <?= csrfField() ?>
-            <?= Vue::boutonAction('debarquement', 'Débarquer') ?>
+            <?= Vue::boutonIcone('debarquement', 'Débarquer') ?>
             <span class="md3-secondary"><?= $troupes ?> <?= __('troupe', 'troupes', $troupes) ?></span>
         </form>
     <?php } ?>

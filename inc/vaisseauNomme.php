@@ -46,7 +46,7 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
                 <div class="ligne-jeu">
                     <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
                     <?= Vue::curseur('nombre', min(1, $place), $place, min(1, $place), 'Nombre à embarquer sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
-                    <?= Vue::boutonAction('embarquer', 'Embarquer', 'md3-button--tonal', $place === 0 ? ' disabled' : '') ?>
+                    <?= Vue::boutonIcone('embarquer', 'Embarquer', false, 'md3-button--tonal', $place === 0 ? ' disabled' : '') ?>
                 </div>
             </form>
             <?php } ?>
@@ -59,7 +59,7 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
             <?= csrfField() ?>
             <div class="ligne-jeu">
                 <input type="text" class="md3-text" name="nom" maxlength="<?= Vaisseau::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($vaisseau->nom) ?>" required aria-label="Nom du vaisseau" />
-                <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
+                <?= Vue::boutonIcone('valider', 'Renommer', false, 'md3-button--tonal') ?>
             </div>
         </form>
     </div>

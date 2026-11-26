@@ -109,7 +109,7 @@ Aucune cible sur <?= $planete->getNom() ?>.
 <form class="action" method="POST" action="?p=assassinerGouverneur">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <?= csrfField() ?>
-    <?= Vue::boutonAction('assassin', 'Assassiner') ?>
+    <?= Vue::boutonIcone('assassin', 'Assassiner') ?>
     <span class="md3-secondary">Gouverneur de <?= htmlspecialchars($lieu->nom) ?> (<?= $lieu->pnj_endurance ?> <?= __('etoile', 'etoiles', $lieu->pnj_endurance) ?>) · réussite <?= $o->chanceAssassinatGouverneur($lieu) ?> %, orbite gardée : −<?= $lieu->penaliteOrbite() ?> %</span>
 </form>
 <?php
@@ -120,7 +120,7 @@ Aucune cible sur <?= $planete->getNom() ?>.
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="batiment" value="<?= $batiment ?>" />
     <?= csrfField() ?>
-    <?= Vue::boutonAction('saboter', 'Saboter') ?>
+    <?= Vue::boutonIcone('saboter', 'Saboter') ?>
     <span class="md3-secondary"><?= htmlspecialchars($libelleBatiment) ?> · réussite <?= $o->chanceSabotage($lieu) ?> %</span>
 </form>
 <?php
@@ -128,32 +128,35 @@ Aucune cible sur <?= $planete->getNom() ?>.
         foreach($cibles as $ligneCible){
             $cible = new Perso($ligneCible->id);
 ?>
-<form method="POST" action="?p=assassiner">
+<form class="action" method="POST" action="?p=assassiner">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="cible" value="<?= $cible->id ?>" />
     <?= csrfField() ?>
-    <input type="submit" value="Assassiner" /> <?= $cible->getNom() ?> de <?= htmlspecialchars($cible->joueur->nom) ?> (chance de réussite <?= $o->chanceAssassinat($cible) ?> %, en cas d'échec : prison ou mort)
+    <?= Vue::boutonIcone('assassin', 'Assassiner') ?>
+    <span class="md3-secondary"><?= $cible->getNom() ?> de <?= htmlspecialchars($cible->joueur->nom) ?> (chance de réussite <?= $o->chanceAssassinat($cible) ?> %, en cas d'échec : prison ou mort)</span>
 </form>
 <?php
         }
     }
     elseif($planete->gouverneur === 0){
 ?>
-<form method="POST" action="?p=faireDiplomatie">
+<form class="action" method="POST" action="?p=faireDiplomatie">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="<?= Perso::ACTION_CONQUETE ?>" />
     <?= csrfField() ?>
-    <input type="submit" value="Faire de la diplomatie" /> sur <?= $planete->getNom() ?> (durée <?= gmdate('i:s', $o->dureeDiplomatie()) ?>, chance de réussite <?= $o->chanceDeSucces($Joueur) ?> %)
+    <?= Vue::boutonIcone('negocier', 'Faire de la diplomatie') ?>
+    <span class="md3-secondary">sur <?= $planete->getNom() ?></span>
 </form>
 <?php
     }
     elseif($planete->gouverneur === $Joueur->id && $planete->perc_revolte > 0){
 ?>
-<form method="POST" action="?p=faireDiplomatie">
+<form class="action" method="POST" action="?p=faireDiplomatie">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="<?= Perso::ACTION_APAISER ?>" />
     <?= csrfField() ?>
-    <input type="submit" class="md3-button md3-button--tonal" value="Apaiser la révolte" /> sur <?= $planete->getNom() ?> (durée <?= gmdate('i:s', $o->dureeDiplomatie()) ?>)
+    <?= Vue::boutonIcone('apaiser', 'Apaiser la révolte', false, 'md3-button--tonal') ?>
+    <span class="md3-secondary">sur <?= $planete->getNom() ?></span>
 </form>
 <?php
     }
@@ -164,11 +167,12 @@ Aucune action possible sur <?= $planete->getNom() ?>.
     }
     if(Perso::placesLibres($Joueur, $planete) > 0){
 ?>
-<form method="POST" action="?p=embarquerPerso">
+<form class="action" method="POST" action="?p=embarquerPerso">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="embarquer" />
     <?= csrfField() ?>
-    <input type="submit" class="md3-button md3-button--tonal" value="Monter dans un transport" /> sur <?= $planete->getNom() ?>
+    <?= Vue::boutonIcone('embarquer', 'Monter dans un transport', false, 'md3-button--tonal') ?>
+    <span class="md3-secondary">sur <?= $planete->getNom() ?></span>
 </form>
 <?php
     }
@@ -179,7 +183,7 @@ elseif($o->embarque){
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="descendre" />
     <?= csrfField() ?>
-    <input type="submit" class="md3-button md3-button--outlined" value="Descendre du transport" />
+    <?= Vue::boutonIcone('decharger', 'Descendre du transport', false, 'md3-button--tonal') ?>
 </form>
 <?php
 }

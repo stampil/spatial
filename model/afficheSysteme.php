@@ -25,7 +25,7 @@ foreach(Flotte::liste($Joueur->id) as $ligne){
     <?= Vue::pastille($nomCamp) ?>
     <?= Vue::pastille(count($systeme->planetes).' '.__('planete', 'planetes', count($systeme->planetes))) ?>
 </div>
-<p><a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $systeme->id ?>">Voir sur la carte</a></p>
+<p><?= Vue::lienIcone('?p=carte&systeme='.$systeme->id, 'carte', 'Voir sur la carte', false, 'md3-button--tonal') ?></p>
 <div class="fiches">
 <?php
 foreach($systeme->planetes as $p){
@@ -57,7 +57,7 @@ foreach($systeme->planetes as $p){
         <p class="md3-secondary"><?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?></p>
         <?php } ?>
         <div class="md3-actions fiche__actions">
-            <a class="md3-button md3-button--tonal" href="?p=listeVaisseau#planete-<?= $p->id ?>">Donner des ordres</a>
+            <?= Vue::lienIcone('?p=listeVaisseau#planete-'.$p->id, 'voyager', 'Donner des ordres', false, 'md3-button--tonal') ?>
         </div>
         <?php } ?>
     </section>

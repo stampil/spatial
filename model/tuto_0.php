@@ -6,6 +6,6 @@
     <p>Humm... vous n'avez ni vaisseau, ni troupe, ni planète sous votre commandement...</p>
     <p>Pour construire des troupes et des vaisseaux, il vous faut une planète, il y a deux moyens de conquérir une planète, par la force ou par la diplomatie.</p>
     <p>Votre puissance de frappe étant réduite à vous et vous seul pour l'instant, optons pour la diplomatie.</p>
-    <p>Touchez « Liste des persos » pour voir votre (premier) personnage.</p>
-    <a class="md3-button" href="?p=listePerso">Liste des persos</a>
+    <p>Touchez l'icône des persos pour voir votre (premier) personnage.</p>
+    <?= Vue::lienIcone('?p=listePerso', 'persos', 'Liste des persos') ?>
 </section>

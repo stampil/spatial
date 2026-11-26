@@ -27,7 +27,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
                 <h3><?= $infos['nom'] ?></h3>
                 <p><?= htmlspecialchars(Batiment::description($batiment)) ?></p>
                 <p class="md3-secondary"><?= $infos['prix'] ?> cr · maintenance <?= $infos['maintenance'] ?> cr/h</p>
-                <form method="dialog"><button class="md3-button md3-button--tonal">Fermer</button></form>
+                <form method="dialog"><?= Vue::boutonIcone('fermer', 'Fermer', false, 'md3-button--tonal') ?></form>
             </dialog>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $planete->nombre($batiment) ?><br>
@@ -40,14 +40,15 @@ $libres = $planete->slot - $planete->batimentsTotal();
                 <input type="hidden" name="batiment" value="<?= $batiment ?>" />
                 <input type="hidden" name="operation" value="<?= Planete::OPERATION_CONSTRUIRE ?>" />
                 <?= csrfField() ?>
-                <input type="submit" value="Construire"<?= $planete->batimentsTotal() < $planete->slot ? '' : ' disabled' ?> />
+                <?= Vue::boutonIcone('construire', 'Construire', false, '', $planete->batimentsTotal() < $planete->slot ? '' : ' disabled') ?>
             </form>
-            <form method="POST" action="?p=gererBatiment">
+            <form class="action" method="POST" action="?p=gererBatiment">
                 <input type="hidden" name="planete" value="<?= $planete->id ?>" />
                 <input type="hidden" name="batiment" value="<?= $batiment ?>" />
                 <input type="hidden" name="operation" value="<?= Planete::OPERATION_DEMOLIR ?>" />
                 <?= csrfField() ?>
-                <input type="submit" class="md3-button md3-button--outlined" value="Démolir (+<?= Batiment::remboursement($batiment) ?> cr)"<?= $planete->nombre($batiment) > 0 ? '' : ' disabled' ?> />
+                <?= Vue::boutonIcone('demolir', 'Démolir', false, 'md3-button--tonal', $planete->nombre($batiment) > 0 ? '' : ' disabled') ?>
+                <span class="md3-secondary">+<?= Batiment::remboursement($batiment) ?> cr</span>
             </form>
         </div>
     </div>
@@ -62,11 +63,12 @@ $libres = $planete->slot - $planete->batimentsTotal();
             <?= Vue::visuel('role', $role, $infosRole['icone']) ?>
             <strong><?= $infosRole['nom'] ?></strong>
         </div>
-        <form method="POST" action="?p=recruter">
+        <form class="action" method="POST" action="?p=recruter">
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
             <input type="hidden" name="role" value="<?= $role ?>" />
             <?= csrfField() ?>
-            <input type="submit" value="Recruter : <?= $infosRole['nom'] ?> (<?= $Joueur->prixUnite($infosRole['prix']) ?> cr)" />
+            <span class="md3-secondary"><?= $Joueur->prixUnite($infosRole['prix']) ?> cr</span>
+            <?= Vue::boutonIcone('recruter', 'Recruter : '.$infosRole['nom']) ?>
         </form>
     </div>
     <?php } ?>
@@ -99,7 +101,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
             <?= csrfField() ?>
             <?php $maximum = $type === Vaisseau::TROUPE ? Vaisseau::placeTroupes($planete, $Joueur->id) : intdiv($Joueur->credits, $Joueur->prixVaisseau($type)); ?>
             <?= Vue::curseur('nombre', min(1, $maximum), $maximum, min(1, $maximum), 'Nombre à produire : '.$infos['nom']) ?>
-            <input type="submit" class="md3-button md3-button--tonal" value="Produire"<?= $maximum === 0 ? ' disabled' : '' ?> />
+            <?= Vue::boutonIcone('produire', 'Produire', false, 'md3-button--tonal', $maximum === 0 ? ' disabled' : '') ?>
         </form>
     </div>
     <?php } ?>

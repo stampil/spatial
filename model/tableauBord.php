@@ -38,7 +38,7 @@ else{
 ?>
 <section class="panneau">
     <p>Prenez contact avec votre premier personnage pour commencer la partie.</p>
-    <a class="md3-button" href="?p=listePerso">Voir mes persos</a>
+    <?= Vue::lienIcone('?p=listePerso', 'persos', 'Voir mes persos') ?>
 </section>
 <?php
 }

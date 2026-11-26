@@ -239,3 +239,18 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 | `icone-debarquement` | `A dark grey landing craft seen from the side hovering above a flat ground line, with a small white soldier figure and a bold white arrow descending from its belly toward the ground line.` |
 | `icone-combattre` | `Two crossed futuristic blaster pistols forming an X, chunky rounded sci-fi design with a thick barrel, a glowing energy cell and a short grip, one pistol in white and one in dark grey, muzzles at the top.` |
 | `icone-laisser` | `An open white hand held palm up with fingers slightly spread, a single dark grey coin falling away from it with a short dotted trail above the coin.` |
+
+## Icônes d'action, seconde série : `icone-<clé>`
+
+8 glyphes pour les boutons des persos, de la planète, du rapport de combat et de la création de flotte. Même bloc DUOTONE, plus la phrase « The magenta background must fill the entire image to all four edges: no frame, no border, no margin, no white edge, no lighter band. » juste avant le sujet.
+
+| Fichier | Prompt |
+|---|---|
+| `icone-negocier` | `Two hands clasped in a handshake seen from the side: the left hand in white and the right hand in dark grey, joined at the center, simple bold shapes.` |
+| `icone-apaiser` | `A white dove in flight seen from the side with spread wings, carrying a small dark grey olive branch in its beak.` |
+| `icone-demolir` | `A dark grey building with a flat roof and window cut-outs, struck from the upper right by a white wrecking ball hanging on a chain, with three small dark grey debris pieces falling from the impact.` |
+| `icone-recruter` | `A white soldier head-and-shoulders bust wearing a plain dark grey combat helmet with a visor and a chin strap, standing in front of two smaller dark grey soldier busts behind it, like a small squad. No star, no emblem, no insignia on the helmet, no plus sign, no cross.` |
+| `icone-produire` | `A dark grey factory building with a flat roof and two tall smokestacks, and in front of it a white conveyor belt carrying one small white spaceship.` |
+| `icone-resoudre` | `A bold white play triangle pointing right, in front of a large dark grey ring-shaped circle.` |
+| `icone-passer` | `Two bold white play triangles pointing right side by side, followed at the right by a thick dark grey vertical bar, like a skip-forward symbol.` |
+| `icone-creer_flotte` | `Two small identical spaceships seen from above, side by side with their noses pointing up, the left one in white and the right one in dark grey, with a bold white plus sign at the upper right.` |

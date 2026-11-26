@@ -11,7 +11,7 @@
         <span class="carte__bandeau-texte" id="carte-bandeau-texte"></span>
         <span class="carte__bandeau-suite" id="carte-bandeau-suite">: choisir le système</span>
         <span aria-hidden="true">·</span>
-        <button type="button" class="lien-action" id="carte-annuler">Annuler</button>
+        <?= Vue::commandeIcone('fermer', 'Annuler', 'md3-button--tonal', ' id="carte-annuler"') ?>
     </div>
     <aside class="carte__feuille" id="carte-feuille" hidden role="dialog" aria-labelledby="carte-feuille-titre">
         <div class="carte__poignee" aria-hidden="true"></div>
@@ -24,6 +24,7 @@
         </header>
         <div class="carte__feuille-corps" id="carte-feuille-corps"></div>
     </aside>
+    <template id="carte-modele-voyager"><?= Vue::commandeIcone('voyager', 'Voyager ici') ?></template>
 </div>
 <?php
 $donnees = Carte::donnees($Joueur);

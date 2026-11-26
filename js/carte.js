@@ -116,8 +116,8 @@
         return noeud;
     }
 
-    function bouton(texte, classe, action) {
-        const noeud = creer('button', {type: 'button', classe: classe, texte: texte});
+    function boutonVoyager(action) {
+        const noeud = document.getElementById('carte-modele-voyager').content.firstElementChild.cloneNode(true);
         noeud.addEventListener('click', () => action(noeud));
         return noeud;
     }
@@ -402,7 +402,7 @@
         systeme.planetes.filter((planete) => planete.id !== ordre.planete).forEach((planete) => {
             feuilleCorps.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
                 creer('span', {texte: planete.nom}),
-                bouton('Voyager ici', 'md3-button', (noeud) => confirmerOrdre(planete.id, noeud))
+                boutonVoyager((noeud) => confirmerOrdre(planete.id, noeud))
             ]));
         });
     }

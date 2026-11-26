@@ -27,7 +27,7 @@ if($menace !== null){
             <input type="hidden" name="menace" value="<?= $menace->id ?>" />
             <input type="hidden" name="action" value="<?= $action ?>" />
             <?= csrfField() ?>
-            <?= Vue::boutonAction($action === Menace::ACTION_LAISSER ? 'laisser' : 'combattre', $libelle, $action === Menace::ACTION_LAISSER ? 'md3-button--outlined' : '') ?>
+            <?= Vue::boutonIcone($action === Menace::ACTION_LAISSER ? 'laisser' : 'combattre', $libelle, false, $action === Menace::ACTION_LAISSER ? 'md3-button--tonal' : '') ?>
         </form>
         <?php } ?>
     </div>
@@ -62,7 +62,7 @@ foreach($flottes as $ligne){
                 <?= csrfField() ?>
                 <div class="ligne-jeu">
                     <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($flotte->nom) ?>" required aria-label="Nom de la flotte" />
-                    <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
+                    <?= Vue::boutonIcone('valider', 'Renommer la flotte', false, 'md3-button--tonal') ?>
                 </div>
             </form>
         </div>
@@ -94,9 +94,9 @@ foreach(array_keys($posees) as $planeteId){
         <h2 class="panneau__titre"><?= Icone::html('flotte') ?><?= $planete->getNom() ?></h2>
         <?php if($creationPossible){ ?>
         <div class="panneau__outils">
-            <button type="button" class="lien-action" data-flotte-creer>Créer une flotte</button>
-            <button type="submit" class="lien-action" form="creation-flotte-<?= $planete->id ?>" data-flotte-enregistrer disabled>Créer une flotte</button>
-            <button type="button" class="lien-action" data-flotte-annuler>Annuler</button>
+            <?= Vue::commandeIcone('creer_flotte', 'Créer une flotte', 'md3-button--tonal', ' data-flotte-creer') ?>
+            <?= Vue::boutonIcone('valider', 'Enregistrer la flotte', false, '', ' form="creation-flotte-'.$planete->id.'" data-flotte-enregistrer disabled') ?>
+            <?= Vue::commandeIcone('fermer', 'Annuler', 'md3-button--tonal', ' data-flotte-annuler') ?>
         </div>
         <form id="creation-flotte-<?= $planete->id ?>" method="POST" action="?p=creerFlotte">
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
@@ -114,7 +114,7 @@ foreach(array_keys($posees) as $planeteId){
     ?>
     <p class="md3-secondary hors-creation">Persos embarqués (<?= count($embarques) ?>/<?= $types[Vaisseau::TRANSPORT_PERSO] * Vaisseau::CAPACITE_TRANSPORT_PERSO ?>) : <?= count($embarques) > 0 ? implode(', ', $embarques) : 'aucun' ?>. Ils partent avec le transport.</p>
     <?php } ?>
-    <p class="hors-creation"><a href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a></p>
+    <p class="hors-creation"><?= Vue::lienIcone('?p=carte&systeme='.$planete->id_systeme, 'carte', 'Voir sur la carte', false, 'md3-button--tonal') ?></p>
     <?php foreach($nommesPlanete as $vaisseau){ $avecVoyage = true; $avecCase = $creationPossible; require 'inc/vaisseauNomme.php'; } ?>
     <?php foreach($types as $type => $nombre){ if(Vaisseau::estNomme($type) || $type === Vaisseau::TROUPE){ continue; } ?>
     <div class="ligne-jeu hors-creation">

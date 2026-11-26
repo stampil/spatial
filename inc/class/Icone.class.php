@@ -62,6 +62,16 @@ class Icone {
         'trophee' => '<path d="M8 4h8v5a4 4 0 0 1-8 0zM12 13v4M8 20h8M8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3"/>',
         'connexion' => '<path d="M10 4h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-8M4 12h10M10 8l4 4-4 4"/>',
         'inscription' => '<circle cx="10" cy="8" r="4"/><path d="M3 20c0-4 3-6 7-6M18 8v6M15 11h6"/>',
+        'negocier' => '<path d="M2 11l5-4 5 2 5-2 5 4"/><path d="M7 7l5 6 5-6M5 14l5 5 4-3 4 3"/>',
+        'apaiser' => '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.5-7 10-7 10z"/>',
+        'demolir' => '<path d="M4 20h16M6 20V10l6-5 6 5v10M9 13l6 5M15 13l-6 5"/>',
+        'recruter' => '<circle cx="10" cy="8" r="4"/><path d="M3 20c0-4 3-6 7-6M18 8v6M15 11h6"/>',
+        'produire' => '<path d="M3 20V9l6 4V9l6 4V5h6v15z"/>',
+        'resoudre' => '<path d="M8 5l11 7-11 7z"/>',
+        'passer' => '<path d="M5 5l9 7-9 7zM17 5v14"/>',
+        'creer_flotte' => '<path d="M5 19l4-9 4 9zM15 19l3-6 3 6zM17 3v6M14 6h6"/>',
+        'fermer' => '<path d="M6 6l12 12M18 6L6 18"/>',
+        'valider' => '<path d="M5 12l5 5 9-10"/>',
     );
 
     public static function html(string $nom, ?int $taille = null): string {
