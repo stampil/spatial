@@ -17,10 +17,14 @@ Ce que j'ai compris (rien codé) :
   - « Reconnaissance de planète » : ouvre la carte, tu choisis le système puis la planète.
 - Textes courts, pensés mobile.
 
-Point que je dois te signaler avant de coder : le panneau « Donner un ordre » sert aussi à envoyer les frégates, barges, capitaux, flottes, troupes et chasseurs embarqués. Si je le supprime sans remplaçant, plus rien ne permet de les déplacer.
+Précision (26/11) : « une fois une flotte créé et un ensemble de vaisseau regrouper, les actions sont pour la flotte ». Compris : les boutons d'action sont sur le panneau de chaque flotte ; les vaisseaux hors flotte ont les leurs sur leur ligne.
+
+Point que je dois te signaler avant de coder (vérifié dans `Vaisseau.class.php` et `model/deplacer.php`) :
+- « Recherche de système » ne fonctionne que pour les vaisseaux de reconnaissance HORS flotte (`explorer` filtre `id_flotte IS NULL`), et une flotte ne peut contenir que frégates, barges et capitaux (`typesDeFlotte`). Une flotte ne peut donc pas faire de recherche de système aujourd'hui.
+- Le panneau « Donner un ordre » sert aussi aux troupes et chasseurs embarqués, qui partent avec leur porteur.
 
 ## Questions en suspens
 
-1. Les 2 actions ne concernent-elles que le vaisseau de reconnaissance ? Et comment déplace-t-on les autres vaisseaux, flottes, troupes et chasseurs : je garde « Donner un ordre » pour eux seuls, ou un bouton « Envoyer » par ligne (vaisseau ou flotte) qui ouvre la carte ?
-2. Combien de reconnaissances partent par action : une seule par clic, ou tu choisis un nombre ?
-3. Où placer les 2 boutons : sous la ligne des reconnaissances de chaque planète (où elles sont posées) ?
+1. Une flotte n'a donc que l'action « Reconnaissance de planète » (carte, choix du système puis de la planète) ? Ou veux-tu que des vaisseaux de reconnaissance puissent entrer dans une flotte, pour que la flotte fasse aussi la « Recherche de système » (nouvelle règle) ?
+2. Les vaisseaux hors flotte (frégate, barge, capital, troupes, chasseurs) : sur leur ligne, seulement l'action « Reconnaissance de planète » (carte) ?
+3. Combien de reconnaissances partent par « Recherche de système » : une seule par clic, ou tu choisis un nombre ?
