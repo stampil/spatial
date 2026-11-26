@@ -62,6 +62,7 @@ if(!empty($_SESSION['Sid'])){
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src="<?= Vue::ressource('js/jquery.countdown.min.js') ?>"></script>
         <script src="<?= Vue::ressource('js/main.js') ?>"></script>
+        <script src="<?= Vue::ressource('js/sante.js') ?>" data-adresse="<?= SANTE_ADRESSE ?>" defer></script>
         <script src="<?= Vue::ressource('js/rapport.js') ?>" defer></script>
         <?php if(isset($Joueur)){ ?>
         <script src="<?= Vue::ressource('js/musique.js') ?>" defer></script>
@@ -78,6 +79,7 @@ if(!empty($_SESSION['Sid'])){
     <body<?= isset($Joueur) && $Joueur->etape_tuto != 0 ? ' class="md3-avec-barre"' : '' ?>>
     <?php
     require 'inc/menu.php';
+    echo '<div class="sante-bandeau" id="sante-bandeau" role="alert" hidden></div>';
     if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE){
         require 'inc/hud.php';
     }

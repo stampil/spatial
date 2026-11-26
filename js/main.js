@@ -2,6 +2,7 @@ $(function(){
 
     var DELAI_MESSAGE = 8000;
     var DELAI_RAFRAICHISSEMENT_MIN = 3000;
+    var MESSAGE_ECHEC_ACTION = 'Le serveur n\'a pas répondu : vérifiez le résultat avant de recommencer.';
     var MILLISECONDES = 1000;
     var SECONDES_MINUTE = 60;
     var SECONDES_HEURE = 3600;
@@ -38,13 +39,16 @@ $(function(){
         var attente = derniereMiseAJour + DELAI_RAFRAICHISSEMENT_MIN - Date.now();
         if (attente > 0) {
             setTimeout(rafraichir, attente);
-            return Promise.resolve();
+            return Promise.resolve(true);
         }
         if (miseAJourEnCours) {
-            return Promise.resolve();
+            return Promise.resolve(true);
         }
         miseAJourEnCours = true;
         return fetch(location.href, {credentials: 'same-origin'}).then(function(reponse) {
+            if (!reponse.ok) {
+                throw new Error('statut');
+            }
             return reponse.text();
         }).then(function(html) {
             var page = new DOMParser().parseFromString(html, 'text/html');
@@ -57,10 +61,29 @@ $(function(){
             });
             initialiserPage();
             document.dispatchEvent(new Event('page-rafraichie'));
+            return true;
+        }).catch(function() {
+            document.dispatchEvent(new Event('sante-verifier'));
+            return false;
         }).finally(function() {
             miseAJourEnCours = false;
             derniereMiseAJour = Date.now();
         });
+    }
+
+    function signalerEchecAction(formulaire) {
+        $(formulaire).find(':submit').prop('disabled', false);
+        var conteneur = $('.messages');
+        if (conteneur.length === 0) {
+            conteneur = $('<div class="messages" role="status" aria-live="polite"></div>').appendTo('main.md3-page');
+        }
+        var message = $('<div class="md3-alert md3-alert--error" role="alert"></div>').text(MESSAGE_ECHEC_ACTION).appendTo(conteneur);
+        message.on('click', function() {
+            message.remove();
+        });
+        setTimeout(function() {
+            message.remove();
+        }, DELAI_MESSAGE);
     }
 
     $(document).on('submit', 'main form[method="POST"]:not([data-navigation])', function(evenement) {
@@ -72,9 +95,19 @@ $(function(){
             corps.append(declencheur.name, declencheur.value);
         }
         $(formulaire).find(':submit').prop('disabled', true);
-        fetch(formulaire.action, {method: 'POST', body: corps, credentials: 'same-origin'}).then(function() {
+        fetch(formulaire.action, {method: 'POST', body: corps, credentials: 'same-origin'}).then(function(reponse) {
+            if (!reponse.ok) {
+                throw new Error('statut');
+            }
             derniereMiseAJour = 0;
             return rafraichir();
+        }).then(function(reussi) {
+            if (!reussi) {
+                signalerEchecAction(formulaire);
+            }
+        }).catch(function() {
+            document.dispatchEvent(new Event('sante-verifier'));
+            signalerEchecAction(formulaire);
         });
     });
 

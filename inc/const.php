@@ -8,6 +8,7 @@
 
 const PAGE_NAME_PATTERN = '/^[A-Za-z0-9_]+$/';
 const LOGOUT_PAGE = 'deconnection';
+const SANTE_ADRESSE = 'sante.php';
 const RECONNEXION_PAGE = 'reconnecter';
 const CONNEXION_CLE_STOCKAGE = 'novarche_connexion';
 const PUBLIC_PAGES = array('welcome', 'connection', 'connecter', 'inscription', 'inscrire', RECONNEXION_PAGE, LOGOUT_PAGE, '404');
