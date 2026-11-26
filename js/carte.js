@@ -34,7 +34,8 @@
     const SECONDES_MINUTE = 60;
     const SECONDES_HEURE = 3600;
     const ADRESSE_FLOTTES = '?p=listeVaisseau';
-    const MESSAGE_ECHEC_ENVOI = 'Le serveur n’a pas répondu : l’ordre n’est pas confirmé, vérifiez la page Flottes avant de recommencer.';
+    const MESSAGE_ECHEC_ENVOI_AVANT = 'Ordre non confirmé (';
+    const MESSAGE_ECHEC_ENVOI_APRES = ') : vérifiez la page Flottes avant de recommencer.';
     const ADRESSE_SYSTEME = '?p=afficheSysteme&id_systeme=';
     const TYPE_RECONNAISSANCE = 'reconnaissance';
     const TYPE_TROUPE = 'troupe_assaut';
@@ -138,16 +139,13 @@
                 corps.append(cle, valeur);
             });
         });
-        fetch(adresse, {method: 'POST', body: corps, credentials: 'same-origin'}).then((reponse) => {
-            if (!reponse.ok) {
-                throw new Error('statut');
-            }
+        window.Requete.demander(adresse, {method: 'POST', body: corps, credentials: 'same-origin'}).then(() => {
             location.replace(ADRESSE_FLOTTES);
-        }).catch(() => {
+        }).catch((erreur) => {
             envoiEnCours = false;
             window.Occupation.liberer(declencheur);
             document.dispatchEvent(new Event('sante-verifier'));
-            bandeauTexte.textContent = MESSAGE_ECHEC_ENVOI;
+            bandeauTexte.textContent = MESSAGE_ECHEC_ENVOI_AVANT + erreur.message + MESSAGE_ECHEC_ENVOI_APRES;
         });
     }
 

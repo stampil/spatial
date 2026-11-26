@@ -40,18 +40,41 @@ window.Occupation = (function() {
     return {demarrer: demarrer, liberer: liberer};
 })();
 
+window.Requete = (function() {
+    var CAUSE_RESEAU = 'échec réseau';
+    var CAUSE_STATUT = 'erreur HTTP ';
+
+    function demander(adresse, options) {
+        return fetch(adresse, options).catch(function() {
+            throw new Error(CAUSE_RESEAU);
+        }).then(function(reponse) {
+            if (!reponse.ok) {
+                throw new Error(CAUSE_STATUT + reponse.status);
+            }
+            return reponse;
+        });
+    }
+
+    return {demander: demander};
+})();
+
 $(function(){
 
     var DELAI_MESSAGE = 8000;
     var DELAI_RAFRAICHISSEMENT_MIN = 3000;
-    var MESSAGE_ECHEC_ACTION = 'Le serveur n\'a pas répondu : vérifiez le résultat avant de recommencer.';
+    var DELAI_AVANT_RECHARGEMENT = 3000;
+    var CAUSE_PAGE = 'page illisible : ';
+    var MESSAGE_ECHEC_ACTION_AVANT = 'Action non confirmée (';
+    var MESSAGE_ECHEC_ACTION_APRES = ') : vérifiez le résultat avant de recommencer.';
+    var MESSAGE_PAGE_NON_RAFRAICHIE_AVANT = 'Action effectuée, mais la page n\'a pas pu être rafraîchie (';
+    var MESSAGE_PAGE_NON_RAFRAICHIE_APRES = ') : rechargement…';
     var MILLISECONDES = 1000;
     var SECONDES_MINUTE = 60;
     var SECONDES_HEURE = 3600;
     var POURCENT = 100;
     var SELECTEURS_REMPLACES = ['main.md3-page', '.hud'];
     var derniereMiseAJour = 0;
-    var miseAJourEnCours = false;
+    var rafraichissementEnCours = null;
 
     function initialiserPage() {
         $('[data-countdown]').each(function() {
@@ -77,39 +100,60 @@ $(function(){
         });
     }
 
+    function appliquerPage(html) {
+        var page = new DOMParser().parseFromString(html, 'text/html');
+        SELECTEURS_REMPLACES.forEach(function(selecteur) {
+            var ancien = document.querySelector(selecteur);
+            var nouveau = page.querySelector(selecteur);
+            if (ancien && nouveau) {
+                ancien.replaceWith(nouveau);
+            }
+        });
+        initialiserPage();
+        document.dispatchEvent(new Event('page-rafraichie'));
+    }
+
     function rafraichir() {
         var attente = derniereMiseAJour + DELAI_RAFRAICHISSEMENT_MIN - Date.now();
         if (attente > 0) {
             setTimeout(rafraichir, attente);
-            return Promise.resolve(true);
+            return Promise.resolve(null);
         }
-        if (miseAJourEnCours) {
-            return Promise.resolve(true);
+        if (rafraichissementEnCours) {
+            return rafraichissementEnCours;
         }
-        miseAJourEnCours = true;
-        return fetch(location.href, {credentials: 'same-origin'}).then(function(reponse) {
-            if (!reponse.ok) {
-                throw new Error('statut');
-            }
+        rafraichissementEnCours = window.Requete.demander(location.href, {credentials: 'same-origin'}).then(function(reponse) {
             return reponse.text();
         }).then(function(html) {
-            var page = new DOMParser().parseFromString(html, 'text/html');
-            SELECTEURS_REMPLACES.forEach(function(selecteur) {
-                var ancien = document.querySelector(selecteur);
-                var nouveau = page.querySelector(selecteur);
-                if (ancien && nouveau) {
-                    ancien.replaceWith(nouveau);
-                }
-            });
-            initialiserPage();
-            document.dispatchEvent(new Event('page-rafraichie'));
-            return true;
-        }).catch(function() {
+            try {
+                appliquerPage(html);
+            } catch (erreur) {
+                throw new Error(CAUSE_PAGE + erreur.message);
+            }
+            return null;
+        }).catch(function(erreur) {
             document.dispatchEvent(new Event('sante-verifier'));
-            return false;
+            return erreur.message;
         }).finally(function() {
-            miseAJourEnCours = false;
+            rafraichissementEnCours = null;
             derniereMiseAJour = Date.now();
+        });
+        return rafraichissementEnCours;
+    }
+
+    function rafraichirMaintenant() {
+        return (rafraichissementEnCours || Promise.resolve()).then(function() {
+            derniereMiseAJour = 0;
+            return rafraichir();
+        });
+    }
+
+    function rafraichirApresAction() {
+        return rafraichirMaintenant().then(function(cause) {
+            if (cause === null) {
+                return null;
+            }
+            return rafraichirMaintenant();
         });
     }
 
@@ -119,19 +163,30 @@ $(function(){
         delete formulaire.dataset.occupe;
     }
 
-    function signalerEchecAction(formulaire) {
-        libererFormulaire(formulaire);
+    function afficherErreur(texte) {
         var conteneur = $('.messages');
         if (conteneur.length === 0) {
             conteneur = $('<div class="messages" role="status" aria-live="polite"></div>').appendTo('main.md3-page');
         }
-        var message = $('<div class="md3-alert md3-alert--error" role="alert"></div>').text(MESSAGE_ECHEC_ACTION).appendTo(conteneur);
+        var message = $('<div class="md3-alert md3-alert--error" role="alert"></div>').text(texte).appendTo(conteneur);
         message.on('click', function() {
             message.remove();
         });
         setTimeout(function() {
             message.remove();
         }, DELAI_MESSAGE);
+    }
+
+    function signalerEchecAction(formulaire, cause) {
+        libererFormulaire(formulaire);
+        afficherErreur(MESSAGE_ECHEC_ACTION_AVANT + cause + MESSAGE_ECHEC_ACTION_APRES);
+    }
+
+    function signalerPageNonRafraichie(cause) {
+        afficherErreur(MESSAGE_PAGE_NON_RAFRAICHIE_AVANT + cause + MESSAGE_PAGE_NON_RAFRAICHIE_APRES);
+        setTimeout(function() {
+            location.reload();
+        }, DELAI_AVANT_RECHARGEMENT);
     }
 
     $(document).on('submit', 'main form[method="POST"]:not([data-navigation])', function(evenement) {
@@ -150,19 +205,15 @@ $(function(){
         $(formulaire).data('principal', principal);
         $(formulaire).find(':submit').not(principal).prop('disabled', true);
         window.Occupation.demarrer(principal);
-        fetch(formulaire.action, {method: 'POST', body: corps, credentials: 'same-origin'}).then(function(reponse) {
-            if (!reponse.ok) {
-                throw new Error('statut');
+        window.Requete.demander(formulaire.action, {method: 'POST', body: corps, credentials: 'same-origin'}).then(function() {
+            return rafraichirApresAction();
+        }).then(function(cause) {
+            if (cause !== null) {
+                signalerPageNonRafraichie(cause);
             }
-            derniereMiseAJour = 0;
-            return rafraichir();
-        }).then(function(reussi) {
-            if (!reussi) {
-                signalerEchecAction(formulaire);
-            }
-        }).catch(function() {
+        }).catch(function(erreur) {
             document.dispatchEvent(new Event('sante-verifier'));
-            signalerEchecAction(formulaire);
+            signalerEchecAction(formulaire, erreur.message);
         });
     });
 
