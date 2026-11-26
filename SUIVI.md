@@ -8,6 +8,8 @@ Ta phrase : « fait de ppetites icones pour toutes les structure » (avec une ca
 
 Lu (rien codé) : dans la liste, chaque ligne affiche une vignette de 72 px (`img/batiment/<clé>.png`, `inc/planeteGestion.php`) placée dans un bouton qui ouvre la fenêtre de détails. Cette vignette ne s'affiche pas (la balise est écrasée à zéro dans le bouton), d'où le vide. Bouclier et Canon n'ont pas d'image de bâtiment et tombent sur leur petite icône de thème. Les icônes de repli SVG existent pour les cinq autres (usine_legere, usine_moyenne, usine_lourde, ferme, academie) mais ne sont pas utilisées ici.
 
+Correction du 26/11 : « evite de dire juste ship bordel, fait des prompt hyper detaillé je veux pas voir de bateau » (capture : un navire de guerre au lieu d'un vaisseau spatial) : prompts des structures refaits en détail, vaisseau spatial décrit pièce par pièce avec une interdiction explicite de tout bateau.
+
 Ce que je comprends : les 7 structures (3 usines, ferme, académie, bouclier planétaire, canon orbital) ont une petite icône de 28 px au même endroit, toutes du même style duotone blanc et gris foncé ; le clic sur l'icône ouvre toujours la fenêtre de détails avec la grande image. Les mêmes icônes servent aussi pour les pastilles d'emplacements et les titres des sections d'usines.
 
 ## Questions en suspens
