@@ -264,3 +264,15 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 | `evenement-rejoint` | `Wide 16:9 cinematic scene of a planet joining a cause: a crowd of settlers and workers in utilitarian jumpsuits cheering in front of a landing plaza of an industrial colony, a freshly raised banner with no symbol on a tall mast, a colonial governor shaking hands with a delegate, warm golden morning light, the planet's curved horizon and a tall orbital elevator in the background, the action in the horizontal middle band.` |
 | `evenement-revolte` | `Wide 16:9 cinematic scene of a planet in revolt: an angry crowd of colonists in worn work clothes filling the street of an industrial colony, torn down banner on the ground, burning barricades made of cargo containers, thick smoke, orange fire light against a dark blue dusk sky, the empty garrison gate behind them, the action in the horizontal middle band.` |
 | `evenement-conquise` | `Wide 16:9 cinematic scene of a planet conquered by force: armored infantry in modular dark olive and sand-colored combat gear holding the main plaza of a colony after the assault, a landing craft on the ground behind them, a pole with an unmarked flag being planted, smoke rising from damaged buildings, defeated defenders disarmed on the side, dramatic orange and blue lighting at dusk, the action in the horizontal middle band.` |
+
+## Icônes de structures : `icone-<clé>`
+
+5 glyphes pour les structures des planètes (liste « Construire », emplacements, titres des usines). Même bloc DUOTONE, plus la phrase « The magenta background must fill the entire image to all four edges: no frame, no border, no margin, no white edge, no lighter band. » juste avant le sujet. Bouclier planétaire et canon orbital réutilisent `icone-bouclier` et `icone-canon`.
+
+| Fichier | Prompt |
+|---|---|
+| `icone-usine_legere` | `A small dark grey workshop hangar with a flat roof, a wide door and one short smokestack, with a small white single-seat spaceship parked in front of it.` |
+| `icone-usine_moyenne` | `A medium dark grey shipyard building with a tall gantry crane and two smokestacks, with a white medium warship hull seen from the side in front of it.` |
+| `icone-usine_lourde` | `A very large dark grey shipyard with a huge arched gantry crane and three smokestacks, holding a long white capital ship hull on its slipway.` |
+| `icone-ferme` | `A dark grey glass-roofed greenhouse dome, with a row of white crop plants sprouting in front of it and a small white sun above it.` |
+| `icone-academie` | `A dark grey academy building with a triangular pediment roof and four columns, with a large white open book in front of the entrance. No star, no emblem.` |
