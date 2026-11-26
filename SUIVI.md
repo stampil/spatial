@@ -35,16 +35,20 @@ Précision (26/11) : « les flottes joueur advrse participe aussi bien sur, mais
 
 Proposition (à valider) : un petit stock de vaisseaux par planète IA (type + nombre, dans une table dédiée, pas des vaisseaux de joueur), dimensionné par la taille de la planète et le camp ; il apparaît à la génération de l'univers, se reconstitue lentement comme la défense, et se voit sur la fiche de la planète (« Flotte pirate stationnée : N vaisseaux »). Dans le combat, les vaisseaux défenseurs (IA ou joueur adverse) tirent dans les mêmes phases que les tiens et absorbent des dégâts avant le canon.
 
+### 4. Combat automatique à l'arrivée et popin « Résoudre » (26/11)
+
+Ta phrase : « quand on arrive sur une planete avec flotte hostile sa declenche immediatement le combat, on a un popin illustrer combat spatial avec un btn résoudre, et on voit les barre de défenses se reduire en fct comme pour un combat de planete. idem pour le combat terrestre au debarquement, popin illuster puis resoudre pour voir l'animatiob ».
+
+Lu (rien codé) : aujourd'hui un combat ne part que sur ton clic « Attaquer » (page de la planète), et l'animation des barres (`inc/rapport.js`, `inc/rapport.php`) se joue toute seule avec « Passer ». Le débarquement ne donne qu'un message texte, sans animation. L'arrivée d'une flotte ne déclenche rien.
+
+Ce que je comprends :
+- Quand tes vaisseaux de combat (flotte ou seuls) arrivent sur une planète où il y a une flotte hostile (flotte IA stationnée ou flotte d'un joueur adverse), le combat spatial se résout tout de suite côté serveur.
+- Au prochain affichage, une fenêtre illustrée « Combat spatial » s'ouvre avec un bouton « Résoudre » ; au clic, les barres de force des deux flottes se réduisent phase par phase, comme pour un combat de planète.
+- Même principe pour le débarquement : une fenêtre illustrée « Combat terrestre » (troupes contre garnison), puis « Résoudre » joue l'animation. Le résultat est déjà décidé : le bouton ne fait que révéler la bataille.
+
 ## Questions en suspens
 
-Flottes IA et défense (point 3) :
-1. Force IA : par défaut, 1 vaisseau de combat par slot de la planète pour l'Empire, moins pour les pirates (et rien pour la Rébellion discrète) ; ça te va, ou autre barème ?
-2. Tutoriel : la planète pirate du tutoriel a une toute petite flotte (ex. 1 chasseur) pour que l'assaut avec 1 frégate + 3 chasseurs reste gagnable ; d'accord ?
-3. La flotte stationnée est-elle visible dès qu'on connaît la planète, ou seulement après une reconnaissance ?
-4. La flotte IA se reconstitue-t-elle (comme bouclier et canon, 10 % par heure) ou est-elle définitivement détruite quand tu la bats ?
-
-Icônes des boutons d'action (point 2) :
-5. Bouton : icône seule avec infobulle, ou icône + un seul mot court (« Attaquer », « Voyager »…) ? Sur mobile, l'icône seule est plus compacte mais moins claire.
-6. Les infos du libellé actuel (nombre de vaisseaux, durée, chance de réussite) : en petit texte à côté du bouton ?
-7. Périmètre : on commence par le combat (attaquer avec les vaisseaux, avec la flotte, avec les chasseurs, débarquer les troupes) et la page Flottes (voyager, chercher, reconnaître, embarquer, débarquer, renommer, dissoudre), le reste ensuite ?
-8. « Attaque de chasseurs » : une action propre aux chasseurs, distincte de l'attaque des vaisseaux de combat, ou juste l'icône d'attaque quand les chasseurs sont là ?
+Point 4 (combat à l'arrivée) :
+9. Le combat à l'arrivée ne se déclenche que si le groupe qui arrive contient des vaisseaux de combat (chasseurs, frégates, capitaux) ; les vaisseaux non armés (reconnaissance, transports) arrivent en paix. D'accord ?
+10. Illustrations : le combat spatial réutilise l'image `combat.jpg` déjà là ; pour le combat terrestre, je te donne un prompt Gemini pour une nouvelle image. D'accord ?
+11. Après « Résoudre », on garde « Passer » pour sauter l'animation ?
