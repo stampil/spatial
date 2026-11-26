@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Usage: generer-terre.py [output folder].
+"""Usage: generer-terre.py [output folder] [world numbers...].
 Generates the earth-like planet textures (img/planete/40.jpg to 45.jpg) from invented continents: 3D noise sampled on a sphere, so the map wraps horizontally with no seam and never copies the real Earth. Water, sand, forest, desert, mountains and snow follow altitude, latitude and moisture."""
 import os
 import sys
@@ -40,14 +40,22 @@ CONIFERE = numpy.array([0.11, 0.29, 0.2])
 TOUNDRA = numpy.array([0.5, 0.5, 0.43])
 ROCHE = numpy.array([0.43, 0.38, 0.34])
 NEIGE = numpy.array([0.95, 0.97, 1.0])
+GLACE_BLEUE = numpy.array([0.74, 0.86, 0.96])
+GLACE_GRISE = numpy.array([0.66, 0.71, 0.78])
+FISSURE = numpy.array([0.36, 0.52, 0.72])
+BANQUISE_LARGEUR = 9.0
+BORD_AMPLITUDE_LENT = 11.0
+BORD_AMPLITUDE_FIN = 4.5
+FISSURE_EPAISSEUR = 0.035
+FISSURE_FORCE = 0.55
 
 MONDES = (
     {'numero': 40, 'graine': 4011, 'terres': 0.3, 'frequence': 0.9, 'nord': 0.35, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.0, 'nuages': 0.5},
-    {'numero': 41, 'graine': 4177, 'terres': 0.33, 'frequence': 1.7, 'nord': 0.0, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.05, 'nuages': 0.55},
-    {'numero': 42, 'graine': 4293, 'terres': 0.14, 'frequence': 2.6, 'nord': 0.0, 'equateur': 0.1, 'froid': 0.05, 'aridite': -0.05, 'nuages': 0.6},
-    {'numero': 43, 'graine': 4351, 'terres': 0.38, 'frequence': 1.3, 'nord': 0.0, 'equateur': 0.55, 'froid': 0.0, 'aridite': -0.05, 'nuages': 0.5},
+    {'numero': 41, 'glace_variee': True, 'graine': 4177, 'terres': 0.33, 'frequence': 1.7, 'nord': 0.0, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.05, 'nuages': 0.55},
+    {'numero': 42, 'glace_variee': True, 'graine': 4293, 'terres': 0.14, 'frequence': 2.6, 'nord': 0.0, 'equateur': 0.1, 'froid': 0.05, 'aridite': -0.05, 'nuages': 0.6},
+    {'numero': 43, 'glace_variee': True, 'graine': 4351, 'terres': 0.38, 'frequence': 1.3, 'nord': 0.0, 'equateur': 0.55, 'froid': 0.0, 'aridite': -0.05, 'nuages': 0.5},
     {'numero': 44, 'graine': 4466, 'terres': 0.35, 'frequence': 1.4, 'nord': 0.15, 'equateur': 0.0, 'froid': 0.28, 'aridite': -0.1, 'nuages': 0.45},
-    {'numero': 45, 'graine': 4589, 'terres': 0.33, 'frequence': 1.2, 'nord': 0.0, 'equateur': 0.0, 'froid': -0.05, 'aridite': 0.3, 'nuages': 0.3},
+    {'numero': 45, 'glace_variee': True, 'graine': 4589, 'terres': 0.33, 'frequence': 1.2, 'nord': 0.0, 'equateur': 0.0, 'froid': -0.05, 'aridite': 0.3, 'nuages': 0.3},
 )
 
 
@@ -116,6 +124,26 @@ def etape(valeurs, debut, fin):
     return lisser(numpy.clip((valeurs - debut) / (fin - debut), 0.0, 1.0))
 
 
+def glace_variee(couleurs, points, latitude, graine):
+    forme_lente = fractal(points, 2.2, graine + 2300) - 0.5
+    forme_fine = fractal(points, 7.0, graine + 2400) - 0.5
+    limite = LATITUDE_CALOTTE - 4.0 + BORD_AMPLITUDE_LENT * 2 * forme_lente + BORD_AMPLITUDE_FIN * 2 * forme_fine
+    distance_pole = numpy.abs(latitude) - limite
+    banquise = fractal(points, 9.0, graine + 2500)
+    morceaux = etape(banquise, 0.5, 0.58) * etape(distance_pole, -BANQUISE_LARGEUR, 0.0)
+    masse = etape(distance_pole, 0.0, 1.6)
+    couverture = numpy.maximum(masse, morceaux * 0.85)
+    ton_bleu = etape(fractal(points, 6.0, graine + 2600), 0.42, 0.62)
+    ton_gris = etape(fractal(points, 16.0, graine + 2700), 0.52, 0.7)
+    glace = melange(numpy.ones(couleurs.shape[:2] + (3,)) * NEIGE, numpy.ones(couleurs.shape[:2] + (3,)) * GLACE_BLEUE, ton_bleu * 0.75)
+    glace = melange(glace, numpy.ones(couleurs.shape[:2] + (3,)) * GLACE_GRISE, ton_gris * 0.45)
+    pole = etape(distance_pole, 0.0, 14.0)
+    glace = melange(glace, numpy.ones(couleurs.shape[:2] + (3,)) * NEIGE, pole * 0.6)
+    fissure = 1.0 - etape(numpy.abs(fractal(points, 11.0, graine + 2800) - 0.5), 0.0, FISSURE_EPAISSEUR)
+    glace = melange(glace, numpy.ones(couleurs.shape[:2] + (3,)) * FISSURE, fissure * FISSURE_FORCE * etape(masse + morceaux, 0.4, 0.9))
+    return melange(couleurs, glace, couverture)
+
+
 def monde(parametres):
     graine = parametres['graine']
     points, latitude = points_sur_sphere()
@@ -147,9 +175,12 @@ def monde(parametres):
     mer_couleur = rampe(numpy.clip(fond, 0.0, 1.0) ** 0.55, ((0.0, OCEAN_CLAIR), (1.0, OCEAN_PROFOND)))
     couleurs = numpy.where(sur_terre[..., None], terre, mer_couleur)
 
-    bruit_calotte = fractal(points, 4.0, graine + 2300) - 0.5
-    calotte = etape(numpy.abs(latitude) + FLOU_CALOTTE * bruit_calotte * 2, LATITUDE_CALOTTE, LATITUDE_CALOTTE + 4.0)
-    couleurs = melange(couleurs, NEIGE, calotte)
+    if parametres.get('glace_variee'):
+        couleurs = glace_variee(couleurs, points, latitude, graine)
+    else:
+        bruit_calotte = fractal(points, 4.0, graine + 2300) - 0.5
+        calotte = etape(numpy.abs(latitude) + FLOU_CALOTTE * bruit_calotte * 2, LATITUDE_CALOTTE, LATITUDE_CALOTTE + 4.0)
+        couleurs = melange(couleurs, NEIGE, calotte)
 
     gradient_y, gradient_x = numpy.gradient(altitude)
     gradient_x = gradient_x / numpy.maximum(numpy.cos(numpy.radians(latitude)), 0.15)
@@ -172,7 +203,10 @@ def rapport_couture(image):
 if __name__ == '__main__':
     destination = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'img', 'planete')
     os.makedirs(destination, exist_ok=True)
+    numeros = [int(numero) for numero in sys.argv[2:]]
     for parametres in MONDES:
+        if numeros and parametres['numero'] not in numeros:
+            continue
         image = monde(parametres)
         rapport = rapport_couture(image)
         sortie = os.path.join(destination, '%d.jpg' % parametres['numero'])
