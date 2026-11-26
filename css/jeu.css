@@ -923,3 +923,61 @@
 .vaisseau-nomme .ligne-jeu {
     border-top: 0;
 }
+
+.panneau__tete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.panneau__tete .panneau__titre {
+    margin: 0;
+}
+
+.panneau__outils {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.panneau__croix {
+    width: 48px;
+    height: 48px;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.case-flotte {
+    display: none;
+    min-width: 48px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-flotte-enregistrer],
+[data-flotte-annuler] {
+    display: none;
+}
+
+.flotte-creation [data-flotte-creer],
+.flotte-creation .hors-creation {
+    display: none;
+}
+
+.flotte-creation [data-flotte-enregistrer] {
+    display: inline-flex;
+}
+
+.flotte-creation [data-flotte-annuler],
+.flotte-creation .case-flotte {
+    display: inline-flex;
+}

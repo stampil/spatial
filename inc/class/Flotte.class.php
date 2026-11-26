@@ -3,6 +3,8 @@
 class Flotte {
 
     const NOM_LONGUEUR_MAX = 32;
+    const NOM_PAR_DEFAUT = 'Flotte ';
+    const VAISSEAUX_MINIMUM = 2;
 
     private MyPDO $bdd;
     public int $id;
@@ -14,39 +16,40 @@ class Flotte {
         return MyPDO::getInstance()->query($query,$joueurId);
     }
 
-    public static function creer(Joueur $joueur, Planete $planete, string $nom, array $nombres): ?string {
+    public static function creer(Joueur $joueur, Planete $planete, array $vaisseauxIds): ?string {
+        $ids = array_values(array_unique(array_map('intval', $vaisseauxIds)));
+        if(count($ids) < self::VAISSEAUX_MINIMUM){
+            return 'Une flotte demande au moins '.self::VAISSEAUX_MINIMUM.' vaisseaux.';
+        }
+        $db = MyPDO::getInstance();
+        $marquesIds = implode(',', array_fill(0, count($ids), '?'));
+        $types = Vaisseau::typesDeFlotte();
+        $marquesTypes = implode(',', array_fill(0, count($types), '?'));
+        $conditions = "WHERE id IN ($marquesIds) AND id_joueur=? AND id_planete=? AND arrivee IS NULL AND id_flotte IS NULL AND type IN ($marquesTypes)";
+        $parametres = array_merge($ids, array($joueur->id, $planete->id), $types);
+        $eligibles = (int) $db->query("SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau " . $conditions,...$parametres)[0]->nombre;
+        if($eligibles !== count($ids)){
+            return 'La situation a changé sur cette planète : recommencez.';
+        }
+        $query = "SELECT COALESCE(MAX(numero), 0) + 1 AS suivant FROM " . MyPDO::DB_FLAG . "flotte WHERE id_joueur=?";
+        $numero = (int) $db->query($query,$joueur->id)[0]->suivant;
+        $db->query("INSERT INTO " . MyPDO::DB_FLAG . "flotte (id_joueur,nom,numero,creato) VALUES (?,?,?,?)",$joueur->id,self::NOM_PAR_DEFAUT.$numero,$numero,Tools::now());
+        $flotteId = (int) $db->lastInsertId();
+        $db->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=? " . $conditions,$flotteId,...$parametres);
+        if($db->lastRowCount !== count($ids)){
+            $db->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=NULL WHERE id_flotte=?",$flotteId);
+            $db->query("DELETE FROM " . MyPDO::DB_FLAG . "flotte WHERE id=?",$flotteId);
+            return 'La situation a changé sur cette planète : recommencez.';
+        }
+        return null;
+    }
+
+    public static function renommer(Joueur $joueur, int $flotteId, string $nom): ?string {
         $nom = trim($nom);
         if($nom === '' || mb_strlen($nom) > self::NOM_LONGUEUR_MAX){
             return 'Le nom de la flotte doit faire entre 1 et '.self::NOM_LONGUEUR_MAX.' caractères.';
         }
-        $stock = Vaisseau::stock($planete->id, $joueur->id);
-        $total = 0;
-        foreach(Vaisseau::typesDeFlotte() as $type){
-            $nombre = $nombres[$type] ?? 0;
-            if($nombre < 0 || $nombre > ($stock[$type] ?? 0)){
-                return 'Pas assez de vaisseaux : '.Vaisseau::CATALOGUE[$type]['nom'].' (disponibles : '.($stock[$type] ?? 0).').';
-            }
-            $total += $nombre;
-        }
-        if($total === 0){
-            return 'Une flotte demande au moins un vaisseau.';
-        }
-        $db = MyPDO::getInstance();
-        $db->query("INSERT INTO " . MyPDO::DB_FLAG . "flotte (id_joueur,nom,creato) VALUES (?,?,?)",$joueur->id,$nom,Tools::now());
-        $flotteId = (int) $db->lastInsertId();
-        foreach(Vaisseau::typesDeFlotte() as $type){
-            $nombre = $nombres[$type] ?? 0;
-            if($nombre === 0){
-                continue;
-            }
-            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
-            $db->query($query,$flotteId,$joueur->id,$planete->id,$type);
-            if($db->lastRowCount !== $nombre){
-                $db->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=NULL WHERE id_flotte=?",$flotteId);
-                $db->query("DELETE FROM " . MyPDO::DB_FLAG . "flotte WHERE id=?",$flotteId);
-                return 'La situation a changé sur cette planète : recommencez.';
-            }
-        }
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "flotte SET nom=? WHERE id=? AND id_joueur=?",$nom,$flotteId,$joueur->id);
         return null;
     }
 
@@ -101,10 +104,10 @@ class Flotte {
     public function deplacer(Joueur $joueur, Planete $destination): ?string {
         $depart = $this->planeteAuRepos();
         if($depart === null){
-            return 'La flotte '.$this->nom.' est déjà en déplacement.';
+            return $this->nom.' est déjà en déplacement.';
         }
         if($depart === $destination->id){
-            return 'La flotte '.$this->nom.' est déjà sur cette planète.';
+            return $this->nom.' est déjà sur cette planète.';
         }
         if(!$joueur->peutCibler($destination->systeme)){
             return 'Destination inconnue.';
@@ -118,11 +121,11 @@ class Flotte {
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, depart=?, arrivee=? WHERE id_flotte=? AND arrivee IS NULL";
         $this->bdd->query($query,$destination->id,$heureDepart,$arrivee,$this->id);
         if($this->bdd->lastRowCount === 0){
-            return 'La flotte '.$this->nom.' est déjà en déplacement.';
+            return $this->nom.' est déjà en déplacement.';
         }
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau e JOIN " . MyPDO::DB_FLAG . "vaisseau h ON h.id=e.id_hote SET e.id_destination=?, e.depart=?, e.arrivee=? WHERE h.id_flotte=? AND e.arrivee IS NULL";
         $this->bdd->query($query,$destination->id,$heureDepart,$arrivee,$this->id);
-        Tools::addMessage('Flotte '.$this->nom.' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', $duree).'.');
+        Tools::addMessage($this->nom.' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', $duree).'.');
         return null;
     }
 

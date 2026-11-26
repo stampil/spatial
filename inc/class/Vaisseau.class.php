@@ -211,7 +211,7 @@ class Vaisseau {
         }
         foreach($flottes as $flotte){
             if($flotte->id_joueur !== $joueur->id || $flotte->planeteAuRepos() !== $depart->id){
-                return 'La flotte '.$flotte->nom.' ne peut pas partir de cette planète.';
+                return $flotte->nom.' ne peut pas partir de cette planète.';
             }
         }
         $nommes = array();

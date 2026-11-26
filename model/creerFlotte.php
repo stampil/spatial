@@ -3,14 +3,10 @@ if(!Tools::isValidCsrfToken($_POST[CSRF_KEY] ?? null)){
     exit('Jeton invalide');
 }
 $planete = new Planete((int) ($_POST['planete'] ?? 0));
-$nombres = is_array($_POST['nombre'] ?? null) ? $_POST['nombre'] : array();
-$inclus = is_array($_POST['inclure'] ?? null) ? $_POST['inclure'] : array();
-foreach(Vaisseau::typesDeFlotte() as $type){
-    $nombres[$type] = isset($inclus[$type]) ? (int) giveInputString($nombres, $type) : 0;
-}
+$vaisseaux = is_array($_POST['vaisseau'] ?? null) ? $_POST['vaisseau'] : array();
 
-$erreur = Flotte::creer($Joueur, $planete, giveInputString($_POST, 'nom'), $nombres);
-Tools::addMessage($erreur ?? 'Flotte '.trim(giveInputString($_POST, 'nom')).' créée sur '.$planete->nom.'.');
+$erreur = Flotte::creer($Joueur, $planete, $vaisseaux);
+Tools::addMessage($erreur ?? 'Flotte créée sur '.$planete->nom.'.');
 
 ?>
 

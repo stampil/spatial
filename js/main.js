@@ -69,6 +69,8 @@ $(function(){
     var DELAI_MESSAGE = 8000;
     var DELAI_RAFRAICHISSEMENT_MIN = 3000;
     var DELAI_AVANT_RECHARGEMENT = 3000;
+    var LIBELLE_CREER_FLOTTE = 'Créer une flotte';
+    var LIBELLE_ENREGISTRER_FLOTTE = 'Enregistrer';
     var CAUSE_PAGE = 'page illisible : ';
     var MESSAGE_ECHEC_ACTION_AVANT = 'Action non confirmée (';
     var MESSAGE_ECHEC_ACTION_APRES = ') : vérifiez le résultat avant de recommencer.';
@@ -226,6 +228,25 @@ $(function(){
             document.dispatchEvent(new Event('sante-verifier'));
             signalerEchecAction(formulaire, erreur.message);
         });
+    });
+
+    function majCreationFlotte(section) {
+        var pret = section.find('.case-flotte input:checked').length >= section.data('minimum');
+        section.find('[data-flotte-enregistrer]').prop('disabled', !pret).text(pret ? LIBELLE_ENREGISTRER_FLOTTE : LIBELLE_CREER_FLOTTE);
+    }
+
+    $(document).on('click', '[data-flotte-creer]', function() {
+        var section = $(this).closest('.panneau');
+        section.addClass('flotte-creation');
+        majCreationFlotte(section);
+    });
+    $(document).on('click', '[data-flotte-annuler]', function() {
+        var section = $(this).closest('.panneau');
+        section.removeClass('flotte-creation').find('.case-flotte input').prop('checked', false);
+        majCreationFlotte(section);
+    });
+    $(document).on('change', '.case-flotte input', function() {
+        majCreationFlotte($(this).closest('.panneau'));
     });
 
     $(document).on('input', '.curseur__piste', function() {

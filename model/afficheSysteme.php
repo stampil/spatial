@@ -53,7 +53,7 @@ foreach($systeme->planetes as $p){
         <?php if(count($stock) > 0 || count($flottes) > 0){ ?>
         <?php if(count($stock) > 0){ echo Vue::composition($stock, $Joueur->id_camp); } ?>
         <?php foreach($flottes as $flotte){ ?>
-        <p class="md3-secondary">Flotte <?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?></p>
+        <p class="md3-secondary"><?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?></p>
         <?php } ?>
         <div class="md3-actions fiche__actions">
             <a class="md3-button md3-button--tonal" href="?p=listeVaisseau#planete-<?= $p->id ?>">Donner des ordres</a>

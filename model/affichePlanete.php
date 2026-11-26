@@ -88,7 +88,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec la flotte <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?>)" />
+            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?>)" />
         </form>
     <?php } ?>
     <?php if($debarquement){ ?>

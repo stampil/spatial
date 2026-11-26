@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `flotte` (
   `id_joueur` int(11) NOT NULL,
   `nom` varchar(64) NOT NULL,
   `creato` datetime NOT NULL,
+  `numero` int(11) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -143,7 +144,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('016_exploration_risquee'),
 ('017_connexion_automatique'),
 ('018_vaisseaux_nommes_embarques'),
-('019_aide_icones_masquee');
+('019_aide_icones_masquee'),
+('020_flotte_numero');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

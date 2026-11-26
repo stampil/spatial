@@ -40,11 +40,22 @@ foreach($flottes as $ligne){
     $trajet = $flotte->enRoute();
 ?>
 <section class="panneau">
-    <h2 class="panneau__titre"><?= Icone::html('persos') ?>Flotte <?= htmlspecialchars($flotte->nom) ?></h2>
+    <h2 class="panneau__titre"><?= Icone::html('persos') ?><?= htmlspecialchars($flotte->nom) ?></h2>
     <?= Vue::composition($flotte->composition(), $Joueur->id_camp) ?>
     <?php if($auRepos !== null){ $planete = new Planete($auRepos); $libres = Vaisseau::stockLibre($planete->id, $Joueur->id); ?>
     <p>Au repos sur <?= $planete->getNom() ?></p>
-    <?php foreach($flotte->vaisseaux() as $vaisseau){ $avecVoyage = false; require 'inc/vaisseauNomme.php'; } ?>
+    <?php foreach($flotte->vaisseaux() as $vaisseau){ $avecVoyage = false; $avecCase = false; require 'inc/vaisseauNomme.php'; } ?>
+    <details class="systeme-details">
+        <summary>Renommer</summary>
+        <form class="systeme-details__corps" method="POST" action="?p=renommerFlotte">
+            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+            <?= csrfField() ?>
+            <div class="ligne-jeu">
+                <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($flotte->nom) ?>" required aria-label="Nom de la flotte" />
+                <input type="submit" class="md3-button md3-button--tonal" value="Renommer" />
+            </div>
+        </form>
+    </details>
     <div class="md3-actions">
         <a class="md3-button" href="?p=carte&ordre=<?= $planete->id ?>&flotte=<?= $flotte->id ?>">Voyager</a>
         <a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a>
@@ -73,11 +84,25 @@ foreach(array_keys($posees) as $planeteId){
     $planete = new Planete($planeteId);
     $types = $posees[$planeteId];
     $libres = $types;
-    $eligibles = array_intersect_key($types, array_flip(Vaisseau::typesDeFlotte()));
+    $nommesPlanete = $nommes[$planete->id] ?? array();
+    $creationPossible = count($nommesPlanete) >= Flotte::VAISSEAUX_MINIMUM;
 ?>
-<section class="panneau" id="planete-<?= $planete->id ?>">
-    <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
-    <?= Vue::composition($types, $Joueur->id_camp) ?>
+<section class="panneau" id="planete-<?= $planete->id ?>" data-minimum="<?= Flotte::VAISSEAUX_MINIMUM ?>">
+    <div class="panneau__tete">
+        <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
+        <?php if($creationPossible){ ?>
+        <div class="panneau__outils">
+            <button type="button" class="md3-button md3-button--tonal" data-flotte-creer>Créer une flotte</button>
+            <button type="submit" class="md3-button" form="creation-flotte-<?= $planete->id ?>" data-flotte-enregistrer disabled>Créer une flotte</button>
+            <button type="button" class="panneau__croix" data-flotte-annuler aria-label="Annuler la création de flotte" title="Annuler la création de flotte">&times;</button>
+        </div>
+        <form id="creation-flotte-<?= $planete->id ?>" method="POST" action="?p=creerFlotte">
+            <input type="hidden" name="planete" value="<?= $planete->id ?>" />
+            <?= csrfField() ?>
+        </form>
+        <?php } ?>
+    </div>
+    <div class="hors-creation"><?= Vue::composition($types, $Joueur->id_camp) ?></div>
     <?php if(($types[Vaisseau::TRANSPORT_PERSO] ?? 0) > 0){ ?>
     <?php
     $embarques = array();
@@ -85,12 +110,12 @@ foreach(array_keys($posees) as $planeteId){
         array_push($embarques, (new Perso($ligneEmbarque->id))->getNom());
     }
     ?>
-    <p class="md3-secondary">Persos embarqués (<?= count($embarques) ?>/<?= $types[Vaisseau::TRANSPORT_PERSO] * Vaisseau::CAPACITE_TRANSPORT_PERSO ?>) : <?= count($embarques) > 0 ? implode(', ', $embarques) : 'aucun' ?>. Ils partent avec le transport.</p>
+    <p class="md3-secondary hors-creation">Persos embarqués (<?= count($embarques) ?>/<?= $types[Vaisseau::TRANSPORT_PERSO] * Vaisseau::CAPACITE_TRANSPORT_PERSO ?>) : <?= count($embarques) > 0 ? implode(', ', $embarques) : 'aucun' ?>. Ils partent avec le transport.</p>
     <?php } ?>
-    <p><a href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a></p>
-    <?php foreach($nommes[$planete->id] ?? array() as $vaisseau){ $avecVoyage = true; require 'inc/vaisseauNomme.php'; } ?>
+    <p class="hors-creation"><a href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a></p>
+    <?php foreach($nommesPlanete as $vaisseau){ $avecVoyage = true; $avecCase = $creationPossible; require 'inc/vaisseauNomme.php'; } ?>
     <?php foreach($types as $type => $nombre){ if(Vaisseau::estNomme($type) || $type === Vaisseau::TROUPE){ continue; } ?>
-    <div class="ligne-jeu">
+    <div class="ligne-jeu hors-creation">
         <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type]['nom'] ?> × <?= $nombre ?></span>
         <div class="md3-actions">
             <?php if($type === Vaisseau::RECONNAISSANCE){ ?>
@@ -109,26 +134,7 @@ foreach(array_keys($posees) as $planeteId){
     </div>
     <?php } ?>
     <?php if(($types[Vaisseau::TROUPE] ?? 0) > 0){ ?>
-    <p class="md3-secondary"><?= Icone::html(Vaisseau::CATALOGUE[Vaisseau::TROUPE]['icone']) ?><?= Vaisseau::CATALOGUE[Vaisseau::TROUPE]['nom'] ?> × <?= $types[Vaisseau::TROUPE] ?> : à embarquer sur un vaisseau pour voyager.</p>
-    <?php } ?>
-    <?php if(count($eligibles) > 0){ ?>
-    <details class="systeme-details">
-        <summary>Créer une flotte</summary>
-        <form class="systeme-details__corps" method="POST" action="?p=creerFlotte">
-            <input type="hidden" name="planete" value="<?= $planete->id ?>" />
-            <?= csrfField() ?>
-            <?php foreach(Vaisseau::typesDeFlotte() as $type){ $nombre = $types[$type] ?? 0; ?>
-            <div class="ligne-jeu">
-                <label class="ligne-jeu__info"><input type="checkbox" name="inclure[<?= $type ?>]"<?= $nombre === 0 ? ' disabled' : '' ?> /><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type][Vaisseau::CLE_PREFIXE] ?></label>
-                <?= Vue::curseur('nombre['.$type.']', min(1, $nombre), $nombre, min(1, $nombre), 'Nombre dans la flotte : '.Vaisseau::CATALOGUE[$type]['nom']) ?>
-            </div>
-            <?php } ?>
-            <div class="ligne-jeu">
-                <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" placeholder="Nom de la flotte" required aria-label="Nom de la flotte" />
-                <input type="submit" class="md3-button md3-button--tonal" value="Créer une flotte" />
-            </div>
-        </form>
-    </details>
+    <p class="md3-secondary hors-creation"><?= Icone::html(Vaisseau::CATALOGUE[Vaisseau::TROUPE]['icone']) ?><?= Vaisseau::CATALOGUE[Vaisseau::TROUPE]['nom'] ?> × <?= $types[Vaisseau::TROUPE] ?> : à embarquer sur un vaisseau pour voyager.</p>
     <?php } ?>
 </section>
 <?php } ?>

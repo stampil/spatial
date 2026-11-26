@@ -6,6 +6,9 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
 <div class="vaisseau-nomme">
     <div class="ligne-jeu">
         <div class="ligne-jeu__info">
+            <?php if($avecCase){ ?>
+            <label class="case-flotte"><input type="checkbox" form="creation-flotte-<?= $vaisseau->id_planete ?>" name="vaisseau[]" value="<?= $vaisseau->id ?>" aria-label="Choisir <?= htmlspecialchars($vaisseau->nom) ?> pour la flotte" /></label>
+            <?php } ?>
             <?= Vue::visuelVaisseau($vaisseau->type, $Joueur->id_camp) ?>
             <div>
                 <strong><?= htmlspecialchars($vaisseau->nom) ?></strong>
@@ -15,10 +18,10 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
             </div>
         </div>
         <?php if($avecVoyage){ ?>
-        <a class="md3-button" href="?p=carte&ordre=<?= $vaisseau->id_planete ?>&vaisseau=<?= $vaisseau->id ?>">Voyager</a>
+        <a class="md3-button hors-creation" href="?p=carte&ordre=<?= $vaisseau->id_planete ?>&vaisseau=<?= $vaisseau->id ?>">Voyager</a>
         <?php } ?>
     </div>
-    <details class="systeme-details">
+    <details class="systeme-details hors-creation">
         <summary>Embarquer</summary>
         <div class="systeme-details__corps">
             <?php foreach($capacites as $typeEmbarque => $cle){ if($infos[$cle] === 0){ continue; } $place = max(0, min($infos[$cle] - ($embarques[$typeEmbarque] ?? 0), $libres[$typeEmbarque] ?? 0)); ?>
@@ -42,7 +45,7 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
             <?php } ?>
         </div>
     </details>
-    <details class="systeme-details">
+    <details class="systeme-details hors-creation">
         <summary>Renommer</summary>
         <form class="systeme-details__corps" method="POST" action="?p=renommerVaisseau">
             <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />

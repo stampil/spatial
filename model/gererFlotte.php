@@ -10,7 +10,7 @@ if($flotte->id_joueur !== $Joueur->id){
 }
 elseif($action === 'dissoudre'){
     $flotte->dissoudre();
-    Tools::addMessage('Flotte '.$flotte->nom.' dissoute : ses vaisseaux redeviennent isolés.');
+    Tools::addMessage($flotte->nom.' dissoute : ses vaisseaux redeviennent isolés.');
 }
 else{
     Tools::addMessage('Action inconnue.');

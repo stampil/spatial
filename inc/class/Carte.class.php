@@ -170,7 +170,7 @@ class Carte {
             $flotte = new Flotte($ligne->id);
             $ligneFlotte = $flotte->enRoute();
             if($ligneFlotte !== null){
-                $trajets['flotte|'.$flotte->id] = self::trajet($destinations, 'Flotte '.$flotte->nom, $ligneFlotte);
+                $trajets['flotte|'.$flotte->id] = self::trajet($destinations, $flotte->nom, $ligneFlotte);
             }
         }
         return array_values($trajets);
