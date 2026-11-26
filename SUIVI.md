@@ -21,9 +21,19 @@ Lu (rien codé) : les boutons d'action portent des phrases longues (« Attaquer 
 
 Ce que je comprends : chaque bouton d'action devient un bouton à icône (style duotone, générées comme les 24 précédentes, prompts un par un), avec le détail (nombre, durée, chance) sorti du libellé.
 
+### 3. Flottes IA stationnées : elles participent à la défense (26/11)
+
+Ta phrase : « il faut modeliser aussi des flottes IA qui stationner sur une planete participe a la defense ».
+
+Lu (rien codé) : une planète tenue par un camp IA (pirates, empire, rébellion) n'a aujourd'hui que 3 valeurs de défense : bouclier, canon, troupes (garnison) ; elles se reconstituent de x % par heure. Elle n'a AUCUN vaisseau : les raids de l'IA (`Ia::raid`, `Menace`) sont abstraits (une « puissance » tirée de la taille de la planète source). Dans `Combat::attaquer`, seuls bouclier et canon de la planète encaissent et tirent.
+
+Ce que je comprends : une planète IA peut avoir une flotte stationnée (des chasseurs, frégates, capitaux comme les tiens). Quand tu l'attaques, cette flotte défend avec le bouclier et le canon : sa force s'ajoute à la défense, elle subit des dégâts, peut être détruite, et tes pertes en tiennent compte.
+
+Proposition (à valider) : un petit stock de vaisseaux par planète IA (type + nombre, dans une table dédiée, pas des vaisseaux de joueur), dimensionné par la taille de la planète et le camp ; il apparaît à la génération de l'univers, se reconstitue lentement comme la défense, et se voit sur la fiche de la planète (« Flotte pirate stationnée : N vaisseaux »). Dans le combat, ses vaisseaux tirent dans les mêmes phases que les tiens et absorbent des dégâts avant le canon.
+
 ## Questions en suspens
 
-1. Bouton : icône seule avec infobulle / nom accessible, ou icône + un seul mot court (« Attaquer », « Voyager »…) ? Sur mobile, une icône seule est plus compacte mais moins claire.
-2. Les infos qui sont dans le libellé aujourd'hui (nombre de vaisseaux, durée, chance de réussite) : en petit texte à côté du bouton ?
-3. Périmètre : on commence par les actions de combat (attaquer avec vaisseaux, attaquer avec flotte, attaquer avec chasseurs, débarquer les troupes) et la page Flottes (voyager, chercher, reconnaître, embarquer, débarquer, renommer, dissoudre) ; le reste (production, construction, rôles) ensuite ?
-4. « Attaque de chasseurs » : une action propre aux chasseurs (distincte de l'attaque des vaisseaux de combat), ou juste l'icône de l'attaque quand les chasseurs sont là ?
+1. Force : par défaut, 1 vaisseau de combat par slot de la planète pour l'Empire, moins pour les pirates (et rien pour la Rébellion discrète) ; ça te va, ou autre barème ?
+2. Tutoriel : la planète pirate du tutoriel garde un petit stock (ex. 1 chasseur) ou aucun, pour que l'assaut avec 1 frégate + 3 chasseurs reste gagnable ?
+3. La flotte stationnée est-elle visible dès qu'on connaît la planète, ou seulement après une reconnaissance ?
+4. Se reconstitue-t-elle (comme bouclier et canon, x % par heure) ou est-elle définitivement détruite quand tu la bats ?
