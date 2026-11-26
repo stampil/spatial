@@ -20,6 +20,9 @@ class Planete {
     const REVOLTE_ALERTE = 70;
     const REGENERATION_POURCENT_PAR_HEURE = 10;
     const REGENERATION_MINIMUM_PAR_HEURE = 1;
+    const FLOTTE_EMPIRE_PAR_SLOT = 1;
+    const FLOTTE_PIRATES_DIVISEUR_SLOT = 2;
+    const FLOTTE_PIRATES_MINIMUM = 1;
     const TROUPES_PAR_HEURE = 1;
     const TROUPES_DE_BASE_MINIMUM = 1;
     const PERCENT = 100;
@@ -43,6 +46,7 @@ class Planete {
     public int $troupes;
     public ?string $bonus;
     public ?string $defense_maj;
+    public int $flotte_ia;
     public ?string $detournement_fin;
     public Systeme $systeme;
     public static int $min_slot = 1;
@@ -89,18 +93,20 @@ class Planete {
 
     public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp, ?string $bonus = null): int{
         $nom_planete = preg_replace("/-[0-9]+/",' '.$numero,$Systeme->nom);
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,bonus,creato)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,flotte_ia,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,bonus,creato)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
         $gouverneur=0;
         $bouclier = 0;
         $canon = 0;
         $troupes = 0;
+        $flotteIa = 0;
         if($id_camp !== null){
             $bouclier = self::bouclierDeBase($slot);
             $canon = self::canonDeBase($slot);
             $troupes = self::troupesDeBase($slot);
+            $flotteIa = self::flotteIADeBase($slot, $id_camp);
         }
-        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,0,0,0,0,0,$bonus);
+        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,$flotteIa,0,0,0,0,0,$bonus);
         return MyPDO::getInstance()->lastInsertId();
     }
 
@@ -116,26 +122,44 @@ class Planete {
         return intdiv($slot, self::TROUPES_DIVISEUR_SLOT) + self::TROUPES_DE_BASE_MINIMUM;
     }
 
+    public static function flotteIADeBase(int $slot, ?int $idCamp): int{
+        if($idCamp === Camp::EMPIRE){
+            return $slot * self::FLOTTE_EMPIRE_PAR_SLOT;
+        }
+        if($idCamp === Camp::PIRATES){
+            return max(self::FLOTTE_PIRATES_MINIMUM, intdiv($slot, self::FLOTTE_PIRATES_DIVISEUR_SLOT));
+        }
+        return 0;
+    }
+
+    private static function expressionFlotteDeBase(): string{
+        return "IF(id_camp=" . Camp::EMPIRE . ", slot * " . self::FLOTTE_EMPIRE_PAR_SLOT . ", IF(id_camp=" . Camp::PIRATES . ", GREATEST(" . self::FLOTTE_PIRATES_MINIMUM . ", slot DIV " . self::FLOTTE_PIRATES_DIVISEUR_SLOT . "), 0))";
+    }
+
     public static function regenererDefenses(): void{
         $maintenant = Tools::now();
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET "
-            . self::expressionRegeneration('bouclier', self::BOUCLIER_PAR_SLOT) . ", "
-            . self::expressionRegeneration('canon', self::CANON_PAR_SLOT) . ", "
+            . self::expressionRegeneration('bouclier', 'slot*' . self::BOUCLIER_PAR_SLOT) . ", "
+            . self::expressionRegeneration('canon', 'slot*' . self::CANON_PAR_SLOT) . ", "
+            . "flotte_ia = IF(gouverneur=0, " . self::valeurRegeneree('flotte_ia', self::expressionFlotteDeBase()) . ", flotte_ia), "
             . "troupes = IF(gouverneur=0, GREATEST(troupes, LEAST(slot DIV " . self::TROUPES_DIVISEUR_SLOT . " + " . self::TROUPES_DE_BASE_MINIMUM . ", troupes + TIMESTAMPDIFF(HOUR, defense_maj, ?) * " . self::TROUPES_PAR_HEURE . ")), troupes), "
             . "defense_maj = DATE_ADD(defense_maj, INTERVAL TIMESTAMPDIFF(HOUR, defense_maj, ?) HOUR) "
             . "WHERE id_camp IS NOT NULL AND defense_maj IS NOT NULL AND defense_maj <= ?";
         $db = MyPDO::getInstance();
-        $db->query($query,$maintenant,$maintenant,$maintenant,$maintenant,Tools::formatDate(time() - self::SECONDS_PER_HOUR));
+        $db->query($query,$maintenant,$maintenant,$maintenant,$maintenant,$maintenant,Tools::formatDate(time() - self::SECONDS_PER_HOUR));
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET defense_maj=NULL
             WHERE defense_maj IS NOT NULL
-            AND (id_camp IS NULL OR (bouclier>=slot*" . self::BOUCLIER_PAR_SLOT . " AND canon>=slot*" . self::CANON_PAR_SLOT . " AND (gouverneur<>0 OR troupes>=slot DIV " . self::TROUPES_DIVISEUR_SLOT . " + " . self::TROUPES_DE_BASE_MINIMUM . ")))";
+            AND (id_camp IS NULL OR (bouclier>=slot*" . self::BOUCLIER_PAR_SLOT . " AND canon>=slot*" . self::CANON_PAR_SLOT . " AND (gouverneur<>0 OR flotte_ia>=" . self::expressionFlotteDeBase() . ") AND (gouverneur<>0 OR troupes>=slot DIV " . self::TROUPES_DIVISEUR_SLOT . " + " . self::TROUPES_DE_BASE_MINIMUM . ")))";
         $db->query($query);
     }
 
-    private static function expressionRegeneration(string $colonne, int $parSlot): string{
-        $maximum = "slot*" . $parSlot;
+    private static function expressionRegeneration(string $colonne, string $maximum): string{
+        return $colonne . " = " . self::valeurRegeneree($colonne, $maximum);
+    }
+
+    private static function valeurRegeneree(string $colonne, string $maximum): string{
         $parHeure = "GREATEST(" . self::REGENERATION_MINIMUM_PAR_HEURE . ", " . $maximum . "*" . self::REGENERATION_POURCENT_PAR_HEURE . " DIV " . self::PERCENT . ")";
-        return $colonne . " = GREATEST(" . $colonne . ", LEAST(" . $maximum . ", " . $colonne . " + TIMESTAMPDIFF(HOUR, defense_maj, ?) * " . $parHeure . "))";
+        return "GREATEST(" . $colonne . ", LEAST(" . $maximum . ", " . $colonne . " + TIMESTAMPDIFF(HOUR, defense_maj, ?) * " . $parHeure . "))";
     }
 
     public static function fillSysteme(Perso $Perso,Systeme $Systeme): void{
@@ -218,6 +242,7 @@ class Planete {
         $this->troupes = $ret[0]->troupes;
         $this->bonus = $ret[0]->bonus;
         $this->defense_maj = $ret[0]->defense_maj;
+        $this->flotte_ia = $ret[0]->flotte_ia;
         $this->detournement_fin = $ret[0]->detournement_fin;
         $this->systeme = new Systeme($this->id_systeme);
         return $this;
@@ -357,7 +382,7 @@ class Planete {
     }
 
     public function capturer(Joueur $joueur, int $troupes): bool {
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, defense_maj=?, detournement_fin=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, defense_maj=?, detournement_fin=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, flotte_ia=0 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0 AND flotte_ia=0";
         $this->bdd->query($query,$joueur->id,$joueur->id_camp,$troupes,self::CAPTURE_REVOLTE,Tools::now(),Tools::now(),$this->id,$this->gouverneur);
         if($this->bdd->lastRowCount !== 1){
             return false;

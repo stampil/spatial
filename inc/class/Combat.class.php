@@ -24,20 +24,38 @@ class Combat {
             return 'Cette planète est inconnue.';
         }
         $flotteId = $flotte === null ? null : $flotte->id;
-        $stock = Vaisseau::stock($planete->id, $joueur->id, $flotteId);
-        $nombres = array();
-        foreach(self::ESCADRE as $type){
-            $nombres[$type] = $stock[$type] ?? 0;
-        }
+        $nombres = Vaisseau::combattants($planete->id, $joueur->id, $flotteId);
         if(array_sum($nombres) === 0){
-            return 'Aucun vaisseau de combat sur cette planète.';
+            return 'Aucun vaisseau de combat engagé sur cette planète.';
         }
-        if($planete->bouclier + $planete->canon === 0){
+        $defenseurs = self::defenseurs($planete);
+        if($planete->bouclier + $planete->canon === 0 && array_sum($defenseurs) === 0){
             return "Cette planète n'a plus de défense.";
         }
 
         $bonusHeros = Perso::boostHeros($joueur, $planete, Perso::CARACTERISTIQUE_FORCE) * self::HEROS_BONUS_PAR_ETOILE_POURCENT;
         $resistance = $planete->bonus === Bonus::CITADELLE ? Bonus::pourcent(Bonus::CITADELLE) : 0;
+        $pertesBataille = array_fill_keys(self::ESCADRE, 0);
+        $bilanBataille = '';
+        if(array_sum($defenseurs) > 0){
+            $bataille = self::bataille('Flotte défenseuse sur '.$planete->nom, array(
+                self::ATTAQUANT => array('nom' => $joueur->nom, 'nombres' => $nombres, 'bonus' => $bonusHeros),
+                self::DEFENSEUR => array('nom' => self::nomDefenseur($planete), 'nombres' => $defenseurs, 'bonus' => self::bonusDefenseur($planete)),
+            ));
+            self::retirerDefenseurs($planete, $bataille['pertes'][self::DEFENSEUR], $joueur);
+            Tools::addRapport($bataille['rapport']);
+            $pertesBataille = $bataille['pertes'][self::ATTAQUANT];
+            if($bataille['vainqueur'] !== self::ATTAQUANT){
+                Vaisseau::retirerCombattants($planete->id, $joueur->id, $flotteId, $pertesBataille);
+                Tools::addMessage($bataille['bilan']);
+                return null;
+            }
+            $joueur->crediter($bataille['epaves']);
+            $bilanBataille = $bataille['bilan'].' ';
+            foreach(self::ESCADRE as $type){
+                $nombres[$type] -= $pertesBataille[$type];
+            }
+        }
         $etapes = array();
         $degats = self::puissance($nombres['chasseur'], 'chasseur', $bonusHeros, $resistance);
         list($canon, $bouclier) = self::infliger($degats, $planete->canon, $planete->bouclier);
@@ -58,15 +76,18 @@ class Combat {
             return 'La situation a changé sur cette planète : recommencez.';
         }
 
-        $pertes = self::pertes($nombres, $planete->canon);
+        $pertes = $pertesBataille;
+        foreach(self::pertes($nombres, $planete->canon) as $type => $perdus){
+            $pertes[$type] += $perdus;
+        }
         $rapport = array();
         foreach($pertes as $type => $perdus){
-            $query = "DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte <=> ? ORDER BY id LIMIT " . $perdus;
-            $db->query($query,$joueur->id,$planete->id,$type,$flotteId);
-            array_push($rapport, $perdus.' × '.Vaisseau::CATALOGUE[$type]['nom']);
+            if($perdus > 0){
+                array_push($rapport, $perdus.' × '.Vaisseau::CATALOGUE[$type]['nom']);
+            }
         }
-        Vaisseau::libererOrphelins();
-        $message = 'Combat sur '.$planete->nom.' : défense restante, bouclier '.$bouclier.' et canon '.$canon.'. Pertes : '.(count($rapport) > 0 ? implode(', ', $rapport) : 'aucune').'.';
+        Vaisseau::retirerCombattants($planete->id, $joueur->id, $flotteId, $pertes);
+        $message = $bilanBataille.'Combat sur '.$planete->nom.' : défense restante, bouclier '.$bouclier.' et canon '.$canon.'. Pertes : '.(count($rapport) > 0 ? implode(', ', $rapport) : 'aucune').'.';
         if($resistance > 0){
             $message .= ' Citadelle : défense +'.$resistance.' %.';
         }
@@ -94,6 +115,43 @@ class Combat {
         return null;
     }
 
+    public static function defenseurs(Planete $planete): array {
+        if($planete->gouverneur === 0){
+            $nombres = array_fill_keys(self::ESCADRE, 0);
+            $nombres[Vaisseau::CHASSEUR] = $planete->flotte_ia;
+            return $nombres;
+        }
+        return Vaisseau::escadre($planete->id, $planete->gouverneur);
+    }
+
+    private static function nomDefenseur(Planete $planete): string {
+        if($planete->gouverneur === 0){
+            return (new Camp($planete->id_camp))->nom;
+        }
+        return (new Joueur($planete->gouverneur))->nom;
+    }
+
+    private static function bonusDefenseur(Planete $planete): int {
+        if($planete->gouverneur === 0){
+            return $planete->bonus === Bonus::CITADELLE ? Bonus::pourcent(Bonus::CITADELLE) : 0;
+        }
+        return Menace::bonusDefense(new Joueur($planete->gouverneur), $planete);
+    }
+
+    private static function retirerDefenseurs(Planete $planete, array $pertes, Joueur $attaquant): void {
+        $total = array_sum($pertes);
+        if($total === 0){
+            return;
+        }
+        if($planete->gouverneur === 0){
+            $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET flotte_ia=GREATEST(0, flotte_ia-?), defense_maj=COALESCE(defense_maj, ?) WHERE id=?";
+            MyPDO::getInstance()->query($query,$pertes[Vaisseau::CHASSEUR],Tools::now(),$planete->id);
+            return;
+        }
+        Vaisseau::detruire($planete->id, $planete->gouverneur, $pertes);
+        Journal::ajouter($planete->gouverneur, $attaquant->nom.' attaque '.$planete->nom.' : '.$total.' '.__('vaisseau','vaisseaux',$total).' détruit(s).');
+    }
+
     public static function debarquer(Joueur $joueur, Planete $planete): ?string {
         if($planete->gouverneur === $joueur->id){
             return 'Vous gouvernez déjà cette planète.';
@@ -103,6 +161,9 @@ class Combat {
         }
         if($planete->bouclier + $planete->canon > 0){
             return "La défense planétaire tient encore : détruisez-la d'abord.";
+        }
+        if(array_sum(self::defenseurs($planete)) > 0){
+            return 'La flotte défenseuse tient encore : détruisez-la d\'abord.';
         }
         $troupes = Vaisseau::troupesEnBarge($planete->id, $joueur->id);
         if($troupes === 0){

@@ -15,7 +15,8 @@ ALTER TABLE `planete`
   ADD COLUMN `troupes` int(11) NOT NULL DEFAULT '0' AFTER `canon`,
   ADD COLUMN `bonus` varchar(16) DEFAULT NULL AFTER `troupes`,
   ADD COLUMN `defense_maj` datetime DEFAULT NULL AFTER `bonus`,
-  ADD COLUMN `detournement_fin` datetime DEFAULT NULL AFTER `defense_maj`;
+  ADD COLUMN `detournement_fin` datetime DEFAULT NULL AFTER `defense_maj`,
+  ADD COLUMN `flotte_ia` int(11) NOT NULL DEFAULT '0' AFTER `creato`;
 
 ALTER TABLE `systeme`
   ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `visible`,
@@ -145,7 +146,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('017_connexion_automatique'),
 ('018_vaisseaux_nommes_embarques'),
 ('019_aide_icones_masquee'),
-('020_flotte_numero');
+('020_flotte_numero'),
+('021_flotte_ia');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

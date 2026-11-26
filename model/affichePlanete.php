@@ -14,6 +14,7 @@ $couleur = $p->id_camp === null ? Camp::SANS_CAMP_COULEUR : (new Camp($p->id_cam
 $map_planete=$id_planete%27;
 if(!$map_planete) $map_planete = 1;
 $defense = $p->bouclier + $p->canon;
+$defenseurs = Combat::defenseurs($p);
 ?>
 <?= Vue::filAriane(array(array(PAGES_TITRES['carte'], '?p=carte&systeme='.$p->id_systeme), array($p->systeme->nom, '?p=afficheSysteme&id_systeme='.$p->id_systeme), array($p->nom, null))) ?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
@@ -43,6 +44,10 @@ $defense = $p->bouclier + $p->canon;
     <?= Vue::jauge('Bouclier', $p->bouclier, max(Planete::bouclierDeBase($p->slot), $p->bouclier), 'bouclier', 'bouclier') ?>
     <?= Vue::jauge('Canon', $p->canon, max(Planete::canonDeBase($p->slot), $p->canon), 'canon', 'canon') ?>
     <?= Vue::jauge('Garnison', $p->troupes, max(Planete::troupesDeBase($p->slot), $p->troupes), 'persos', 'troupes') ?>
+    <?php if($p->gouverneur === 0 && $p->flotte_ia > 0){ ?>
+    <p class="md3-secondary">Flotte stationnée :</p>
+    <?= Vue::composition(array(Vaisseau::CHASSEUR => $p->flotte_ia), $p->id_camp) ?>
+    <?php } ?>
     <?php if($p->gouverneur !== 0){ ?>
     <?= Vue::jauge('Révolte', $p->perc_revolte, Planete::MAX_REVOLTE, 'revolte', 'revolte') ?>
     <?php } ?>
@@ -52,21 +57,19 @@ $defense = $p->bouclier + $p->canon;
 </section>
 <?php
 if($p->gouverneur !== $Joueur->id){
-    $presents = Vaisseau::stock($p->id, $Joueur->id);
-    $escadre = 0;
-    foreach(Combat::ESCADRE as $type){
-        $escadre += $presents[$type] ?? 0;
-    }
+    $escadre = array_sum(Vaisseau::combattants($p->id, $Joueur->id, null));
     $troupes = Vaisseau::troupesEnBarge($p->id, $Joueur->id);
+    $defenseActive = $defense > 0 || array_sum($defenseurs) > 0;
     $flottesPresentes = array();
     foreach(Flotte::liste($Joueur->id) as $ligne){
         $flotte = new Flotte($ligne->id);
-        if($flotte->planeteAuRepos() === $p->id && $defense > 0){
-            array_push($flottesPresentes, $flotte);
+        $engages = array_sum(Vaisseau::combattants($p->id, $Joueur->id, $flotte->id));
+        if($flotte->planeteAuRepos() === $p->id && $defenseActive && $engages > 0){
+            array_push($flottesPresentes, array('flotte' => $flotte, 'engages' => $engages));
         }
     }
-    $attaque = $escadre > 0 && $defense > 0;
-    $debarquement = $troupes > 0 && $defense === 0;
+    $attaque = $escadre > 0 && $defenseActive;
+    $debarquement = $troupes > 0 && !$defenseActive;
 ?>
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html('canon') ?>Opérations</h2>
@@ -82,13 +85,13 @@ if($p->gouverneur !== $Joueur->id){
             <input type="submit" value="Attaquer avec <?= $escadre ?> <?= __('vaisseau', 'vaisseaux', $escadre) ?> de combat" />
         </form>
     <?php } ?>
-    <?php foreach($flottesPresentes as $flotte){ ?>
+    <?php foreach($flottesPresentes as $presente){ ?>
         <form method="POST" action="?p=combattre">
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
-            <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+            <input type="hidden" name="flotte" value="<?= $presente['flotte']->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?>)" />
+            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec <?= htmlspecialchars($presente['flotte']->nom) ?> (<?= $presente['engages'] ?> <?= __('vaisseau', 'vaisseaux', $presente['engages']) ?>)" />
         </form>
     <?php } ?>
     <?php if($debarquement){ ?>

@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `defense_maj` datetime DEFAULT NULL,
   `detournement_fin` datetime DEFAULT NULL,
   `creato` datetime NOT NULL,
+  `flotte_ia` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 
@@ -294,7 +295,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('017_connexion_automatique'),
 ('018_vaisseaux_nommes_embarques'),
 ('019_aide_icones_masquee'),
-('020_flotte_numero');
+('020_flotte_numero'),
+('021_flotte_ia');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 
