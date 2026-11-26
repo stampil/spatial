@@ -1,7 +1,7 @@
 # Prompts d'images photo-réalistes (Gemini)
 
 37 images à générer : 23 objets sur fond magenta (transformés en PNG transparent par le script) et 14 fonds plein cadre, plus 21 vaisseaux par camp (section « Vaisseaux par camp »).
-Les icônes de l'interface ont leur propre section « Icônes de l'interface » (glyphes monochromes sobres : elles s'affichent à 24 px). Seuls les pictogrammes fonctionnels (menu, son, muet, ajouter, info) restent en SVG.
+Les icônes de l'interface ont leur propre section « Icônes de l'interface » (glyphes duotones sobres : elles s'affichent à 24 px). Seuls les pictogrammes fonctionnels (menu, son, muet, ajouter, info) restent en SVG.
 
 Les designs sont volontairement originaux : aucune silhouette, aucun nom ni aucun style reconnaissable d'une franchise existante. Aucune garantie juridique n'est possible, mais ne garde pas une image qui rappelle clairement une œuvre connue : régénère-la.
 
@@ -183,35 +183,35 @@ Photorealistic macro photograph of a physical metal badge, ultra detailed, reali
 
 ## Icônes de l'interface : `icone-<clé>`
 
-24 glyphes affichés à 24 px dans la barre du haut, les titres, le menu et les panneaux. Ils doivent rester sobres, épurés et sans couleur, comme les icônes actuelles. Pour ces images, remplace le bloc STYLE et le bloc DESIGN ORIGINAL par le bloc GLYPHE ci-dessous, puis ajoute le bloc FOND MAGENTA et le prompt. Le script les met en 128 px dans `img/icone/<clé>.png`. Le jeu les affiche comme un masque : seule la forme compte, elle prend la couleur du thème. Les images absentes ne cassent rien : le jeu garde l'icône SVG.
+24 glyphes duotones affichés à 24 px dans la barre du haut, les titres, le menu et les panneaux. Ils doivent rester sobres et épurés, sans couleur, mais avec deux tons : une forme principale en blanc et une forme secondaire en gris foncé. Pour ces images, remplace le bloc STYLE et le bloc DESIGN ORIGINAL par le bloc DUOTONE ci-dessous, puis ajoute le bloc FOND MAGENTA et le prompt. Le script les met en 128 px dans `img/icone/<clé>.png` : le blanc devient opaque, le gris devient transparent à environ 35 %. Le jeu les affiche comme un masque : seules les deux intensités comptent, elles prennent la couleur du thème. Les images absentes ne cassent rien : le jeu garde l'icône SVG.
 
 ```
-Minimalist monochrome glyph icon, like a symbol from an icon font: a single solid pure white silhouette, flat fill, no outline, no gradient, no shading, no texture, no shadow, no color, no text, no letters, no logo. Very simple, bold and geometric, with large clear shapes, rounded corners and small clean cut-outs in the shape instead of drawn lines (the cut-outs show the background). Perfectly centered, sober and clean, designed to stay instantly readable when shrunk to 24 pixels. Completely original design.
+Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly two flat tones and nothing else, a primary shape in solid pure white (#FFFFFF) and a secondary shape in solid dark grey (#595959) that adds depth and detail to the same object. Flat fill, no outline, no gradient, no shading, no texture, no shadow, no color, no text, no letters, no logo. Very simple, bold and geometric, with large clear shapes and rounded corners; small clean cut-outs may show the background. Perfectly centered, sober and clean, designed to stay instantly readable when shrunk to 24 pixels. Completely original design.
 ```
 
 | Fichier | Prompt |
 |---|---|
-| `icone-credits` | `A stack of three coins seen slightly from the side, the top coin with a simple ring cut out of its face.` |
-| `icone-revenu` | `One coin with a bold arrow rising from behind it and pointing up and to the right.` |
-| `icone-planetes` | `A round planet with one thin tilted ring around it and a curved band cut out across its surface.` |
-| `icone-fusee` | `A small spaceship flying diagonally toward the upper right, with a short flame trail and two short speed lines.` |
-| `icone-carte` | `A folded star chart in three panels with a dotted route line cut out across it, ending in a small round marker.` |
-| `icone-persos` | `Two head-and-shoulders human busts side by side, one slightly in front of the other, plain featureless faces.` |
-| `icone-classement` | `A three-step winner podium with a five-pointed star floating above the tallest middle step.` |
-| `icone-mission` | `A flag on a short pole planted on a small round mound.` |
-| `icone-bouclier` | `A classic heater-shaped shield with one bold vertical band cut out through its center.` |
-| `icone-canon` | `A short stubby cannon on a round base, barrel pointing to the upper right, with a small flash burst at the muzzle.` |
-| `icone-revolte` | `A raised clenched fist seen from the front, with simple thick fingers.` |
-| `icone-force` | `A flexed arm showing the biceps, seen from the side.` |
-| `icone-endurance` | `A bold heart with a small pulse line cut out across it.` |
-| `icone-diplomatie` | `A balance scale with two round pans hanging level from a horizontal beam on a central post.` |
-| `icone-emplacements` | `A two-by-two grid of four square tiles, one tile topped with a small building shape.` |
-| `icone-construire` | `A hammer and a wrench crossed in an X.` |
-| `icone-ancre` | `A classic ship anchor with a round ring on top and a curved double hook at the bottom.` |
-| `icone-route` | `A short dotted path curving from a small round start dot to a bold arrowhead pointing right.` |
-| `icone-actions` | `A single bold lightning bolt.` |
-| `icone-quartier` | `A compact command building with a flat roof, a small satellite dish and a short antenna on top, with a row of window cut-outs.` |
-| `icone-journal` | `A closed notebook seen from the front, a ribbon bookmark hanging out of the bottom and two horizontal lines cut out of the cover.` |
-| `icone-trophee` | `A trophy cup with two curved handles on a small base.` |
-| `icone-connexion` | `An open doorway in a wall with a bold arrow pointing into it from the left.` |
-| `icone-inscription` | `A head-and-shoulders human bust with a small round badge holding a bold plus sign at its lower right.` |
+| `icone-credits` | `A stack of three coins seen slightly from the side: the top coin in white with a simple ring cut out of its face, the two coins beneath it in dark grey.` |
+| `icone-revenu` | `One coin in dark grey with a bold white arrow rising in front of it and pointing up and to the right.` |
+| `icone-planetes` | `A round planet in white with a curved band cut out across it, and one thin tilted ring around it in dark grey.` |
+| `icone-fusee` | `A small spaceship in white flying diagonally toward the upper right, its short flame trail and two short speed lines in dark grey.` |
+| `icone-carte` | `A folded star chart in three panels: the middle panel in white, the two side panels in dark grey, with a dotted route line cut out of it ending in a small round marker.` |
+| `icone-persos` | `Two head-and-shoulders human busts side by side: the front one in white, the one slightly behind it in dark grey, plain featureless faces.` |
+| `icone-classement` | `A three-step winner podium: the tallest middle step in white, the two side steps in dark grey, and a five-pointed star in white floating above the middle step.` |
+| `icone-mission` | `A flag in white on a short pole, planted on a small round mound in dark grey.` |
+| `icone-bouclier` | `A classic heater-shaped shield in dark grey with one bold white vertical band through its center.` |
+| `icone-canon` | `A short stubby cannon in white on a round base in dark grey, barrel pointing to the upper right, with a small flash burst at the muzzle in dark grey.` |
+| `icone-revolte` | `A raised clenched fist in white with simple thick fingers, a dark grey cuff below the wrist.` |
+| `icone-force` | `A flexed arm showing the biceps, the upper arm in white and the forearm in dark grey, seen from the side.` |
+| `icone-endurance` | `A bold heart in white with a small pulse line across it in dark grey.` |
+| `icone-diplomatie` | `A balance scale: the horizontal beam and the central post in white, the two round hanging pans in dark grey.` |
+| `icone-emplacements` | `A two-by-two grid of four square tiles in dark grey, one of the tiles in white and topped with a small building shape.` |
+| `icone-construire` | `A hammer in white and a wrench in dark grey crossed in an X.` |
+| `icone-ancre` | `A classic ship anchor in white with its round ring on top in dark grey.` |
+| `icone-route` | `A short dotted path in dark grey curving from a small round start dot to a bold white arrowhead pointing right.` |
+| `icone-actions` | `A single bold lightning bolt in white, with a larger dark grey bolt shape slightly offset behind it.` |
+| `icone-quartier` | `A compact command building with a flat roof in white and a row of window cut-outs, its small satellite dish and short antenna on top in dark grey.` |
+| `icone-journal` | `A closed notebook in white seen from the front with two horizontal lines cut out of the cover, a ribbon bookmark hanging out of the bottom in dark grey.` |
+| `icone-trophee` | `A trophy cup in white, its two curved handles and its small base in dark grey.` |
+| `icone-connexion` | `An open doorway in a wall in dark grey, with a bold white arrow pointing into it from the left.` |
+| `icone-inscription` | `A head-and-shoulders human bust in white with a small round badge in dark grey at its lower right, holding a bold white plus sign.` |

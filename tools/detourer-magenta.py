@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Usage: detourer-magenta.py <folder of generated images> [game img folder].
-Names and prompts: tools/prompts-images.md. A name like vaisseau-pirates-chasseur goes to img/vaisseau/pirates/chasseur.png."""
+Names and prompts: tools/prompts-images.md. An icone- image is turned into a white mask whose grey tone becomes partial transparency. A name like vaisseau-pirates-chasseur goes to img/vaisseau/pirates/chasseur.png."""
 import os
 import sys
 
@@ -15,6 +15,10 @@ COTE_OBJET = 512
 COTE_LOGO = 128
 COTE_ICONE = 128
 COTES_PETITS = {'logo': COTE_LOGO, 'icone': COTE_ICONE}
+POIDS_ROUGE = 0.299
+POIDS_VERT = 0.587
+POIDS_BLEU = 0.114
+MAXIMUM_COULEUR = 255.0
 DIVISEUR_MARGE = 20
 LARGEUR_FOND = 1600
 RATIO_FOND = 16 / 9
@@ -56,6 +60,14 @@ def detourer(image):
     return Image.fromarray(resultat, 'RGBA')
 
 
+def en_duotone(image):
+    pixels = numpy.asarray(image).astype(numpy.float64)
+    luminance = (pixels[:, :, 0] * POIDS_ROUGE + pixels[:, :, 1] * POIDS_VERT + pixels[:, :, 2] * POIDS_BLEU) / MAXIMUM_COULEUR
+    pixels[:, :, 3] = pixels[:, :, 3] * numpy.clip(luminance, 0.0, 1.0)
+    pixels[:, :, :3] = MAXIMUM_COULEUR
+    return Image.fromarray(pixels.astype(numpy.uint8), 'RGBA')
+
+
 def cadrer(image, cote):
     opacite = numpy.asarray(image)[:, :, 3] / 255.0
     lignes = numpy.where(opacite.max(axis=1) > SEUIL_OPACITE_CADRAGE)[0]
@@ -79,6 +91,8 @@ def traiter(chemin, nom, destination):
             return False
         sortie = os.path.join(destination, dossier, *cle.split('-', 1)) + '.png'
         os.makedirs(os.path.dirname(sortie), exist_ok=True)
+        if dossier == 'icone':
+            image = en_duotone(image)
         cadrer(image, COTES_PETITS.get(dossier, COTE_OBJET)).save(sortie, optimize=True)
         print('  %s -> %s' % (nom, sortie))
         return True
