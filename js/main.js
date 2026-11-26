@@ -1,3 +1,45 @@
+window.Occupation = (function() {
+    function demarrer(noeud) {
+        if (!noeud || noeud.dataset.occupe) {
+            return;
+        }
+        var spinner = document.createElement('span');
+        spinner.className = 'bouton__spinner';
+        spinner.setAttribute('aria-hidden', 'true');
+        spinner.style.color = getComputedStyle(noeud).color;
+        noeud.dataset.occupe = '1';
+        noeud.setAttribute('aria-busy', 'true');
+        if (noeud.tagName === 'INPUT') {
+            var enveloppe = document.createElement('span');
+            enveloppe.className = 'bouton-attente';
+            noeud.parentNode.insertBefore(enveloppe, noeud);
+            enveloppe.appendChild(noeud);
+            enveloppe.appendChild(spinner);
+        } else {
+            noeud.appendChild(spinner);
+        }
+        noeud.classList.add('bouton--attente');
+    }
+
+    function liberer(noeud) {
+        if (!noeud || !noeud.dataset.occupe) {
+            return;
+        }
+        var enveloppe = noeud.parentNode;
+        if (noeud.tagName === 'INPUT') {
+            enveloppe.parentNode.insertBefore(noeud, enveloppe);
+            enveloppe.remove();
+        } else {
+            noeud.querySelector('.bouton__spinner').remove();
+        }
+        noeud.classList.remove('bouton--attente');
+        noeud.removeAttribute('aria-busy');
+        delete noeud.dataset.occupe;
+    }
+
+    return {demarrer: demarrer, liberer: liberer};
+})();
+
 $(function(){
 
     var DELAI_MESSAGE = 8000;
@@ -71,8 +113,14 @@ $(function(){
         });
     }
 
-    function signalerEchecAction(formulaire) {
+    function libererFormulaire(formulaire) {
         $(formulaire).find(':submit').prop('disabled', false);
+        window.Occupation.liberer($(formulaire).data('principal'));
+        delete formulaire.dataset.occupe;
+    }
+
+    function signalerEchecAction(formulaire) {
+        libererFormulaire(formulaire);
         var conteneur = $('.messages');
         if (conteneur.length === 0) {
             conteneur = $('<div class="messages" role="status" aria-live="polite"></div>').appendTo('main.md3-page');
@@ -89,12 +137,19 @@ $(function(){
     $(document).on('submit', 'main form[method="POST"]:not([data-navigation])', function(evenement) {
         evenement.preventDefault();
         var formulaire = this;
+        if (formulaire.dataset.occupe) {
+            return;
+        }
         var corps = new FormData(formulaire);
         var declencheur = evenement.originalEvent && evenement.originalEvent.submitter;
         if (declencheur && declencheur.name) {
             corps.append(declencheur.name, declencheur.value);
         }
-        $(formulaire).find(':submit').prop('disabled', true);
+        var principal = declencheur || $(formulaire).find(':submit').get(0);
+        formulaire.dataset.occupe = '1';
+        $(formulaire).data('principal', principal);
+        $(formulaire).find(':submit').not(principal).prop('disabled', true);
+        window.Occupation.demarrer(principal);
         fetch(formulaire.action, {method: 'POST', body: corps, credentials: 'same-origin'}).then(function(reponse) {
             if (!reponse.ok) {
                 throw new Error('statut');

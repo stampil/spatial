@@ -71,6 +71,7 @@
     const marqueurs = [];
     let vue = {x: 0, y: 0, echelle: 1};
     let ordre = null;
+    let envoiEnCours = false;
 
     DONNEES.systemes.forEach((systeme) => {
         systemes[systeme.id] = systeme;
@@ -120,11 +121,16 @@
 
     function bouton(texte, classe, action) {
         const noeud = creer('button', {type: 'button', classe: classe, texte: texte});
-        noeud.addEventListener('click', action);
+        noeud.addEventListener('click', () => action(noeud));
         return noeud;
     }
 
-    function envoyer(adresse, champs) {
+    function envoyer(adresse, champs, declencheur) {
+        if (envoiEnCours) {
+            return;
+        }
+        envoiEnCours = true;
+        window.Occupation.demarrer(declencheur);
         const corps = new URLSearchParams();
         corps.append('csrf_token', JETON);
         Object.keys(champs).forEach((cle) => {
@@ -138,6 +144,8 @@
             }
             location.replace(ADRESSE_FLOTTES);
         }).catch(() => {
+            envoiEnCours = false;
+            window.Occupation.liberer(declencheur);
             document.dispatchEvent(new Event('sante-verifier'));
             bandeauTexte.textContent = MESSAGE_ECHEC_ENVOI;
         });
@@ -386,20 +394,20 @@
         return convoi > 0 ? convoi : toutes;
     }
 
-    function confirmerOrdre(planeteId) {
+    function confirmerOrdre(planeteId, declencheur) {
         const champs = {depart: ordre.planete, destination: planeteId, 'flotte[]': ordre.flottes.map((flotte) => flotte.id)};
         Object.keys(ordre.nombres).forEach((type) => {
             if (ordre.nombres[type] > 0) {
                 champs['nombre[' + type + ']'] = ordre.nombres[type];
             }
         });
-        envoyer('?p=deplacer', champs);
+        envoyer('?p=deplacer', champs, declencheur);
     }
 
-    function explorer() {
+    function explorer(evenement) {
         const champs = {depart: ordre.planete, destination: DESTINATION_EXPLORATION};
         champs['nombre[' + TYPE_RECONNAISSANCE + ']'] = ordre.nombres[TYPE_RECONNAISSANCE];
-        envoyer('?p=deplacer', champs);
+        envoyer('?p=deplacer', champs, evenement.currentTarget);
     }
 
     function ouvrirDestination(systemeId) {
@@ -410,7 +418,7 @@
         systeme.planetes.filter((planete) => planete.id !== ordre.planete).forEach((planete) => {
             feuilleCorps.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
                 creer('span', {texte: planete.nom}),
-                bouton('Envoyer ici', 'md3-button', () => confirmerOrdre(planete.id))
+                bouton('Envoyer ici', 'md3-button', (noeud) => confirmerOrdre(planete.id, noeud))
             ]));
         });
     }

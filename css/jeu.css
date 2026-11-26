@@ -833,3 +833,41 @@
         display: none;
     }
 }
+
+.bouton--attente {
+    position: relative;
+    color: transparent !important;
+    cursor: progress;
+    pointer-events: none;
+}
+
+.bouton-attente {
+    position: relative;
+    display: inline-flex;
+}
+
+.bouton__spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 3px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: bouton-rotation 0.8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes bouton-rotation {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bouton__spinner {
+        animation: none;
+    }
+}
