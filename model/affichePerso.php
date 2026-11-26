@@ -15,8 +15,13 @@ $etat = Perso::ETATS[$o->etat()];
 if($Joueur->etape_tuto==1){
 ?>
 <details class="mission" open>
-    <summary><?= Icone::html('mission') ?>Mission : les caractéristiques de votre perso</summary>
-    <p class="mission__texte">Il a <?= $o->diplomatie ?>/<?= Perso::MAX_STARS ?> étoile<?= $o->diplomatie > 1 ? 's' : '' ?> en diplomatie. Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions. Dans ce tuto, nous n'irons pas dans ces extrêmes. Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra.</p>
+    <summary><?= Icone::html('mission') ?>Mission : lancer la diplomatie</summary>
+    <?php if($o->action_diplomatie === null){ ?>
+    <p class="mission__texte"><strong>Lancez la diplomatie sur votre planète natale :</strong> touchez « Faire de la diplomatie » dans la section Actions, plus bas (<a href="#actions">aller aux actions</a>). Dans le tutoriel, elle réussit à coup sûr.</p>
+    <?php } else { ?>
+    <p class="mission__texte"><strong>La diplomatie est en cours :</strong> attendez la fin du compte à rebours dans la section Statut, la page se met à jour toute seule.</p>
+    <?php } ?>
+    <p class="mission__texte">Les caractéristiques de votre perso : il a <?= $o->diplomatie ?>/<?= Perso::MAX_STARS ?> étoile<?= $o->diplomatie > 1 ? 's' : '' ?> en diplomatie. Un perso avec une faible diplomatie mettra plus de temps, voire pourra se faire emprisonner ou tuer plus facilement lors de ses missions. Dans ce tuto, nous n'irons pas dans ces extrêmes. Les actions de votre perso s'affichent de manière contextuelle, par exemple, si vous avez un vaisseau sur la même planète, une action "monter dans le vaisseau" apparaîtra.</p>
 </details>
 <?php   
 }
@@ -75,7 +80,7 @@ else{
 ?>
 </section>
 
-<section class="panneau">
+<section class="panneau" id="actions">
     <h2 class="panneau__titre"><?= Icone::html('actions') ?>Actions</h2>
 <?php
 if($o->canAct()){
