@@ -21,7 +21,7 @@ class Flotte {
         }
         $stock = Vaisseau::stock($planete->id, $joueur->id);
         $total = 0;
-        foreach(Combat::ESCADRE as $type){
+        foreach(Vaisseau::typesDeFlotte() as $type){
             $nombre = $nombres[$type] ?? 0;
             if($nombre < 0 || $nombre > ($stock[$type] ?? 0)){
                 return 'Pas assez de vaisseaux : '.Vaisseau::CATALOGUE[$type]['nom'].' (disponibles : '.($stock[$type] ?? 0).').';
@@ -29,12 +29,12 @@ class Flotte {
             $total += $nombre;
         }
         if($total === 0){
-            return 'Une flotte demande au moins un vaisseau de combat.';
+            return 'Une flotte demande au moins un vaisseau.';
         }
         $db = MyPDO::getInstance();
         $db->query("INSERT INTO " . MyPDO::DB_FLAG . "flotte (id_joueur,nom,creato) VALUES (?,?,?)",$joueur->id,$nom,Tools::now());
         $flotteId = (int) $db->lastInsertId();
-        foreach(Combat::ESCADRE as $type){
+        foreach(Vaisseau::typesDeFlotte() as $type){
             $nombre = $nombres[$type] ?? 0;
             if($nombre === 0){
                 continue;

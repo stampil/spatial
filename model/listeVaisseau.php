@@ -66,11 +66,21 @@ foreach($flottes as $ligne){
 <?php } ?>
 
 <?php
-foreach($posees as $planeteId => $types){
+$flottesAuRepos = array();
+foreach($flottes as $ligne){
+    $flotte = new Flotte($ligne->id);
+    $auRepos = $flotte->planeteAuRepos();
+    if($auRepos !== null){
+        $flottesAuRepos[$auRepos][] = $flotte;
+    }
+}
+$planetesAvecUnites = array_unique(array_merge(array_keys($posees), array_keys($flottesAuRepos)));
+foreach($planetesAvecUnites as $planeteId){
     $planete = new Planete($planeteId);
-    $escadre = array_intersect_key($types, array_flip(Combat::ESCADRE));
+    $types = $posees[$planeteId] ?? array();
+    $eligibles = array_intersect_key($types, array_flip(Vaisseau::typesDeFlotte()));
 ?>
-<section class="panneau">
+<section class="panneau" id="planete-<?= $planete->id ?>">
     <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
     <?= Vue::composition($types) ?>
     <?php if(($types[Vaisseau::TRANSPORT_PERSO] ?? 0) > 0){ ?>
@@ -83,16 +93,38 @@ foreach($posees as $planeteId => $types){
     <p class="md3-secondary">Persos embarqués (<?= count($embarques) ?>/<?= $types[Vaisseau::TRANSPORT_PERSO] * Vaisseau::CAPACITE_TRANSPORT_PERSO ?>) : <?= count($embarques) > 0 ? implode(', ', $embarques) : 'aucun' ?>. Ils partent avec le transport.</p>
     <?php } ?>
     <p><a href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a></p>
-    <?php if(count($escadre) > 0){ ?>
+    <details class="systeme-details">
+        <summary>Donner un ordre</summary>
+        <form class="systeme-details__corps" method="GET" action="index.php">
+            <input type="hidden" name="p" value="carte" />
+            <input type="hidden" name="ordre" value="<?= $planete->id ?>" />
+            <?php foreach($types as $type => $nombre){ ?>
+            <div class="ligne-jeu">
+                <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type]['nom'] ?> × <?= $nombre ?></span>
+                <input type="number" class="md3-number" name="nombre[<?= $type ?>]" min="0" max="<?= $nombre ?>" value="0" aria-label="Nombre à envoyer : <?= Vaisseau::CATALOGUE[$type]['nom'] ?>" />
+            </div>
+            <?php } ?>
+            <?php foreach($flottesAuRepos[$planete->id] ?? array() as $flotte){ ?>
+            <label class="ligne-jeu">
+                <span class="ligne-jeu__info"><?= Icone::html('persos') ?>Flotte <?= htmlspecialchars($flotte->nom) ?> (<?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?>)</span>
+                <input type="checkbox" name="flotte[]" value="<?= $flotte->id ?>" />
+            </label>
+            <?php } ?>
+            <div class="ligne-jeu">
+                <input type="submit" class="md3-button" value="Choisir la destination sur la carte" />
+            </div>
+        </form>
+    </details>
+    <?php if(count($eligibles) > 0){ ?>
     <details class="systeme-details">
         <summary>Créer une flotte</summary>
         <form class="systeme-details__corps" method="POST" action="?p=creerFlotte">
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
             <?= csrfField() ?>
-            <?php foreach($escadre as $type => $nombre){ ?>
+            <?php foreach(Vaisseau::typesDeFlotte() as $type){ $nombre = $types[$type] ?? 0; ?>
             <div class="ligne-jeu">
                 <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type]['nom'] ?> × <?= $nombre ?></span>
-                <input type="number" class="md3-number" name="nombre[<?= $type ?>]" min="0" max="<?= $nombre ?>" value="0" aria-label="Nombre dans la flotte" />
+                <input type="number" class="md3-number" name="nombre[<?= $type ?>]" min="0" max="<?= $nombre ?>" value="0"<?= $nombre === 0 ? ' disabled' : '' ?> aria-label="Nombre dans la flotte : <?= Vaisseau::CATALOGUE[$type]['nom'] ?>" />
             </div>
             <?php } ?>
             <div class="ligne-jeu">

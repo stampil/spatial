@@ -29,6 +29,6 @@
 <?php
 $donnees = Carte::donnees($Joueur);
 $donnees['focus'] = isset($_GET['systeme']) ? (int) $_GET['systeme'] : null;
-$donnees['ordre'] = isset($_GET['ordre']) ? (int) $_GET['ordre'] : null;
+$donnees['ordre'] = Carte::ordreDeLaRequete($_GET);
 ?>
 <script type="application/json" id="carte-donnees"><?= json_encode($donnees, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>

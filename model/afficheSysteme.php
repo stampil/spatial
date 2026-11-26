@@ -56,7 +56,7 @@ foreach($systeme->planetes as $p){
         <p class="md3-secondary">Flotte <?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?></p>
         <?php } ?>
         <div class="md3-actions fiche__actions">
-            <a class="md3-button md3-button--tonal" href="?p=carte&ordre=<?= $p->id ?>">Envoyer des vaisseaux</a>
+            <a class="md3-button md3-button--tonal" href="?p=listeVaisseau#planete-<?= $p->id ?>">Donner des ordres</a>
         </div>
         <?php } ?>
     </section>

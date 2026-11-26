@@ -33,9 +33,11 @@
     const MILLISECONDES = 1000;
     const SECONDES_MINUTE = 60;
     const SECONDES_HEURE = 3600;
-    const ADRESSE_CARTE = '?p=carte';
+    const ADRESSE_FLOTTES = '?p=listeVaisseau';
     const ADRESSE_SYSTEME = '?p=afficheSysteme&id_systeme=';
     const TYPE_RECONNAISSANCE = 'reconnaissance';
+    const TYPE_TROUPE = 'troupe_assaut';
+    const TYPE_CHASSEUR = 'chasseur';
     const DESTINATION_EXPLORATION = 'explorer';
     const TOUCHE_ENTREE = 'Enter';
     const TOUCHE_ESPACE = ' ';
@@ -76,11 +78,6 @@
     if (DONNEES.voisin) {
         positions[DONNEES.voisin.id] = {x: DONNEES.voisin.x, y: DONNEES.voisin.y};
     }
-    DONNEES.stocks.forEach((stock) => {
-        stock.vaisseaux.forEach((vaisseau) => {
-            vaisseau.choix = vaisseau.nombre;
-        });
-    });
 
     function maintenant() {
         return (Date.now() + decalage) / MILLISECONDES;
@@ -133,10 +130,12 @@
         const corps = new URLSearchParams();
         corps.append('csrf_token', JETON);
         Object.keys(champs).forEach((cle) => {
-            corps.append(cle, champs[cle]);
+            [].concat(champs[cle]).forEach((valeur) => {
+                corps.append(cle, valeur);
+            });
         });
         fetch(adresse, {method: 'POST', body: corps, credentials: 'same-origin'}).then(() => {
-            location.replace(ADRESSE_CARTE);
+            location.replace(ADRESSE_FLOTTES);
         });
     }
 
@@ -396,79 +395,43 @@
         return creer('p', {classe: 'md3-secondary', texte: texte});
     }
 
-    function stepper(vaisseau) {
-        const valeur = creer('span', {classe: 'carte__valeur', texte: String(vaisseau.choix), 'aria-live': 'polite'});
-        const changer = (delta) => {
-            vaisseau.choix = Math.min(vaisseau.nombre, Math.max(0, vaisseau.choix + delta));
-            valeur.textContent = String(vaisseau.choix);
-        };
-        const moins = bouton('−', 'carte__pas', () => changer(-1));
-        moins.setAttribute('aria-label', 'Moins de ' + vaisseau.nom);
-        const plus = bouton('+', 'carte__pas', () => changer(1));
-        plus.setAttribute('aria-label', 'Plus de ' + vaisseau.nom);
-        return creer('div', {classe: 'carte__stepper'}, [moins, valeur, plus]);
-    }
-
-    function blocStock(stock) {
-        const bloc = creer('div', {classe: 'carte__bloc'});
-        bloc.appendChild(creer('strong', {texte: stock.nom}));
-        stock.vaisseaux.forEach((vaisseau) => {
-            bloc.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
-                creer('span', {texte: vaisseau.nom + ' × ' + vaisseau.nombre}),
-                stepper(vaisseau)
-            ]));
-        });
-        bloc.appendChild(bouton('Envoyer', 'md3-button', () => {
-            const total = stock.vaisseaux.reduce((somme, vaisseau) => somme + vaisseau.choix, 0);
-            if (total > 0) {
-                commencerOrdre({stock: stock, flotte: null, systeme: stock.systeme});
-            }
-        }));
-        return bloc;
-    }
-
-    function blocFlotte(flotte) {
-        const composition = flotte.composition.map((ligne) => ligne.nombre + ' × ' + ligne.nom).join(', ');
-        const bloc = creer('div', {classe: 'carte__bloc'});
-        bloc.appendChild(creer('strong', {texte: 'Flotte ' + flotte.nom}));
-        bloc.appendChild(ligneInfo(composition));
-        bloc.appendChild(bouton('Envoyer la flotte', 'md3-button', () => {
-            commencerOrdre({stock: null, flotte: flotte, systeme: flotte.systeme});
-        }));
-        return bloc;
-    }
-
     function secondesDeOrdre(systemeId) {
-        if (ordre.flotte) {
-            return ordre.flotte.secondes[systemeId];
+        const embarques = [TYPE_TROUPE];
+        if (systemeId !== ordre.systeme) {
+            embarques.push(TYPE_CHASSEUR);
         }
-        let duree = 0;
-        ordre.stock.vaisseaux.forEach((vaisseau) => {
-            if (vaisseau.choix > 0) {
-                duree = Math.max(duree, vaisseau.secondes[systemeId]);
+        let convoi = 0;
+        let toutes = 0;
+        const vaisseaux = ordre.stock ? ordre.stock.vaisseaux : [];
+        vaisseaux.forEach((vaisseau) => {
+            if (!ordre.nombres[vaisseau.type]) {
+                return;
+            }
+            toutes = Math.max(toutes, vaisseau.secondes[systemeId]);
+            if (!embarques.includes(vaisseau.type)) {
+                convoi = Math.max(convoi, vaisseau.secondes[systemeId]);
             }
         });
-        return duree;
+        ordre.flottes.forEach((flotte) => {
+            toutes = Math.max(toutes, flotte.secondes[systemeId]);
+            convoi = Math.max(convoi, flotte.secondes[systemeId]);
+        });
+        return convoi > 0 ? convoi : toutes;
     }
 
     function confirmerOrdre(planeteId) {
-        if (ordre.flotte) {
-            envoyer('?p=gererFlotte', {flotte: ordre.flotte.id, action: 'envoyer', destination: planeteId});
-            return;
-        }
-        const champs = {depart: ordre.stock.planete, destination: planeteId};
-        ordre.stock.vaisseaux.forEach((vaisseau) => {
-            if (vaisseau.choix > 0) {
-                champs['nombre[' + vaisseau.type + ']'] = vaisseau.choix;
+        const champs = {depart: ordre.planete, destination: planeteId, 'flotte[]': ordre.flottes.map((flotte) => flotte.id)};
+        Object.keys(ordre.nombres).forEach((type) => {
+            if (ordre.nombres[type] > 0) {
+                champs['nombre[' + type + ']'] = ordre.nombres[type];
             }
         });
         envoyer('?p=deplacer', champs);
     }
 
     function explorer() {
-        const reconnaissance = ordre.stock.vaisseaux.find((vaisseau) => vaisseau.type === TYPE_RECONNAISSANCE);
-        const champs = {depart: ordre.stock.planete, destination: DESTINATION_EXPLORATION};
-        champs['nombre[' + TYPE_RECONNAISSANCE + ']'] = reconnaissance.choix;
+        const champs = {depart: ordre.planete, destination: DESTINATION_EXPLORATION};
+        champs['nombre[' + TYPE_RECONNAISSANCE + ']'] = ordre.nombres[TYPE_RECONNAISSANCE];
         envoyer('?p=deplacer', champs);
     }
 
@@ -483,8 +446,7 @@
         }
         const systeme = systemes[systemeId];
         ouvrirFeuille('Envoyer vers ' + systeme.nom, 'Trajet : ' + formaterDuree(duree), systeme.couleur);
-        const origine = ordre.stock ? ordre.stock.planete : ordre.flotte.planete;
-        systeme.planetes.filter((planete) => planete.id !== origine).forEach((planete) => {
+        systeme.planetes.filter((planete) => planete.id !== ordre.planete).forEach((planete) => {
             feuilleCorps.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
                 creer('span', {texte: planete.nom}),
                 bouton('Envoyer ici', 'md3-button', () => confirmerOrdre(planete.id))
@@ -495,8 +457,7 @@
     function commencerOrdre(nouvelOrdre) {
         ordre = nouvelOrdre;
         fermerFeuille();
-        const reconnaissance = ordre.stock ? ordre.stock.vaisseaux.find((vaisseau) => vaisseau.type === TYPE_RECONNAISSANCE) : null;
-        const exploration = Boolean(reconnaissance && reconnaissance.choix > 0);
+        const exploration = Boolean(ordre.nombres[TYPE_RECONNAISSANCE]);
         bandeauTexte.textContent = exploration ? 'Touchez le système de destination, ou Explorer : le vaisseau part dans l’inconnu et peut ne pas revenir.' : 'Touchez le système de destination.';
         boutonExplorer.hidden = !exploration;
         bandeau.hidden = false;
@@ -514,22 +475,23 @@
         feuilleCorps.appendChild(ligneInfo('Envoyez un vaisseau de reconnaissance : \u00e0 son arriv\u00e9e, le syst\u00e8me sera explor\u00e9.'));
     }
 
-    function ouvrirOrdre(planeteId) {
-        const stock = stockDePlanete(planeteId);
-        const flottes = DONNEES.flottes.filter((flotte) => flotte.planete === planeteId);
-        if (!stock && flottes.length === 0) {
+    function reprendreOrdre(demande) {
+        const stock = stockDePlanete(demande.planete);
+        const flottes = DONNEES.flottes.filter((flotte) => flotte.planete === demande.planete && demande.flottes.includes(flotte.id));
+        const nombres = {};
+        let total = flottes.length;
+        if (stock) {
+            stock.vaisseaux.forEach((vaisseau) => {
+                nombres[vaisseau.type] = Math.min(vaisseau.nombre, demande.nombres[vaisseau.type] || 0);
+                total += nombres[vaisseau.type];
+            });
+        }
+        if (total === 0) {
             return;
         }
-        const systeme = systemes[stock ? stock.systeme : flottes[0].systeme];
-        centrerSur(systeme.id, ECHELLE_BASE);
-        marquerSelection(systeme.id);
-        ouvrirFeuille('Envoyer des vaisseaux', systeme.nom, systeme.couleur);
-        if (stock) {
-            feuilleCorps.appendChild(blocStock(stock));
-        }
-        flottes.forEach((flotte) => {
-            feuilleCorps.appendChild(blocFlotte(flotte));
-        });
+        const systemeId = stock ? stock.systeme : flottes[0].systeme;
+        centrerSur(systemeId, ECHELLE_BASE);
+        commencerOrdre({planete: demande.planete, systeme: systemeId, stock: stock, nombres: nombres, flottes: flottes});
     }
 
     function toucherSysteme(systemeId) {
@@ -733,7 +695,7 @@
         marquerSelection(DONNEES.focus);
     }
     if (DONNEES.ordre !== null) {
-        ouvrirOrdre(DONNEES.ordre);
+        reprendreOrdre(DONNEES.ordre);
     }
     tic();
     setInterval(tic, MILLISECONDES);

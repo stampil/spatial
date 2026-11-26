@@ -4,7 +4,7 @@ if(!Tools::isValidCsrfToken($_POST[CSRF_KEY] ?? null)){
 }
 $planete = new Planete((int) ($_POST['planete'] ?? 0));
 $nombres = is_array($_POST['nombre'] ?? null) ? $_POST['nombre'] : array();
-foreach(Combat::ESCADRE as $type){
+foreach(Vaisseau::typesDeFlotte() as $type){
     $nombres[$type] = (int) giveInputString($nombres, $type);
 }
 

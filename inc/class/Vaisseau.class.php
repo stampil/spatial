@@ -6,9 +6,9 @@ class Vaisseau {
     const TRAJET_SECONDES_PAR_UNITE = 1;
     const PERCENT = 100;
     const RECONNAISSANCE = 'reconnaissance';
+    const CHASSEUR = 'chasseur';
     const BARGE = 'barge';
     const TROUPE = 'troupe_assaut';
-    const CAPACITE_BARGE = 10;
     const DESTINATION_EXPLORATION = 'explorer';
     const EXPLORATION_SECONDES = 900;
     const EXPLORATION_PERTE_POURCENT = 20;
@@ -17,13 +17,13 @@ class Vaisseau {
     const CAPACITE_TRANSPORT_PERSO = 2;
 
     const CATALOGUE = array(
-        'chasseur' => array('icone' => 'chasseur', 'nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100, 'force' => 5),
-        'reconnaissance' => array('icone' => 'reconnaissance', 'nom' => 'Vaisseau de reconnaissance', 'usine' => Batiment::USINE_LEGERE, 'prix' => 30, 'duree' => 30, 'vitesse' => 50, 'force' => 0),
-        'transport_perso' => array('icone' => 'transport', 'nom' => 'Transport personnel', 'usine' => Batiment::USINE_LEGERE, 'prix' => 50, 'duree' => 45, 'vitesse' => 60, 'force' => 0),
-        'fregate' => array('icone' => 'fregate', 'nom' => 'Frégate', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 120, 'duree' => 90, 'vitesse' => 100, 'force' => 15),
-        'barge' => array('icone' => 'barge', 'nom' => 'Barge de débarquement', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 150, 'duree' => 120, 'vitesse' => 200, 'force' => 0),
-        'capital' => array('icone' => 'fusee', 'nom' => 'Vaisseau capital', 'usine' => Batiment::USINE_LOURDE, 'prix' => 400, 'duree' => 300, 'vitesse' => 150, 'force' => 50),
-        'troupe_assaut' => array('icone' => 'troupe', 'nom' => 'Troupe d\'assaut', 'usine' => Batiment::ACADEMIE, 'prix' => 60, 'duree' => 20, 'vitesse' => 200, 'force' => 10),
+        'chasseur' => array('icone' => 'chasseur', 'nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100, 'force' => 5, 'troupes' => 0, 'chasseurs' => 0),
+        'reconnaissance' => array('icone' => 'reconnaissance', 'nom' => 'Vaisseau de reconnaissance', 'usine' => Batiment::USINE_LEGERE, 'prix' => 30, 'duree' => 30, 'vitesse' => 50, 'force' => 0, 'troupes' => 0, 'chasseurs' => 0),
+        'transport_perso' => array('icone' => 'transport', 'nom' => 'Transport personnel', 'usine' => Batiment::USINE_LEGERE, 'prix' => 50, 'duree' => 45, 'vitesse' => 60, 'force' => 0, 'troupes' => 0, 'chasseurs' => 0),
+        'fregate' => array('icone' => 'fregate', 'nom' => 'Frégate', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 120, 'duree' => 90, 'vitesse' => 100, 'force' => 15, 'troupes' => 10, 'chasseurs' => 3),
+        'barge' => array('icone' => 'barge', 'nom' => 'Barge de débarquement', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 150, 'duree' => 120, 'vitesse' => 200, 'force' => 0, 'troupes' => 10, 'chasseurs' => 0),
+        'capital' => array('icone' => 'fusee', 'nom' => 'Vaisseau capital', 'usine' => Batiment::USINE_LOURDE, 'prix' => 400, 'duree' => 300, 'vitesse' => 150, 'force' => 50, 'troupes' => 20, 'chasseurs' => 6),
+        'troupe_assaut' => array('icone' => 'troupe', 'nom' => 'Troupe d\'assaut', 'usine' => Batiment::ACADEMIE, 'prix' => 60, 'duree' => 20, 'vitesse' => 200, 'force' => 10, 'troupes' => 0, 'chasseurs' => 0),
     );
 
     public static function typesDeLUsine(string $usine): array {
@@ -157,27 +157,83 @@ class Vaisseau {
         }
     }
 
-    public static function deplacer(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre): ?string {
-        if(!isset(self::CATALOGUE[$type])){
-            return 'Type de vaisseau inconnu.';
+    public static function typesDeFlotte(): array {
+        return array_merge(self::typesDeLUsine(Batiment::USINE_MOYENNE), self::typesDeLUsine(Batiment::USINE_LOURDE));
+    }
+
+    public static function capacite(array $nombres, string $cle): int {
+        $total = 0;
+        foreach($nombres as $type => $nombre){
+            $total += $nombre * self::CATALOGUE[$type][$cle];
         }
+        return $total;
+    }
+
+    public static function ordonner(Joueur $joueur, Planete $depart, Planete $destination, array $nombres, array $flottes): ?string {
         if($depart->id === $destination->id){
             return 'Les vaisseaux sont déjà sur cette planète.';
         }
         if(!$joueur->peutCibler($destination->systeme)){
             return 'Destination inconnue.';
         }
+        $nombres = array_filter($nombres, fn($nombre) => $nombre > 0);
+        foreach(array_keys($nombres) as $type){
+            if(!isset(self::CATALOGUE[$type])){
+                return 'Type de vaisseau inconnu.';
+            }
+        }
+        $convoi = array_diff_key($nombres, array(self::TROUPE => 0, self::CHASSEUR => 0));
+        foreach($flottes as $flotte){
+            if($flotte->id_joueur !== $joueur->id || $flotte->planeteAuRepos() !== $depart->id){
+                return 'La flotte '.$flotte->nom.' ne peut pas partir de cette planète.';
+            }
+            foreach($flotte->composition() as $type => $nombre){
+                $convoi[$type] = ($convoi[$type] ?? 0) + $nombre;
+            }
+        }
+        $memeSysteme = $depart->id_systeme === $destination->id_systeme;
+        $troupes = $nombres[self::TROUPE] ?? 0;
+        if($troupes > self::capacite($convoi, 'troupes')){
+            return 'Les troupes ne voyagent jamais seules : '.$troupes.' '.__('troupe','troupes',$troupes).' '.__('demande','demandent',$troupes).' des vaisseaux capables de les embarquer (barge, frégate ou vaisseau capital).';
+        }
+        $chasseurs = $nombres[self::CHASSEUR] ?? 0;
+        if(!$memeSysteme && $chasseurs > self::capacite($convoi, 'chasseurs')){
+            return 'Les chasseurs ne changent de système que embarqués : '.$chasseurs.' '.__('chasseur','chasseurs',$chasseurs).' '.__('demande','demandent',$chasseurs).' un vaisseau capable de les emporter (frégate ou vaisseau capital).';
+        }
+        $dureeConvoi = null;
+        foreach(array_keys($convoi) as $type){
+            $dureeConvoi = max($dureeConvoi ?? 0, self::dureeTrajet($joueur, $type, $depart, $destination));
+        }
+        foreach($nombres as $type => $nombre){
+            $embarque = $type === self::TROUPE || ($type === self::CHASSEUR && !$memeSysteme);
+            $erreur = self::envoyerType($joueur, $depart, $destination, $type, $nombre, $embarque ? $dureeConvoi : null);
+            if($erreur !== null){
+                return $erreur;
+            }
+        }
+        foreach($flottes as $flotte){
+            $erreur = $flotte->deplacer($joueur, $destination);
+            if($erreur !== null){
+                return $erreur;
+            }
+        }
+        return null;
+    }
+
+    private static function envoyerType(Joueur $joueur, Planete $depart, Planete $destination, string $type, int $nombre, ?int $duree): ?string {
         $disponibles = self::stock($depart->id, $joueur->id)[$type] ?? 0;
-        if($nombre < 1 || $nombre > $disponibles){
+        if($nombre > $disponibles){
             return 'Pas assez de vaisseaux : '.self::CATALOGUE[$type]['nom'].' (disponibles : '.$disponibles.').';
         }
         $db = MyPDO::getInstance();
-        $arrivee = Tools::nowPlus(self::dureeTrajet($joueur, $type, $depart, $destination));
+        $duree = $duree ?? self::dureeTrajet($joueur, $type, $depart, $destination);
+        $arrivee = Tools::nowPlus($duree);
         $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_destination=?, depart=?, arrivee=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT " . $nombre;
         $db->query($query,$destination->id,Tools::now(),$arrivee,$joueur->id,$depart->id,$type);
         if($db->lastRowCount !== $nombre){
             return __('seul','seuls',$db->lastRowCount).' '.$db->lastRowCount.' '.__('vaisseau','vaisseaux',$db->lastRowCount).' '.__('disponible','disponibles',$db->lastRowCount).' : '.self::CATALOGUE[$type]['nom'].'.';
         }
+        Tools::addMessage($nombre.' × '.self::CATALOGUE[$type]['nom'].' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', $duree).'.');
         if($type === self::TRANSPORT_PERSO){
             $passagers = Perso::emmener($joueur, $depart, $destination, $nombre * self::CAPACITE_TRANSPORT_PERSO, $arrivee);
             if($passagers > 0){

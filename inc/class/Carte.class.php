@@ -38,6 +38,23 @@ class Carte {
         return $donnees;
     }
 
+    public static function ordreDeLaRequete(array $requete): ?array {
+        if(!isset($requete['ordre'])){
+            return null;
+        }
+        $nombres = array();
+        foreach(is_array($requete['nombre'] ?? null) ? $requete['nombre'] : array() as $type => $nombre){
+            if(isset(Vaisseau::CATALOGUE[$type])){
+                $nombres[$type] = (int) $nombre;
+            }
+        }
+        $flottes = array();
+        foreach(is_array($requete['flotte'] ?? null) ? $requete['flotte'] : array() as $flotteId){
+            array_push($flottes, (int) $flotteId);
+        }
+        return array('planete' => (int) $requete['ordre'], 'nombres' => $nombres, 'flottes' => $flottes);
+    }
+
     private static function systemeDeBase(Joueur $joueur): ?int {
         $idPlanete = Planete::premiereGouvernee($joueur->id);
         if($idPlanete !== null){

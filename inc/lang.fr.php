@@ -11,6 +11,8 @@ return array(
     'vaisseaux' => 'vaisseaux',
     'troupe' => 'troupe',
     'troupes' => 'troupes',
+    'chasseur' => 'chasseur',
+    'chasseurs' => 'chasseurs',
     'barge' => 'barge',
     'barges' => 'barges',
     'perso' => 'perso',

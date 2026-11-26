@@ -11,25 +11,17 @@ if(giveInputString($_POST, 'destination') === Vaisseau::DESTINATION_EXPLORATION)
     Tools::addMessage($erreur ?? $nombre.' × '.Vaisseau::CATALOGUE[Vaisseau::RECONNAISSANCE]['nom'].' : départ vers l\'inconnu, retour dans '.gmdate('i:s', Vaisseau::dureeExpedition($Joueur)).' (risque de ne pas revenir : '.Vaisseau::EXPLORATION_PERTE_POURCENT.' %).');
 }
 else{
-    $destination = new Planete((int) ($_POST['destination'] ?? 0));
-    $troupes = (int) giveInputString($nombres, Vaisseau::TROUPE);
-    $capacite = (int) giveInputString($nombres, Vaisseau::BARGE) * Vaisseau::CAPACITE_BARGE;
-    $ordres = 0;
-    foreach(Vaisseau::CATALOGUE as $type => $infos){
-        $nombre = (int) giveInputString($nombres, $type);
-        if($nombre < 1 || $troupes > $capacite){
-            continue;
-        }
-        $ordres++;
-        $erreur = Vaisseau::deplacer($Joueur, $depart, $destination, $type, $nombre);
-        Tools::addMessage($erreur ?? $nombre.' × '.$infos['nom'].' : départ vers '.$destination->nom.', arrivée dans '.gmdate('i:s', Vaisseau::dureeTrajet($Joueur, $type, $depart, $destination)).'.');
+    $choix = array();
+    foreach(array_keys(Vaisseau::CATALOGUE) as $type){
+        $choix[$type] = (int) giveInputString($nombres, $type);
     }
-    if($troupes > $capacite){
-        $barges = intdiv($troupes + Vaisseau::CAPACITE_BARGE - 1, Vaisseau::CAPACITE_BARGE);
-        Tools::addMessage('Les troupes voyagent en barge : '.$troupes.' '.__('troupe','troupes',$troupes).' '.__('demande','demandent',$troupes).' '.$barges.' '.__('barge','barges',$barges).', '.Vaisseau::CAPACITE_BARGE.' troupes par barge.');
+    $flottes = array();
+    foreach(is_array($_POST['flotte'] ?? null) ? $_POST['flotte'] : array() as $flotteId){
+        array_push($flottes, new Flotte((int) $flotteId));
     }
-    elseif($ordres === 0){
-        Tools::addMessage('Aucun vaisseau choisi.');
+    $erreur = Vaisseau::ordonner($Joueur, $depart, new Planete((int) ($_POST['destination'] ?? 0)), $choix, $flottes);
+    if($erreur !== null){
+        Tools::addMessage($erreur);
     }
 }
 
