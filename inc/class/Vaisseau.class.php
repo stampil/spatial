@@ -5,6 +5,10 @@ class Vaisseau {
     const TRAJET_MEME_SYSTEME_SECONDES = 60;
     const TRAJET_SECONDES_PAR_UNITE = 1;
     const PERCENT = 100;
+    const ILLUSTRATION_DECOUVERTE = 'evenement-decouverte';
+    const ILLUSTRATION_RIEN = 'evenement-rien';
+    const ILLUSTRATION_PERDU = 'evenement-perdu';
+    const ILLUSTRATION_ANALYSE = 'evenement-analyse';
     const RECONNAISSANCE = 'reconnaissance';
     const CHASSEUR = 'chasseur';
     const BARGE = 'barge';
@@ -195,7 +199,7 @@ class Vaisseau {
             if(random_int(1, self::PERCENT) <= $perte){
                 $db->query("DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id=? AND exploration=1",$ligne->id);
                 if($db->lastRowCount === 1){
-                    Tools::addInfo('Signal perdu', 'Plus de nouvelles de votre vaisseau de reconnaissance : perdu à jamais.');
+                    Tools::addInfo('Signal perdu', 'Plus de nouvelles de votre vaisseau de reconnaissance : perdu à jamais.', self::ILLUSTRATION_PERDU);
                 }
                 continue;
             }
@@ -206,10 +210,10 @@ class Vaisseau {
             $planete = new Planete($ligne->id_planete);
             $systeme = self::decouverteDeLExpedition($joueur, $planete);
             if($systeme !== null){
-                Tools::addInfo('Système découvert', $systeme->nom.' ('.count($systeme->planetes).' '.__('planete','planetes',count($systeme->planetes)).')');
+                Tools::addInfo('Système découvert', $systeme->nom.' ('.count($systeme->planetes).' '.__('planete','planetes',count($systeme->planetes)).')', self::ILLUSTRATION_DECOUVERTE);
             }
             else{
-                Tools::addInfo('Rien trouvé', 'Votre vaisseau de reconnaissance est revenu sur '.$planete->nom.' sans rien trouver.');
+                Tools::addInfo('Rien trouvé', 'Votre vaisseau de reconnaissance est revenu sur '.$planete->nom.' sans rien trouver.', self::ILLUSTRATION_RIEN);
             }
         }
     }
@@ -483,7 +487,7 @@ class Vaisseau {
                     if(Decouverte::ajouter($joueur->id, $planete->id_systeme)){
                         $analyse = $planete->nom.' : fiche complète relevée, système '.$planete->systeme->nom.' exploré, '.count($planete->systeme->planetes).' '.__('planete','planetes',count($planete->systeme->planetes)).' '.__('decouverte','decouvertes',count($planete->systeme->planetes)).'.';
                     }
-                    Tools::addInfo('Planète analysée', $analyse);
+                    Tools::addInfo('Planète analysée', $analyse, self::ILLUSTRATION_ANALYSE);
                 }
             }
         }
