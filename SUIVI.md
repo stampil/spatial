@@ -14,8 +14,9 @@ Ce que je comprends (le curseur et le choix par type disparaissent) :
 - Le bouton devient « Enregistrer » quand 2 vaisseaux ou plus sont cochés ; à côté, une croix annule et remet l'affichage normal.
 - On choisit donc des vaisseaux précis (par leur nom, ex. « Frégate 12 »), plus « les premiers du type ».
 
+Réponse (26/11) : « par défaut c'est flotte "inc" le nom et on peut renommer comme le reste ». Compris : pas de champ de nom à la création ; la flotte s'appelle « Flotte 1 », « Flotte 2 »… (compteur par joueur, comme pour les vaisseaux : nouvelle colonne `numero` sur `flotte`, migration 020, les flottes existantes numérotées) ; et elle se renomme ensuite avec un « Renommer » comme les vaisseaux (aujourd'hui seules les vaisseaux se renomment : à ajouter pour les flottes).
+
 ## Questions en suspens
 
-1. Le nom de la flotte : au clic sur « Enregistrer », un champ de nom apparaît (proposé : prérempli « Flotte 1 », « Flotte 2 »…, modifiable) ? Ou un autre moyen ?
-2. Avant 2 cases cochées, le bouton du mode garde-t-il le libellé « Créer une flotte » (inactif), et devient « Enregistrer » dès la 2e case ? C'est ma lecture ; sinon dis-moi.
-3. Dans le mode création, les vaisseaux éligibles gardent-ils leurs boutons (Voyager, Embarquer, Renommer) ou je les masque aussi pour alléger ?
+1. Avant 2 cases cochées, le bouton du mode garde-t-il le libellé « Créer une flotte » (inactif), et devient « Enregistrer » dès la 2e case ? C'est ma lecture.
+2. En mode création, les vaisseaux éligibles gardent-ils leurs boutons (Voyager, Embarquer, Renommer), ou je les masque pour alléger ? (sans avis, je les masque : le mode sert à cocher)
