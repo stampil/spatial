@@ -92,9 +92,9 @@ foreach(array_keys($posees) as $planeteId){
         <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
         <?php if($creationPossible){ ?>
         <div class="panneau__outils">
-            <button type="button" class="md3-button md3-button--tonal" data-flotte-creer>Créer une flotte</button>
-            <button type="submit" class="md3-button" form="creation-flotte-<?= $planete->id ?>" data-flotte-enregistrer disabled>Créer une flotte</button>
-            <button type="button" class="panneau__croix" data-flotte-annuler aria-label="Annuler la création de flotte" title="Annuler la création de flotte">&times;</button>
+            <button type="button" class="lien-action" data-flotte-creer>Créer une flotte</button>
+            <button type="submit" class="lien-action" form="creation-flotte-<?= $planete->id ?>" data-flotte-enregistrer disabled>Créer une flotte</button>
+            <button type="button" class="lien-action" data-flotte-annuler>Annuler</button>
         </div>
         <form id="creation-flotte-<?= $planete->id ?>" method="POST" action="?p=creerFlotte">
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />

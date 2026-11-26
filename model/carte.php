@@ -11,7 +11,7 @@
         <span class="carte__bandeau-texte" id="carte-bandeau-texte"></span>
         <span class="carte__bandeau-suite" id="carte-bandeau-suite">: choisir le système</span>
         <span aria-hidden="true">·</span>
-        <button type="button" class="carte__lien" id="carte-annuler">Annuler</button>
+        <button type="button" class="lien-action" id="carte-annuler">Annuler</button>
     </div>
     <aside class="carte__feuille" id="carte-feuille" hidden role="dialog" aria-labelledby="carte-feuille-titre">
         <div class="carte__poignee" aria-hidden="true"></div>

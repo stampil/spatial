@@ -178,18 +178,6 @@ main.md3-page > .mission {
     white-space: normal;
 }
 
-.carte__lien {
-    flex: none;
-    min-height: 48px;
-    padding: 0 4px;
-    border: 0;
-    background: none;
-    color: var(--md-sys-color-primary);
-    font: inherit;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
 .carte__feuille {
     position: absolute;
     right: 0;
