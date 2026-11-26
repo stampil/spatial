@@ -469,7 +469,7 @@ class Perso {
             Tools::addMessage($planete->nom.' a déjà un gouverneur : la diplomatie de '.$this->nom.' est annulée.');
             return;
         }
-        Tools::addMessage('Vous gouvernez maintenant '.$planete->nom.'.');
+        Tools::addInfo('Une planète rejoint votre cause', $planete->nom.' rejoint votre camp : vous la gouvernez maintenant.', Planete::ILLUSTRATION_REJOINT, $joueur->id_camp);
         if($joueur->etape_tuto < Tuto::ETAPE_USINE){
             $joueur->etape_tuto = Tuto::ETAPE_USINE;
             $joueur->save();

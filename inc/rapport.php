@@ -6,6 +6,9 @@
         <div class="rapport__barres"></div>
         <ol class="rapport__journal" aria-live="polite"></ol>
         <p class="rapport__bilan" hidden></p>
+        <?php if(isset($rapport['id_camp'])){ ?>
+        <p class="rapport__camp" hidden><?= Vue::emblemeCamp($rapport['id_camp'], Vue::ICONE_VAISSEAU_TAILLE) ?><?= htmlspecialchars((new Camp($rapport['id_camp']))->nom) ?></p>
+        <?php } ?>
         <div class="md3-actions">
             <?= Vue::commandeIcone('resoudre', 'Résoudre', 'rapport__resoudre') ?>
             <?= Vue::commandeIcone('passer', 'Passer', 'md3-button--tonal rapport__passer', ' hidden') ?>

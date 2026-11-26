@@ -24,7 +24,11 @@ class Planete {
     const MALUS_OCCUPATION_POURCENT = 20;
     const TROUPES_DIVISEUR_SLOT = 2;
     const CAPTURE_REVOLTE = 50;
-    const REVOLTE_ALERTE = 70;
+    const REVOLTE_ALERTE = 40;
+    const SEUIL_INDEPENDANCE = 51;
+    const ILLUSTRATION_REJOINT = 'evenement-rejoint';
+    const ILLUSTRATION_REVOLTE = 'evenement-revolte';
+    const ILLUSTRATION_CONQUISE = 'evenement-conquise';
     const REGENERATION_POURCENT_PAR_HEURE = 10;
     const REGENERATION_MINIMUM_PAR_HEURE = 1;
     const FLOTTE_EMPIRE_PAR_SLOT = 1;
@@ -497,9 +501,11 @@ class Planete {
         if($this->gouverneur === 0){
             return;
         }
-        if($this->occupee && !$this->estOccupee()){
+        $occupee = $this->estOccupee();
+        if($this->occupee && !$occupee){
+            $camp = $this->id_camp;
             $this->redevenirNeutre();
-            Tools::addMessage($this->nom.' n\'a plus de garnison : elle redevient neutre.');
+            Tools::addInfo('Une planète vous échappe', $this->nom.' n\'a plus de garnison : elle redevient neutre.', self::ILLUSTRATION_REVOLTE, $camp);
             return;
         }
         if($this->revolte_maj === null){
@@ -513,17 +519,18 @@ class Planete {
             return;
         }
         $revolte = $this->perc_revolte;
-        if(!$this->estOccupee()){
+        if(!$occupee){
             $revolte = min($revolte + $heures * self::REVOLTE_PER_HOUR, self::MAX_REVOLTE);
         }
         $nouvelleMaj = Tools::formatDate($depuis + $heures * self::SECONDS_PER_HOUR);
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=?, revolte_maj=? WHERE id=? AND revolte_maj=?";
         $this->bdd->query($query,$revolte,$nouvelleMaj,$this->id,$this->revolte_maj);
-        if($this->bdd->lastRowCount !== 1 || $revolte < self::MAX_REVOLTE){
+        if($this->bdd->lastRowCount !== 1 || $occupee || $revolte < self::SEUIL_INDEPENDANCE){
             return;
         }
+        $camp = $this->id_camp;
         $this->redevenirNeutre();
-        Tools::addMessage($this->nom.' est devenue indépendante : sa révolte a atteint '.self::MAX_REVOLTE.' %.');
+        Tools::addInfo('Une planète se révolte', $this->nom.', sans troupes pour la tenir, a atteint '.$revolte.' % de révolte : elle devient indépendante.', self::ILLUSTRATION_REVOLTE, $camp);
     }
 
 public function getNom(): string {

@@ -238,11 +238,13 @@ class Combat {
 
         $force = Vaisseau::CATALOGUE[Vaisseau::TROUPE]['force'];
         $attaque = self::alea($troupes * $force);
+        $conquete = false;
         if($attaque > $planete->troupes * $force){
             $survivants = max(1, $troupes - $planete->troupes);
             if(!$planete->capturer($joueur, $survivants)){
                 return 'La planète a changé de main : les troupes sont perdues.';
             }
+            $conquete = true;
             $message = 'Débarquement réussi : vous gouvernez maintenant '.$planete->nom.' ('.$survivants.' '.__('troupe','troupes',$survivants).' en garnison). La planète est révoltée à '.Planete::CAPTURE_REVOLTE.' %.';
             $garnison = 0;
         }
@@ -254,13 +256,18 @@ class Combat {
             $garnison = $planete->troupes - $abattues;
         }
         Tools::addMessage($message);
-        Tools::addRapport(array(
+        $rapport = array(
             'titre' => 'Débarquement sur '.$planete->nom,
             'illustration' => self::ILLUSTRATION_TERRESTRE,
             'barres' => array(array('cle' => 'troupes', 'nom' => 'Garnison', 'maximum' => $planete->troupes)),
             'etapes' => array(array('texte' => $troupes.' '.__('troupe','troupes',$troupes).' d\'assaut : '.$attaque.' de force', 'valeurs' => array('troupes' => $garnison))),
             'bilan' => $message,
-        ));
+        );
+        if($conquete){
+            $rapport['id_camp'] = $joueur->id_camp;
+            $rapport['illustration_finale'] = Vue::fichierFond(Planete::ILLUSTRATION_CONQUISE);
+        }
+        Tools::addRapport($rapport);
         return null;
     }
 

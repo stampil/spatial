@@ -73,6 +73,13 @@
             }
             bilan.textContent = rapport.bilan;
             bilan.hidden = false;
+            const camp = dialogue.querySelector('.rapport__camp');
+            if (camp) {
+                camp.hidden = false;
+            }
+            if (rapport.illustration_finale) {
+                dialogue.querySelector('.bandeau').style.backgroundImage = 'url(' + rapport.illustration_finale + ')';
+            }
             passer.hidden = true;
             fermer.hidden = false;
             fermer.focus();

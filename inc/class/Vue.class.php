@@ -57,6 +57,11 @@ class Vue {
         return '<div class="banniere" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
     }
 
+    public static function fichierFond(string $nom): ?string {
+        $chemin = self::DOSSIER_IMAGES.'/'.$nom.'.'.self::EXTENSION_FOND;
+        return is_file($chemin) ? $chemin : null;
+    }
+
     public static function bandeau(string $nom): string {
         $chemin = self::DOSSIER_IMAGES.'/'.$nom.'.'.self::EXTENSION_FOND;
         if(!is_file($chemin)){
