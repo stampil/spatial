@@ -290,9 +290,9 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 
 ## Textures de planètes telluriques : `planete-<n>` (2:1, raccord automatique)
 
-12 nouvelles textures de surface (27 à 38) : projection plane 2:1 d'un monde rocheux entier, sans sphère ni halo ni étoiles. Joindre dans Gemini l'image de référence indiquée (un fichier de `img/planete/`) et coller le prompt. Le script `tools/detourer-magenta.py` raccorde le bord gauche au bord droit (fondu) pour que le défilement n'ait aucune couture, puis range le résultat dans `img/planete/<n>.jpg`.
+12 nouvelles textures de surface (27 à 38) : projection plane 2:1 d'un monde rocheux entier, sans sphère ni halo ni étoiles. Sans image de référence (ça consomme des jetons) : coller seulement le prompt. La colonne « Référence » ne sert qu'en cas de rendu raté. Le script `tools/detourer-magenta.py` raccorde le bord gauche au bord droit (fondu) pour que le défilement n'ait aucune couture, puis range le résultat dans `img/planete/<n>.jpg`.
 
-Début de chaque prompt (bloc TEXTURE) : `Flat equirectangular surface texture map of an entire rocky planet, exact 2:1 aspect ratio, seen straight on as a flat rectangular map with no sphere, no curvature, no atmosphere glow, no stars, no clouds shadow, no text, no labels, no grid lines. Same flat, realistic satellite-map look and level of detail as the attached reference image.`
+Début de chaque prompt (bloc TEXTURE) : `Flat equirectangular surface texture map of an entire rocky planet, exact 2:1 aspect ratio, seen straight on as a flat rectangular map with no sphere, no curvature, no atmosphere glow, no stars, no clouds shadow, no text, no labels, no grid lines. Flat, realistic global satellite-map look with fine surface detail, like a real planetary mosaic map.`
 
 | Fichier | Référence à joindre | Prompt (après le bloc TEXTURE) |
 |---|---|---|
