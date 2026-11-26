@@ -20,6 +20,6 @@ Ce que je comprends : générer avec toi, une par une, de nouvelles textures dan
 
 ## Questions en suspens
 
-1. Combien : 12 nouvelles textures (38 au total) : océan, dunes dorées, jungle, violet exotique, vert toxique, cristallin bleuté, volcanique sombre, archipel, toundra, tempêtes rouges, nuages roses, cendres et fissures. Je recommande 12.
+1. Combien : ta précision du 26/11, « fait des tellurique » : uniquement des planètes telluriques (rocheuses, à surface solide), pas de géantes gazeuses. 12 nouvelles textures (38 au total) : monde océan, dunes dorées, jungle dense, archipel, toundra, canyons rouges, plaines de sel, volcanique sombre, cendres et fissures, minéral violet, minéral vert, cratères sombres. Je recommande ces 12.
 2. Le choix de la texture se fait par l'identifiant de la planète : avec plus d'images, les planètes existantes changeront d'aspect (l'univers est reconstruit à chaque remise à zéro de toute façon). Je recommande d'accepter ce changement.
 3. Références : je te dis pour chaque prompt quelle image existante joindre (par exemple \`img/planete/7.jpg\` pour un monde lisse, \`15.jpg\` pour un monde terrestre, \`17.jpg\` pour la lave). Je recommande oui.
