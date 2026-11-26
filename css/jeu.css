@@ -1004,6 +1004,11 @@
     gap: 8px;
 }
 
+.actions-icones form,
+.md3-actions form {
+    margin: 0;
+}
+
 .actions-icones--flotte {
     margin: 8px 0;
     gap: 12px;
