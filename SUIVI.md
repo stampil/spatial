@@ -70,6 +70,18 @@ Ce que je comprends : une nouvelle étape de tutoriel après « Répondre à une
 
 Constat à signaler (fait aujourd'hui, point 3) : avec 1 chasseur IA sur la planète pirate du tutoriel, mon script de test (1 seule tentative d'assaut) réussit environ 2 fois sur 3 ; le chasseur IA tue 1 de tes chasseurs avant l'assaut de la défense. Un joueur peut recommencer, mais c'est moins fiable qu'avant.
 
+### 8. Chasseurs : bonus contre les capitaux, nécessité d'avoir ses propres chasseurs (26/11)
+
+Ta phrase : « les chasseurs ont de bonus pour endomager gravelement les vaisseaux capitaux de par leur difficulté a etre touché, il faut donc ses propre chasseur pour s'en proteger ».
+
+Lu (rien codé) : dans une bataille de flottes (`Combat::bataille`, utilisée par les menaces pirates et, depuis le point 3, par les défenseurs d'une planète), chaque type tire par phase (chasseur, frégate, capital) et les dégâts reçus détruisent d'abord les chasseurs, puis les frégates, puis les capitaux (`Combat::detruire`). Il n'existe aucun bonus d'un type contre un autre.
+
+Ce que je comprends :
+- Les chasseurs infligent des dégâts bonifiés aux capitaux (cible lente et grosse, mais les chasseurs sont difficiles à toucher).
+- Pour s'en protéger, il faut avoir ses propres chasseurs : ils interceptent. Sans chasseurs, les chasseurs ennemis frappent tes capitaux de plein fouet.
+
+Proposition (à valider) : dans une bataille de flottes, la part des dégâts d'un chasseur qui arrive sur un capital est multipliée par 2 ; les chasseurs défenseurs encaissent toujours en premier (c'est déjà l'ordre actuel), donc tant qu'il te reste des chasseurs, la part qui atteint tes capitaux est réduite d'autant. Le bonus ne s'applique pas à l'assaut de la défense planétaire (bouclier, canon).
+
 ## Questions en suspens
 
 Point 7 (tutoriel Restrictor) et constat :
@@ -87,3 +99,7 @@ Point 5 (Restrictor et fuite) :
 14. Destination : la planète la plus proche (par la carte) qui est à toi, ou à ton camp pour l'IA, ou neutre (sans camp) ; les fuyards voyagent le temps normal (ils réapparaissent à l'arrivée). D'accord ?
 15. Le Restrictor bloque seulement la fuite des vaisseaux ennemis (pas la sienne) ; s'il meurt pendant la bataille, la fuite redevient possible. D'accord ?
 16. Les flottes IA stationnées (point 3) ne fuient jamais (elles défendent leur planète) ; l'Empire reçoit des Restrictors sur ses grandes planètes (slot 10 et plus) ? Ou pas de Restrictor IA pour l'instant ?
+
+Point 8 (chasseurs contre capitaux) :
+19. Bonus des chasseurs contre les capitaux : ×2 (+100 %) sur les dégâts qui atteignent un capital ; d'accord, ou autre valeur ?
+20. Le bonus compte aussi pour les chasseurs IA (flottes stationnées, menaces pirates), et le texte du tutoriel de préparation mentionne que les chasseurs protègent les capitaux ?
