@@ -12,7 +12,11 @@ Ce que je comprends : écrire les prompts Gemini de 4 images (crédits, revenu, 
 
 Point à signaler : la barre du haut les montre à 24 px. Une image photo-réaliste y devient illisible. Il faut des objets simples, très contrastés, lisibles en miniature.
 
+Précision (26/11) : « idem les autres icone, » : même traitement pour toutes les autres icônes de l'interface.
+
+Lu (rien codé) : en plus des 4 du haut, `Icone::DESSINS` contient d'autres icônes SVG sans image : carte, persos, classement, mission, bouclier, canon, révolte, force, endurance, diplomatie, emplacements, construire, ancre, route, actions, quartier, journal, trophée, connexion, inscription (24 au total avec les 4 du haut), plus des pictogrammes purement fonctionnels : menu, son, muet, ajouter, info. Bâtiments, vaisseaux, rôles et bonus ont déjà leurs images.
+
 ## Questions en suspens
 
-1. Style : objet 3D simple et brillant (recommandé, ex. pile de pièces dorées, pièce avec flèche vers le haut, planète avec anneau, vaisseau avec traînée), ou pictogramme plat façon « icône d'application » ?
-2. Seulement ces 4 icônes du haut, ou aussi celles du menu du bas (Carte, Colonies, Flottes, Persos, Classement) ?
+1. Style : un objet 3D simple et brillant (recommandé : pile de pièces dorées, planète avec anneau, vaisseau avec traînée, bouclier, etc.), ou un pictogramme plat façon icône d'application ?
+2. Les 5 pictogrammes fonctionnels (menu, son, muet, ajouter, info) restent en SVG (recommandé : un hamburger ou un haut-parleur 3D serait moins clair) ; les 24 autres reçoivent un prompt. D'accord ?
