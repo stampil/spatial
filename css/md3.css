@@ -306,6 +306,20 @@ body {
         linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-primary)) border-box;
 }
 
+.md3-page .md3-button.md3-button--icone {
+    background:
+        linear-gradient(135deg, var(--md-sys-color-secondary-container), color-mix(in srgb, var(--md-sys-color-secondary-container) 80%, black)) padding-box,
+        linear-gradient(135deg, color-mix(in srgb, white 70%, transparent), var(--md-sys-color-outline)) border-box;
+    color: white;
+}
+
+.md3-page .md3-button.md3-button--icone:not(.md3-button--tonal) {
+    border-width: 2px;
+    background:
+        linear-gradient(135deg, var(--md-sys-color-secondary-container), color-mix(in srgb, var(--md-sys-color-secondary-container) 80%, black)) padding-box,
+        linear-gradient(135deg, white, var(--md-sys-color-primary) 55%, #6F4BFF) border-box;
+}
+
 .md3-page .md3-button.md3-button--grand,
 .md3-page input[type="submit"].md3-button--grand {
     width: 100%;
