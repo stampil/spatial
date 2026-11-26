@@ -22,7 +22,21 @@ Précision du 26/11 : « il fau sassurer que sa fasse pas un trait au defilement
 
 Ce que je comprends : je fais un outil de raccord (\`tools/raccorder-planete.py\`) qui fond la fin de l'image dans son début sur une bande, pour que le dernier pixel se prolonge naturellement dans le premier ; il tourne automatiquement à l'import de chaque nouvelle texture, et je vérifie ensuite par la mesure que la couture n'est plus plus marquée qu'entre deux colonnes voisines. Aucune texture ne sera importée sans raccord vérifié.
 
+### 3. Repasse complète sur les pluriels (26/11)
+
+Ta phrase : « fait une repasse sur les pluriel sale feneant ».
+
+Lu (rien codé) : j'ai cherché dans tout le code (\`inc\`, \`model\`, \`js\`) les accords écrits à la main. Plus aucun « (s) », « (aux) » ni ternaire du type \`> 1 ? 's'\`. Restent des mots de quantité au pluriel collés à une constante ou à un nombre variable sans \`__()\`, dans les textes du jeu :
+- \`Tuto.class.php\` : « N crédits » (4 primes), « N troupes », « N chasseurs » (étapes 5, 7, 17) ;
+- \`Perso.class.php\` : « N minutes » (prison, mort) ;
+- \`Flotte.class.php\` : « au moins N vaisseaux » ; \`Batiment.class.php\` : « N troupes par académie » ; \`Ia.class.php\` : « N points » ; \`Combat.class.php\` ligne 255 (« vos / votre N troupe(s) ») à vérifier.
+Les valeurs actuelles de ces constantes sont toutes supérieures à 1, donc l'affichage est juste aujourd'hui ; mais si une valeur passe à 1 (ou à 0), le texte devient faux, ce que tu ne veux pas.
+
+Ce que je comprends : je passe tous ces mots par \`__()\` avec leurs deux formes dans \`inc/lang.fr.php\`, et je teste de 0 à 3 pour chacun.
+
 ## Questions en suspens
+
+0. Go pour la repasse sur ces pluriels ?
 
 
 1. Combien : ta précision du 26/11, « fait des tellurique » : uniquement des planètes telluriques (rocheuses, à surface solide), pas de géantes gazeuses. 12 nouvelles textures (38 au total) : monde océan, dunes dorées, jungle dense, archipel, toundra, canyons rouges, plaines de sel, volcanique sombre, cendres et fissures, minéral violet, minéral vert, cratères sombres. Je recommande ces 12.
