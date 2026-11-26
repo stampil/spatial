@@ -207,6 +207,10 @@
     background-color: transparent;
 }
 
+.avatar .visuel--image {
+    background-size: 110%;
+}
+
 .visuel {
     flex: none;
     width: 72px;
