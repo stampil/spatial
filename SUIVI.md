@@ -2,15 +2,7 @@
 
 ## À faire
 
-### 1. Toutes les icônes alignées, en lignes et en colonnes (26/11)
-
-Ta phrase : « assure toi que la totaité des icones soient aligné » (capture : la liste « Construire » : les icônes marteau et démolir ne sont pas à la même place d'une ligne à l'autre).
-
-Lu (rien codé) : sur la capture, le texte du remboursement à droite des icônes (« +50 cr », « +100 cr », « +75 cr »…) a une largeur différente selon la ligne, et comme le groupe est collé à droite, les icônes se décalent d'une ligne à l'autre (jusqu'à 9 px). Mon correctif précédent ne réglait que la hauteur dans une même ligne.
-
-Ce que je comprends : je donne une largeur fixe à ces textes pour que les colonnes d'icônes tombent exactement au même endroit, puis je mesure TOUTES les pages qui ont des icônes (Flottes, planète, perso, persos, carte, rapport, fenêtres) : aligné en hauteur dans chaque ligne, et aligné en colonnes dans les listes. Je corrige ce que la mesure trouve et je te donne le tableau de mesure.
-
-### 2. Nouvelles images de planètes pour enrichir la collection (26/11)
+### 1. Nouvelles images de planètes pour enrichir la collection (26/11)
 
 Ta phrase : « fait generer de nouvelles image de planete pour enrichir tu peux donner ref ».
 
@@ -24,7 +16,7 @@ Ce que je comprends : je fais un outil de raccord (\`tools/raccorder-planete.py\
 
 Ajout du 26/11 : « rajoute une planete cité ville hyper industrialisé » : une 13e texture (`planete-39`) : une planète-ville entière, mégalopole industrielle continue (usines, cheminées, raffineries, réseaux, lumières orange, scories en fusion, brume de pollution), générée juste après les plaines de sel.
 
-### 3. Planètes de type Terre avec des continents différents (26/11)
+### 2. Planètes de type Terre avec des continents différents (26/11)
 
 Ta phrase : « fait des planete earth like, eau, terre de foret sable neige, mais des continent different ».
 
