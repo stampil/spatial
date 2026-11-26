@@ -21,7 +21,7 @@ foreach($gouvernees as $ligne){
         <div class="fiche__tete">
             <div class="avatar avatar--planete" style="background-image:url(img/planete/<?= $map_planete ?>.jpg)"></div>
             <div>
-                <h2 class="fiche__nom"><a href="?p=affichePlanete&id_planete=<?= $p->id ?>"><?= htmlspecialchars($p->nom) ?></a></h2>
+                <h2 class="fiche__nom"><a href="?p=affichePlanete&id_planete=<?= $p->id ?>" data-tuto="<?= Tuto::CLE_PLANETE.$p->id ?>"><?= htmlspecialchars($p->nom) ?></a></h2>
                 <p class="md3-secondary">Système <?= $p->systeme->getNom() ?></p>
             </div>
         </div>

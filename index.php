@@ -66,6 +66,9 @@ if(!empty($_SESSION['Sid'])){
         <script src="<?= Vue::ressource('js/rapport.js') ?>" defer></script>
         <?php if(isset($Joueur)){ ?>
         <script src="<?= Vue::ressource('js/musique.js') ?>" defer></script>
+        <?php if($Joueur->enTuto()){ ?>
+        <script src="<?= Vue::ressource('js/tuto.js') ?>" defer></script>
+        <?php } ?>
         <?php } else { ?>
         <script src="<?= Vue::ressource('js/autoconnexion.js') ?>" data-cle="<?= CONNEXION_CLE_STOCKAGE ?>" data-reconnexion="?p=<?= RECONNEXION_PAGE ?>" data-accueil="?p=<?= HOME_PAGE ?>"></script>
         <?php } ?>
@@ -84,7 +87,7 @@ if(!empty($_SESSION['Sid'])){
         require 'inc/hud.php';
     }
     ?>
-    <main class="md3-page">
+    <main class="md3-page"<?= isset($Joueur) ? Tuto::attributsFleche($Joueur, $p) : '' ?>>
     <?php
     if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE && $Joueur->enTuto()){
         require 'inc/tuto.php';

@@ -23,13 +23,13 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
             <?= Vue::lienIcone('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager') ?>
             <?php } ?>
             <?php if($peutEmbarquer){ ?>
-            <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal') ?>
+            <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal', ' data-tuto="embarquer"') ?>
             <?php } ?>
             <?php if(array_sum($embarques) > 0){ ?>
             <form method="POST" action="?p=debarquer">
                 <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
                 <?= csrfField() ?>
-                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal') ?>
+                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal', ' data-tuto="decharger"') ?>
             </form>
             <?php } ?>
             <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer', false, 'md3-button--tonal') ?>

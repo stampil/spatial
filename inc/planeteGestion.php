@@ -40,7 +40,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
                 <input type="hidden" name="batiment" value="<?= $batiment ?>" />
                 <input type="hidden" name="operation" value="<?= Planete::OPERATION_CONSTRUIRE ?>" />
                 <?= csrfField() ?>
-                <?= Vue::boutonIcone('construire', 'Construire', false, '', $planete->batimentsTotal() < $planete->slot ? '' : ' disabled') ?>
+                <?= Vue::boutonIcone('construire', 'Construire', false, '', ($planete->batimentsTotal() < $planete->slot ? '' : ' disabled').' data-tuto="'.Tuto::CLE_CONSTRUIRE.$batiment.'"') ?>
             </form>
             <form class="action" method="POST" action="?p=gererBatiment">
                 <input type="hidden" name="planete" value="<?= $planete->id ?>" />
@@ -68,7 +68,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
             <input type="hidden" name="role" value="<?= $role ?>" />
             <?= csrfField() ?>
             <span class="md3-secondary"><?= $Joueur->prixUnite($infosRole['prix']) ?> cr</span>
-            <?= Vue::boutonIcone('recruter', 'Recruter : '.$infosRole['nom']) ?>
+            <?= Vue::boutonIcone('recruter', 'Recruter : '.$infosRole['nom'], false, '', ' data-tuto="'.Tuto::CLE_RECRUTER.$role.'"') ?>
         </form>
     </div>
     <?php } ?>
@@ -101,7 +101,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
             <?= csrfField() ?>
             <?php $maximum = $type === Vaisseau::TROUPE ? Vaisseau::placeTroupes($planete, $Joueur->id) : intdiv($Joueur->credits, $Joueur->prixVaisseau($type)); ?>
             <?= Vue::curseur('nombre', min(1, $maximum), $maximum, min(1, $maximum), 'Nombre à produire : '.$infos['nom']) ?>
-            <?= Vue::boutonIcone('produire', 'Produire', false, 'md3-button--tonal', $maximum === 0 ? ' disabled' : '') ?>
+            <?= Vue::boutonIcone('produire', 'Produire', false, 'md3-button--tonal', ($maximum === 0 ? ' disabled' : '').' data-tuto="'.Tuto::CLE_PRODUIRE.$type.'"') ?>
         </form>
     </div>
     <?php } ?>

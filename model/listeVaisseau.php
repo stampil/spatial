@@ -27,7 +27,7 @@ if($menace !== null){
             <input type="hidden" name="menace" value="<?= $menace->id ?>" />
             <input type="hidden" name="action" value="<?= $action ?>" />
             <?= csrfField() ?>
-            <?= Vue::boutonIcone($action === Menace::ACTION_LAISSER ? 'laisser' : 'combattre', $libelle, false, $action === Menace::ACTION_LAISSER ? 'md3-button--tonal' : '') ?>
+            <?= Vue::boutonIcone($action === Menace::ACTION_LAISSER ? 'laisser' : 'combattre', $libelle, false, $action === Menace::ACTION_LAISSER ? 'md3-button--tonal' : '', ' data-tuto="'.($action === Menace::ACTION_LAISSER ? 'laisser' : 'combattre').'"') ?>
         </form>
         <?php } ?>
     </div>
@@ -46,7 +46,7 @@ foreach($flottes as $ligne){
     <p>Au repos sur <?= $planete->getNom() ?></p>
     <div data-bloc>
         <div class="actions-icones actions-icones--flotte">
-            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&flotte='.$flotte->id, 'voyager', 'Voyager', true) ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&flotte='.$flotte->id, 'voyager', 'Voyager', true, '', ' data-tuto="voyager-flotte"') ?>
             <?= Vue::lienIcone('?p=carte&systeme='.$planete->id_systeme, 'carte', 'Carte', true, 'md3-button--tonal') ?>
             <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer la flotte', true, 'md3-button--tonal') ?>
             <form method="POST" action="?p=gererFlotte">
@@ -94,8 +94,8 @@ foreach(array_keys($posees) as $planeteId){
         <h2 class="panneau__titre"><?= Icone::html('flotte') ?><?= $planete->getNom() ?></h2>
         <?php if($creationPossible){ ?>
         <div class="panneau__outils">
-            <?= Vue::commandeIcone('creer_flotte', 'Créer une flotte', 'md3-button--tonal', ' data-flotte-creer') ?>
-            <?= Vue::boutonIcone('valider', 'Enregistrer la flotte', false, '', ' form="creation-flotte-'.$planete->id.'" data-flotte-enregistrer disabled') ?>
+            <?= Vue::commandeIcone('creer_flotte', 'Créer une flotte', 'md3-button--tonal', ' data-flotte-creer data-tuto="creer-flotte"') ?>
+            <?= Vue::boutonIcone('valider', 'Enregistrer la flotte', false, '', ' form="creation-flotte-'.$planete->id.'" data-flotte-enregistrer data-tuto="enregistrer-flotte" disabled') ?>
             <?= Vue::commandeIcone('fermer', 'Annuler', 'md3-button--tonal', ' data-flotte-annuler') ?>
         </div>
         <form id="creation-flotte-<?= $planete->id ?>" method="POST" action="?p=creerFlotte">
@@ -126,11 +126,11 @@ foreach(array_keys($posees) as $planeteId){
                 <input type="hidden" name="destination" value="<?= Vaisseau::DESTINATION_EXPLORATION ?>" />
                 <input type="hidden" name="nombre[<?= Vaisseau::RECONNAISSANCE ?>]" value="1" />
                 <?= csrfField() ?>
-                <?= Vue::boutonIcone('chercher', 'Chercher', false, 'md3-button--tonal') ?>
+                <?= Vue::boutonIcone('chercher', 'Chercher', false, 'md3-button--tonal', ' data-tuto="chercher"') ?>
             </form>
-            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&type='.$type, 'reconnaitre', 'Reconnaître') ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&type='.$type, 'reconnaitre', 'Reconnaître', false, '', ' data-tuto="'.Tuto::CLE_VOYAGER.$type.'"') ?>
             <?php } else { ?>
-            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&type='.$type, 'voyager', 'Voyager') ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&type='.$type, 'voyager', 'Voyager', false, '', ' data-tuto="'.Tuto::CLE_VOYAGER.$type.'"') ?>
             <?php } ?>
         </div>
     </div>

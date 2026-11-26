@@ -1052,3 +1052,36 @@
     -webkit-mask-size: contain;
     mask-size: contain;
 }
+
+.tuto-fleche {
+    --rotation: 0deg;
+    position: fixed;
+    z-index: 40;
+    width: 56px;
+    height: 72px;
+    background: linear-gradient(180deg, var(--md-sys-color-primary), white);
+    clip-path: polygon(35% 0, 65% 0, 65% 55%, 100% 55%, 50% 100%, 0 55%, 35% 55%);
+    pointer-events: none;
+    animation: tuto-rebond 0.8s ease-in-out infinite alternate;
+}
+
+.tuto-fleche--vers-le-haut {
+    --rotation: 180deg;
+}
+
+@keyframes tuto-rebond {
+    from {
+        transform: rotate(var(--rotation)) translateY(-6px);
+    }
+
+    to {
+        transform: rotate(var(--rotation)) translateY(10px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tuto-fleche {
+        transform: rotate(var(--rotation));
+        animation: none;
+    }
+}

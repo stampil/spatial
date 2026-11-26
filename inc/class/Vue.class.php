@@ -164,13 +164,13 @@ class Vue {
         return self::bouton('button', $icone, $libelle, false, $classes, $attributs);
     }
 
-    public static function lienIcone(string $adresse, string $icone, string $libelle, bool $flotte = false, string $classes = ''): string {
+    public static function lienIcone(string $adresse, string $icone, string $libelle, bool $flotte = false, string $classes = '', string $attributs = ''): string {
         $libelleSur = htmlspecialchars($libelle);
-        return '<a class="'.self::classesIcone($flotte, $classes).'" href="'.htmlspecialchars($adresse).'" title="'.$libelleSur.'" aria-label="'.$libelleSur.'">'.self::glyphe($icone, $flotte).'</a>';
+        return '<a class="'.self::classesIcone($flotte, $classes).'" href="'.htmlspecialchars($adresse).'" title="'.$libelleSur.'" aria-label="'.$libelleSur.'"'.$attributs.'>'.self::glyphe($icone, $flotte).'</a>';
     }
 
-    public static function basculeIcone(string $panneau, string $icone, string $libelle, bool $flotte = false, string $classes = ''): string {
-        return self::bouton('button', $icone, $libelle, $flotte, $classes, ' data-bascule="'.htmlspecialchars($panneau).'" aria-expanded="false"');
+    public static function basculeIcone(string $panneau, string $icone, string $libelle, bool $flotte = false, string $classes = '', string $attributs = ''): string {
+        return self::bouton('button', $icone, $libelle, $flotte, $classes, ' data-bascule="'.htmlspecialchars($panneau).'" aria-expanded="false"'.$attributs);
     }
 
     public static function emblemeCamp(?int $idCamp, int $taille = self::EMBLEME_TAILLE): string {

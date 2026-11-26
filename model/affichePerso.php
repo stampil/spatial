@@ -17,7 +17,7 @@ if($Joueur->etape_tuto==1){
 <details class="mission" open>
     <summary><?= Icone::html('mission') ?>Mission : lancer la diplomatie</summary>
     <?php if($o->action_diplomatie === null){ ?>
-    <p class="mission__texte"><strong>Lancez la diplomatie sur votre planète natale :</strong> touchez « Faire de la diplomatie » dans la section Actions, plus bas (<a href="#actions">aller aux actions</a>). Dans le tutoriel, elle réussit à coup sûr.</p>
+    <p class="mission__texte"><strong>Lancez la diplomatie sur votre planète natale :</strong> touchez <?= Icone::html('negocier') ?> « Faire de la diplomatie » dans la section Actions, plus bas (<a href="#actions">aller aux actions</a>). Dans le tutoriel, elle réussit à coup sûr.</p>
     <?php } else { ?>
     <p class="mission__texte"><strong>La diplomatie est en cours :</strong> attendez la fin du compte à rebours dans la section Statut, la page se met à jour toute seule.</p>
     <?php } ?>
@@ -109,7 +109,7 @@ Aucune cible sur <?= $planete->getNom() ?>.
 <form class="action" method="POST" action="?p=assassinerGouverneur">
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <?= csrfField() ?>
-    <?= Vue::boutonIcone('assassin', 'Assassiner') ?>
+    <?= Vue::boutonIcone('assassin', 'Assassiner', false, '', ' data-tuto="assassin"') ?>
     <span class="md3-secondary">Gouverneur de <?= htmlspecialchars($lieu->nom) ?> (<?= $lieu->pnj_endurance ?> <?= __('etoile', 'etoiles', $lieu->pnj_endurance) ?>) · réussite <?= $o->chanceAssassinatGouverneur($lieu) ?> %, orbite gardée : −<?= $lieu->penaliteOrbite() ?> %</span>
 </form>
 <?php
@@ -120,7 +120,7 @@ Aucune cible sur <?= $planete->getNom() ?>.
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="batiment" value="<?= $batiment ?>" />
     <?= csrfField() ?>
-    <?= Vue::boutonIcone('saboter', 'Saboter') ?>
+    <?= Vue::boutonIcone('saboter', 'Saboter', false, '', ' data-tuto="saboter"') ?>
     <span class="md3-secondary"><?= htmlspecialchars($libelleBatiment) ?> · réussite <?= $o->chanceSabotage($lieu) ?> %</span>
 </form>
 <?php
@@ -144,7 +144,7 @@ Aucune cible sur <?= $planete->getNom() ?>.
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="<?= Perso::ACTION_CONQUETE ?>" />
     <?= csrfField() ?>
-    <?= Vue::boutonIcone('negocier', 'Faire de la diplomatie') ?>
+    <?= Vue::boutonIcone('negocier', 'Faire de la diplomatie', false, '', ' data-tuto="negocier"') ?>
     <span class="md3-secondary">sur <?= $planete->getNom() ?></span>
 </form>
 <?php
@@ -171,7 +171,7 @@ Aucune action possible sur <?= $planete->getNom() ?>.
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="embarquer" />
     <?= csrfField() ?>
-    <?= Vue::boutonIcone('embarquer', 'Monter dans un transport', false, 'md3-button--tonal') ?>
+    <?= Vue::boutonIcone('embarquer', 'Monter dans un transport', false, 'md3-button--tonal', ' data-tuto="embarquer"') ?>
     <span class="md3-secondary">sur <?= $planete->getNom() ?></span>
 </form>
 <?php
