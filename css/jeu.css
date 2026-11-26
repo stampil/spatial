@@ -957,6 +957,12 @@
     gap: 4px 12px;
 }
 
+.action__valeur {
+    min-width: 7ch;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 .curseur {
     display: inline-flex;
     flex: 1 1 200px;

@@ -48,7 +48,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
                 <input type="hidden" name="operation" value="<?= Planete::OPERATION_DEMOLIR ?>" />
                 <?= csrfField() ?>
                 <?= Vue::boutonIcone('demolir', 'Démolir', false, 'md3-button--tonal', $planete->nombre($batiment) > 0 ? '' : ' disabled') ?>
-                <span class="md3-secondary">+<?= Batiment::remboursement($batiment) ?> cr</span>
+                <span class="md3-secondary action__valeur">+<?= Batiment::remboursement($batiment) ?> cr</span>
             </form>
         </div>
     </div>
@@ -67,7 +67,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
             <input type="hidden" name="role" value="<?= $role ?>" />
             <?= csrfField() ?>
-            <span class="md3-secondary"><?= $Joueur->prixUnite($infosRole['prix']) ?> cr</span>
+            <span class="md3-secondary action__valeur"><?= $Joueur->prixUnite($infosRole['prix']) ?> cr</span>
             <?= Vue::boutonIcone('recruter', 'Recruter : '.$infosRole['nom'], false, '', ' data-tuto="'.Tuto::CLE_RECRUTER.$role.'"') ?>
         </form>
     </div>

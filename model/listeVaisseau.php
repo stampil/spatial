@@ -98,7 +98,7 @@ foreach(array_keys($posees) as $planeteId){
             <?= Vue::boutonIcone('valider', 'Enregistrer la flotte', false, '', ' form="creation-flotte-'.$planete->id.'" data-flotte-enregistrer data-tuto="enregistrer-flotte" disabled') ?>
             <?= Vue::commandeIcone('fermer', 'Annuler', 'md3-button--tonal', ' data-flotte-annuler') ?>
         </div>
-        <form id="creation-flotte-<?= $planete->id ?>" method="POST" action="?p=creerFlotte">
+        <form id="creation-flotte-<?= $planete->id ?>" method="POST" action="?p=creerFlotte" hidden>
             <input type="hidden" name="planete" value="<?= $planete->id ?>" />
             <?= csrfField() ?>
         </form>
