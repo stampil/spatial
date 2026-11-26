@@ -29,12 +29,16 @@ Ce que je comprends du résultat (rien codé) :
 - Reconnaissance : « Recherche de système » (part tout de suite, sans carte) et « Reconnaissance de planète » (ouvre la carte : système puis planète).
 - Frégate, barge, capital, flotte, troupe, chasseur : l'envoi vers une planète choisie sur la carte.
 
-Points à trancher avant de coder (vérifiés dans `Vaisseau.class.php`) :
-- Les troupes ne voyagent jamais seules et les chasseurs ne changent de système qu'embarqués (frégate : 10 troupes, 3 chasseurs ; barge : 10 troupes ; capital : 20 troupes, 6 chasseurs). Sans champ de nombre, il faut une règle pour embarquer.
-- Les persos du transport personnel partent déjà tout seuls avec le transport : rien à changer.
+Réponses (26/11) :
+- « 1 non c a nous de lees faire embarquer » : pas d'embarquement automatique. Le joueur embarque lui-même troupes et chasseurs sur un porteur, par une action à lui.
+- « 2 "voyager" plutot que envoyer » : le bouton de déplacement s'appelle « Voyager ».
+- « 3 oui » : une flotte n'a pas de « Recherche de système » (pas de reconnaissance dans une flotte).
+
+Conséquence à bien voir (rien codé) : aujourd'hui l'embarquement n'existe pas en base, il se calcule au moment de l'ordre (`Vaisseau::ordonner`). « Embarquer soi-même » veut dire mémoriser, pour chaque troupe ou chasseur, le porteur qui l'a pris : nouvelle colonne sur `vaisseau` + migration, et les troupes et chasseurs embarqués partent avec le porteur quand il voyage. Capacités : frégate 10 troupes et 3 chasseurs, barge 10 troupes, capital 20 troupes et 6 chasseurs.
 
 ## Questions en suspens
 
-1. Embarquement sans sélecteur : quand j'envoie une frégate, une barge ou un capital (ou une flotte), les troupes et chasseurs présents sur la planète montent automatiquement, jusqu'à la capacité du vaisseau ? Les troupes et chasseurs n'ont alors pas de bouton d'envoi propre pour changer de système (un chasseur peut encore bouger dans son système).
-2. Libellés courts : pour les vaisseaux autres que la reconnaissance (et les flottes), un seul bouton « Envoyer » (carte) ; pour la reconnaissance « Chercher un système » et « Reconnaître une planète » ?
-3. Une flotte ne peut toujours pas contenir de reconnaissance, donc pas de « Recherche de système » pour une flotte : confirmes-tu ?
+1. Où se fait l'embarquement : sur la ligne du porteur (frégate, barge, capital, flotte), avec un bouton « Embarquer troupes » et un « Embarquer chasseurs » ? Un clic embarque-t-il UNE unité (cohérent avec « atomique », mais 10 clics pour remplir une barge sur mobile) ou remplit-il jusqu'à la capacité ?
+2. Plusieurs frégates sur la même planète : j'embarque dans la première qui a de la place (simple), ou tu choisis un vaisseau précis (il faut alors un nom court par vaisseau, ex. « Frégate 12 ») ?
+3. Un bouton « Débarquer » pour redescendre troupes et chasseurs sur la planète sans voyager ?
+4. Libellés de reconnaissance : je garde tes mots « Recherche de système » et « Reconnaissance de planète » (plus longs que mes propositions, à vérifier sur mobile) ?
