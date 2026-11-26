@@ -19,6 +19,7 @@
 <?= Vue::emblemeCamp($camp->id, 48) ?>
 <span class="faction__nom"><?= htmlspecialchars($camp->nom) ?></span>
 <span class="md3-secondary"><?= htmlspecialchars($camp->histoire) ?></span>
+<span class="faction__vaisseaux" aria-label="Design de la barge et des troupes de ce camp"><?= Vue::visuelVaisseau(Vaisseau::BARGE, $camp->id) ?><?= Vue::visuelVaisseau(Vaisseau::TROUPE, $camp->id) ?></span>
 <span class="faction__avantage"><?= htmlspecialchars($camp->avantage()) ?></span>
 </label>
 <?php } ?>

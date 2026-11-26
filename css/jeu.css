@@ -573,7 +573,7 @@
 }
 
 .faction .embleme {
-    grid-row: span 3;
+    grid-row: span 4;
 }
 
 .faction__nom {
@@ -764,4 +764,16 @@
 
 .popin h3 {
     margin: 12px 0 8px;
+}
+
+.faction__vaisseaux {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+}
+
+.faction__vaisseaux .visuel {
+    width: 120px;
+    height: 120px;
 }
