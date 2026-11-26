@@ -17,6 +17,19 @@ Codé (à valider, non publié) dans `js/main.js` et `js/carte.js` :
 - (b) Action réussie mais page non rafraîchie : un second essai, puis message « Action effectuée, mais la page n'a pas pu être rafraîchie (cause) : rechargement… » et rechargement de la page après 3 s.
 - (c) Rafraîchissement déjà en cours à la fin de l'action : on attend sa fin puis on rafraîchit.
 
+### 3. Bouton diplomatie : erreur 404 (26/11)
+
+Ta phrase : « sa affiche erreur 404 pour le btn diplomatie ».
+
+Lu dans le code (rien codé) :
+- Le bouton poste vers `?p=faireDiplomatie` (`model/affichePerso.php`), et `model/faireDiplomatie.php` existe.
+- Mon code ne renvoie jamais de statut 404 : pas de `http_response_code(404)`, pas de `.htaccess`. Une page inconnue répond 200 avec le texte « 404 - Page … non trouvée ».
+- Donc le 404 vient de l'hébergeur (ou d'une autre adresse que celle que je crois), pas de mon PHP. Je ne sais pas encore si c'est le POST ou le rafraîchissement qui suit : le message actuel ne donne pas l'adresse.
+
+Proposition (rien codé) : le message indique aussi l'adresse en échec (ex. « erreur HTTP 404 sur ?p=faireDiplomatie »), pour trancher POST ou rafraîchissement à la prochaine occurrence.
+
 ## Questions en suspens
 
-Sur quelle action as-tu vu l'erreur (quel bouton), et l'action a-t-elle quand même fait son effet ? Si l'alerte revient, le message affiche désormais la cause exacte : donne-la-moi.
+1. Le message exact affiché : « Action non confirmée (erreur HTTP 404) … » ou « Action effectuée, mais la page n'a pas pu être rafraîchie (erreur HTTP 404) … » ?
+2. La diplomatie démarre-t-elle quand même (compte à rebours après rechargement) ?
+3. Les autres boutons (construire, produire) marchent-ils en ligne ?
