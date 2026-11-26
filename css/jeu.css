@@ -699,6 +699,10 @@
     .md3-page input[type="submit"] {
         min-height: 48px;
     }
+
+    .md3-button--icone:not(.md3-button--icone-flotte) {
+        width: 48px;
+    }
 }
 
 [id] {
@@ -929,6 +933,12 @@
 
 .vaisseau-nomme .ligne-jeu {
     border-top: 0;
+}
+
+.tuto-action {
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: 500;
 }
 
 .actions-icones {

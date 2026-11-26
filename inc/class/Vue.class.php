@@ -8,6 +8,7 @@ class Vue {
     const EMBLEME_TRAIT = 3;
     const ICONE_VAISSEAU_TAILLE = 24;
     const ICONE_FLOTTE_TAILLE = 32;
+    const ICONE_TEXTE_TAILLE = 20;
     const DOSSIER_IMAGES = 'img';
     const EXTENSION_OBJET = 'png';
     const EXTENSION_FOND = 'jpg';
