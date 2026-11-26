@@ -1,7 +1,7 @@
 # Prompts d'images photo-réalistes (Gemini)
 
 37 images à générer : 23 objets sur fond magenta (transformés en PNG transparent par le script) et 14 fonds plein cadre, plus 21 vaisseaux par camp (section « Vaisseaux par camp »).
-Les icônes de l'interface ont leur propre section « Icônes de l'interface » (style plat, pas de réalisme : elles s'affichent à 24 px). Seuls les pictogrammes fonctionnels (menu, son, muet, ajouter, info) restent en SVG.
+Les icônes de l'interface ont leur propre section « Icônes de l'interface » (glyphes monochromes sobres : elles s'affichent à 24 px). Seuls les pictogrammes fonctionnels (menu, son, muet, ajouter, info) restent en SVG.
 
 Les designs sont volontairement originaux : aucune silhouette, aucun nom ni aucun style reconnaissable d'une franchise existante. Aucune garantie juridique n'est possible, mais ne garde pas une image qui rappelle clairement une œuvre connue : régénère-la.
 
@@ -183,35 +183,35 @@ Photorealistic macro photograph of a physical metal badge, ultra detailed, reali
 
 ## Icônes de l'interface : `icone-<clé>`
 
-24 icônes affichées à 24 px dans la barre du haut, les titres, le menu et les panneaux. Un style photo-réaliste y serait illisible : pour ces images, remplace le bloc STYLE et le bloc DESIGN ORIGINAL par le bloc ICÔNE ci-dessous, puis ajoute le bloc FOND MAGENTA et le prompt. Le script les met en 128 px dans `img/icone/<clé>.png`. Les images absentes ne cassent rien : le jeu garde l'icône SVG.
+24 glyphes affichés à 24 px dans la barre du haut, les titres, le menu et les panneaux. Ils doivent rester sobres, épurés et sans couleur, comme les icônes actuelles. Pour ces images, remplace le bloc STYLE et le bloc DESIGN ORIGINAL par le bloc GLYPHE ci-dessous, puis ajoute le bloc FOND MAGENTA et le prompt. Le script les met en 128 px dans `img/icone/<clé>.png`. Le jeu les affiche comme un masque : seule la forme compte, elle prend la couleur du thème. Les images absentes ne cassent rien : le jeu garde l'icône SVG.
 
 ```
-Flat vector-style video game interface icon, not photorealistic: bold simple shapes, thick clean dark navy outlines, two to four flat saturated colors with a single small light highlight, no gradients, no texture, no shadow, no text, no letters, no logo. One single centered object with a very simple silhouette and large shapes, designed to stay instantly readable when shrunk to 24 pixels, high contrast, no fine details. Completely original design. Avoid magenta, pink and purple tones.
+Minimalist monochrome glyph icon, like a symbol from an icon font: a single solid pure white silhouette, flat fill, no outline, no gradient, no shading, no texture, no shadow, no color, no text, no letters, no logo. Very simple, bold and geometric, with large clear shapes, rounded corners and small clean cut-outs in the shape instead of drawn lines (the cut-outs show the background). Perfectly centered, sober and clean, designed to stay instantly readable when shrunk to 24 pixels. Completely original design.
 ```
 
 | Fichier | Prompt |
 |---|---|
-| `icone-credits` | `A stack of three thick golden coins seen slightly from the side, the top coin showing a plain ring in relief.` |
-| `icone-revenu` | `One thick golden coin with a bold green arrow rising from behind it and pointing up and to the right.` |
-| `icone-planetes` | `A round planet with teal oceans and green continents and one thin tilted ring around it.` |
-| `icone-fusee` | `A small spaceship flying diagonally toward the upper right, a short orange flame trail behind it and two short speed lines.` |
-| `icone-carte` | `A folded star chart, three panels, with a dotted orange route line across it ending in a small round marker.` |
-| `icone-persos` | `Two head-and-shoulders human busts side by side, one slightly in front of the other, plain faces without details.` |
-| `icone-classement` | `A three-step winner podium in three shades of blue-grey, a gold star floating above the tallest middle step.` |
-| `icone-mission` | `A bold orange flag on a short pole planted on a small round mound.` |
-| `icone-bouclier` | `A classic heater-shaped shield in steel blue with a lighter rim and one bold central vertical band.` |
-| `icone-canon` | `A short stubby cannon on a round base, barrel pointing to the upper right with a small yellow muzzle flash.` |
-| `icone-revolte` | `A raised clenched fist in strong red-orange, seen from the front, with simple thick fingers.` |
-| `icone-force` | `A flexed muscular arm showing the biceps, skin tone in warm tan, seen from the side.` |
-| `icone-endurance` | `A bold strong red heart with a small white pulse line across it.` |
-| `icone-diplomatie` | `A golden balance scale with two small round pans hanging level from a horizontal beam on a central post.` |
-| `icone-emplacements` | `A two-by-two grid of square building plots on a dark tile, three plots empty and flat, one holding a small yellow building.` |
-| `icone-construire` | `A hammer and a wrench crossed in an X, steel grey heads and orange handles.` |
-| `icone-ancre` | `A classic ship anchor in steel blue with a round ring on top and a curved double hook at the bottom.` |
-| `icone-route` | `A short dotted path curving from a small round start dot to a bold green arrowhead pointing right.` |
-| `icone-actions` | `A single bold yellow lightning bolt.` |
-| `icone-quartier` | `A compact command building with a flat roof, a small satellite dish and a short antenna on top, a lit window row, in blue-grey tones.` |
-| `icone-journal` | `A closed notebook seen from the front with a ribbon bookmark hanging out of the bottom, plain cover with two horizontal lines.` |
-| `icone-trophee` | `A golden trophy cup with two curved handles on a small base.` |
-| `icone-connexion` | `An open doorway in a wall with a bold green arrow pointing into it from the left.` |
-| `icone-inscription` | `A head-and-shoulders human bust with a small round green badge showing a bold white plus sign at its lower right.` |
+| `icone-credits` | `A stack of three coins seen slightly from the side, the top coin with a simple ring cut out of its face.` |
+| `icone-revenu` | `One coin with a bold arrow rising from behind it and pointing up and to the right.` |
+| `icone-planetes` | `A round planet with one thin tilted ring around it and a curved band cut out across its surface.` |
+| `icone-fusee` | `A small spaceship flying diagonally toward the upper right, with a short flame trail and two short speed lines.` |
+| `icone-carte` | `A folded star chart in three panels with a dotted route line cut out across it, ending in a small round marker.` |
+| `icone-persos` | `Two head-and-shoulders human busts side by side, one slightly in front of the other, plain featureless faces.` |
+| `icone-classement` | `A three-step winner podium with a five-pointed star floating above the tallest middle step.` |
+| `icone-mission` | `A flag on a short pole planted on a small round mound.` |
+| `icone-bouclier` | `A classic heater-shaped shield with one bold vertical band cut out through its center.` |
+| `icone-canon` | `A short stubby cannon on a round base, barrel pointing to the upper right, with a small flash burst at the muzzle.` |
+| `icone-revolte` | `A raised clenched fist seen from the front, with simple thick fingers.` |
+| `icone-force` | `A flexed arm showing the biceps, seen from the side.` |
+| `icone-endurance` | `A bold heart with a small pulse line cut out across it.` |
+| `icone-diplomatie` | `A balance scale with two round pans hanging level from a horizontal beam on a central post.` |
+| `icone-emplacements` | `A two-by-two grid of four square tiles, one tile topped with a small building shape.` |
+| `icone-construire` | `A hammer and a wrench crossed in an X.` |
+| `icone-ancre` | `A classic ship anchor with a round ring on top and a curved double hook at the bottom.` |
+| `icone-route` | `A short dotted path curving from a small round start dot to a bold arrowhead pointing right.` |
+| `icone-actions` | `A single bold lightning bolt.` |
+| `icone-quartier` | `A compact command building with a flat roof, a small satellite dish and a short antenna on top, with a row of window cut-outs.` |
+| `icone-journal` | `A closed notebook seen from the front, a ribbon bookmark hanging out of the bottom and two horizontal lines cut out of the cover.` |
+| `icone-trophee` | `A trophy cup with two curved handles on a small base.` |
+| `icone-connexion` | `An open doorway in a wall with a bold arrow pointing into it from the left.` |
+| `icone-inscription` | `A head-and-shoulders human bust with a small round badge holding a bold plus sign at its lower right.` |
