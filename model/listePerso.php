@@ -2,7 +2,7 @@
 <?php if($Joueur->etape_tuto==1){ ?>
 <details class="mission" open>
     <summary><?= Icone::html('mission') ?>Mission : découvrir votre perso</summary>
-    <p class="mission__texte">Voici la liste de tous les persos disponibles. Pour l'instant il n'y a que vous, mais vous pourrez recruter par la suite des espions, diplomates et autres. Touchez le nom de votre perso ci-dessous pour ouvrir sa fiche : c'est là que vous lancerez la diplomatie.</p>
+    <p class="mission__texte">Voici la liste de tous les persos disponibles. Pour l'instant il n'y a que vous, mais vous pourrez recruter par la suite des espions, diplomates et autres. Touchez votre perso ci-dessous pour ouvrir sa fiche : c'est là que vous lancerez la diplomatie.</p>
 </details>
 <?php } ?>
 <div class="fiches">
@@ -12,7 +12,7 @@ foreach(Perso::liste($Joueur) as $ligne){
     $couleur = (new Camp($perso->joueur->id_camp))->couleur;
     $etat = Perso::ETATS[$perso->etat()];
 ?>
-    <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
+    <section class="panneau fiche--lien" style="--accent:<?= htmlspecialchars($couleur) ?>">
         <div class="fiche__tete">
             <div class="avatar" style="--accent:<?= htmlspecialchars($couleur) ?>"><?= Vue::visuel('role', $perso->role, Perso::ROLES[$perso->role]['icone']) ?></div>
             <div>
