@@ -1,9 +1,5 @@
 <?php
 require_once 'inc/header.php';
-if(Installation::ancienneBase()){
-    require 'inc/migration.php';
-    exit();
-}
 Installation::verifier();
 
 if(!empty($_GET['d'])){

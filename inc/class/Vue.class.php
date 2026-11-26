@@ -57,12 +57,6 @@ class Vue {
         return '<div class="fond" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
     }
 
-    public static function boutonMigration(): string {
-        return '<form class="migration" method="POST" action="?p='.MIGRATION_PAGE.'" onsubmit="return confirm('.htmlspecialchars(json_encode(MIGRATION_CONFIRMATION, JSON_UNESCAPED_UNICODE), ENT_QUOTES).')">'
-            .csrfField()
-            .'<button type="submit" class="md3-nav-link md3-nav-link--bouton">'.MIGRATION_LABEL.'</button></form>';
-    }
-
     public static function filAriane(array $etapes): string {
         $html = '<nav class="fil" aria-label="Fil d\'Ariane"><ol>';
         foreach($etapes as list($libelle, $adresse)){

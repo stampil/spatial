@@ -3,9 +3,6 @@
 class Installation {
 
     const SQL_FILE = 'database/installation.sql';
-    const MIGRATION_FILE = 'database/migration_revival.sql';
-    const TABLES_DE_JEU = array('joueur', 'perso', 'planete', 'systeme', 'production', 'vaisseau', 'flotte', 'decouverte', 'journal', 'menace');
-    const MESSAGE_MIGREE = "Serveur réinitialisé : comptes supprimés, univers recréé. Inscrivez-vous de nouveau.";
     const MIGRATIONS_DIR = 'database/migrations';
     const LOCK_NAME = 'spatial_installation';
     const LOCK_TIMEOUT_SECONDS = 30;
@@ -16,9 +13,15 @@ class Installation {
             return;
         }
         $bdd = MyPDO::getInstance();
-        self::verrouiller();
+        $ret = $bdd->query("SELECT GET_LOCK(?, ?) AS obtenu", self::LOCK_NAME, self::LOCK_TIMEOUT_SECONDS);
+        if($ret === MyPDO::QUERY_FAILED || (int) $ret[0]->obtenu !== self::LOCK_OBTAINED){
+            exit("Installation de la base en cours, réessayez dans un instant.");
+        }
         $nouvelle = !self::estInstallee();
         if($nouvelle){
+            if(self::existe('joueur')){
+                exit("La base est incomplète : importer database/migration_revival.sql, ou supprimer ses tables pour une nouvelle installation.");
+            }
             self::executer(self::SQL_FILE);
         }
         foreach(self::enAttente() as $version){
@@ -29,33 +32,6 @@ class Installation {
             Univers::peupler();
         }
         $bdd->query("SELECT RELEASE_LOCK(?)", self::LOCK_NAME);
-    }
-
-    public static function ancienneBase(): bool {
-        return !self::estInstallee() && self::existe('joueur');
-    }
-
-    public static function migrer(): string {
-        $bdd = MyPDO::getInstance();
-        self::verrouiller();
-        if(self::ancienneBase()){
-            self::executer(self::MIGRATION_FILE);
-        }
-        foreach(self::TABLES_DE_JEU as $table){
-            if($bdd->query("TRUNCATE TABLE " . MyPDO::DB_FLAG . $table) === MyPDO::QUERY_FAILED){
-                exit("La migration a échoué en vidant la table " . $table . " : voir le journal d'erreurs du serveur.");
-            }
-        }
-        Univers::peupler();
-        $bdd->query("SELECT RELEASE_LOCK(?)", self::LOCK_NAME);
-        return self::MESSAGE_MIGREE;
-    }
-
-    private static function verrouiller(): void {
-        $ret = MyPDO::getInstance()->query("SELECT GET_LOCK(?, ?) AS obtenu", self::LOCK_NAME, self::LOCK_TIMEOUT_SECONDS);
-        if($ret === MyPDO::QUERY_FAILED || (int) $ret[0]->obtenu !== self::LOCK_OBTAINED){
-            exit("Installation de la base en cours, réessayez dans un instant.");
-        }
     }
 
     private static function existe(string $table): bool {
