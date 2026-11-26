@@ -50,11 +50,11 @@ FISSURE_EPAISSEUR = 0.035
 FISSURE_FORCE = 0.55
 
 MONDES = (
-    {'numero': 40, 'graine': 4011, 'terres': 0.3, 'frequence': 0.9, 'nord': 0.35, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.0, 'nuages': 0.5},
-    {'numero': 41, 'glace_variee': True, 'graine': 4177, 'terres': 0.33, 'frequence': 1.7, 'nord': 0.0, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.05, 'nuages': 0.55},
-    {'numero': 42, 'glace_variee': True, 'graine': 4293, 'terres': 0.14, 'frequence': 2.6, 'nord': 0.0, 'equateur': 0.1, 'froid': 0.05, 'aridite': -0.05, 'nuages': 0.6},
-    {'numero': 43, 'glace_variee': True, 'graine': 4351, 'terres': 0.38, 'frequence': 1.3, 'nord': 0.0, 'equateur': 0.55, 'froid': 0.0, 'aridite': -0.05, 'nuages': 0.5},
-    {'numero': 44, 'graine': 4466, 'terres': 0.35, 'frequence': 1.4, 'nord': 0.15, 'equateur': 0.0, 'froid': 0.28, 'aridite': -0.1, 'nuages': 0.45},
+    {'numero': 40, 'reduction_glace': 9.0, 'graine': 4011, 'terres': 0.3, 'frequence': 0.9, 'nord': 0.35, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.0, 'nuages': 0.5},
+    {'numero': 41, 'reduction_glace': 9.0, 'glace_variee': True, 'graine': 4177, 'terres': 0.33, 'frequence': 1.7, 'nord': 0.0, 'equateur': 0.0, 'froid': 0.0, 'aridite': 0.05, 'nuages': 0.55},
+    {'numero': 42, 'reduction_glace': 9.0, 'glace_variee': True, 'graine': 4293, 'terres': 0.14, 'frequence': 2.6, 'nord': 0.0, 'equateur': 0.1, 'froid': 0.05, 'aridite': -0.05, 'nuages': 0.6},
+    {'numero': 43, 'reduction_glace': 9.0, 'glace_variee': True, 'graine': 4351, 'terres': 0.38, 'frequence': 1.3, 'nord': 0.0, 'equateur': 0.55, 'froid': 0.0, 'aridite': -0.05, 'nuages': 0.5},
+    {'numero': 44, 'reduction_glace': 9.0, 'graine': 4466, 'terres': 0.35, 'frequence': 1.4, 'nord': 0.15, 'equateur': 0.0, 'froid': 0.28, 'aridite': -0.1, 'nuages': 0.45},
     {'numero': 45, 'glace_variee': True, 'graine': 4589, 'terres': 0.33, 'frequence': 1.2, 'nord': 0.0, 'equateur': 0.0, 'froid': -0.05, 'aridite': 0.3, 'nuages': 0.3},
 )
 
@@ -124,10 +124,10 @@ def etape(valeurs, debut, fin):
     return lisser(numpy.clip((valeurs - debut) / (fin - debut), 0.0, 1.0))
 
 
-def glace_variee(couleurs, points, latitude, graine):
+def glace_variee(couleurs, points, latitude, graine, reduction):
     forme_lente = fractal(points, 2.2, graine + 2300) - 0.5
     forme_fine = fractal(points, 7.0, graine + 2400) - 0.5
-    limite = LATITUDE_CALOTTE - 4.0 + BORD_AMPLITUDE_LENT * 2 * forme_lente + BORD_AMPLITUDE_FIN * 2 * forme_fine
+    limite = LATITUDE_CALOTTE + reduction - 4.0 + BORD_AMPLITUDE_LENT * 2 * forme_lente + BORD_AMPLITUDE_FIN * 2 * forme_fine
     distance_pole = numpy.abs(latitude) - limite
     banquise = fractal(points, 9.0, graine + 2500)
     morceaux = etape(banquise, 0.5, 0.58) * etape(distance_pole, -BANQUISE_LARGEUR, 0.0)
@@ -176,10 +176,10 @@ def monde(parametres):
     couleurs = numpy.where(sur_terre[..., None], terre, mer_couleur)
 
     if parametres.get('glace_variee'):
-        couleurs = glace_variee(couleurs, points, latitude, graine)
+        couleurs = glace_variee(couleurs, points, latitude, graine, parametres.get('reduction_glace', 0.0))
     else:
         bruit_calotte = fractal(points, 4.0, graine + 2300) - 0.5
-        calotte = etape(numpy.abs(latitude) + FLOU_CALOTTE * bruit_calotte * 2, LATITUDE_CALOTTE, LATITUDE_CALOTTE + 4.0)
+        calotte = etape(numpy.abs(latitude) + FLOU_CALOTTE * bruit_calotte * 2, LATITUDE_CALOTTE + parametres.get('reduction_glace', 0.0), LATITUDE_CALOTTE + parametres.get('reduction_glace', 0.0) + 4.0)
         couleurs = melange(couleurs, NEIGE, calotte)
 
     gradient_y, gradient_x = numpy.gradient(altitude)
