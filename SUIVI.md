@@ -46,9 +46,26 @@ Ce que je comprends :
 - Au prochain affichage, une fenêtre illustrée « Combat spatial » s'ouvre avec un bouton « Résoudre » ; au clic, les barres de force des deux flottes se réduisent phase par phase, comme pour un combat de planète.
 - Même principe pour le débarquement : une fenêtre illustrée « Combat terrestre » (troupes contre garnison), puis « Résoudre » joue l'animation. Le résultat est déjà décidé : le bouton ne fait que révéler la bataille.
 
+### 5. Nouveau vaisseau lourd « Restrictor » et fuite des flottes (26/11)
+
+Ta phrase : « en vaisseau lourd créé un nouveau type, restrictor, tant que se vaisseau est en vie, les autres ne peuvent pas fuir. dans un combat, si il est tres desequilibré et les pertes tres prononcer dans un camps, les vaisseaux fuieront dans la planete alié ou neutre la plus proche ».
+
+Lu (rien codé) : il n'existe aujourd'hui aucune fuite : une bataille (`Combat::bataille`, `Combat::attaquer`) va jusqu'à l'anéantissement ou la défaite, les survivants restent sur place. Les vaisseaux lourds (usine lourde) sont limités au « capital ». Types de combat : chasseur, frégate, capital.
+
+Ce que je comprends :
+- Nouveau type « Restrictor » produit à l'usine lourde (comme le capital). Tant qu'il est vivant dans une bataille, les vaisseaux ADVERSES ne peuvent pas fuir.
+- Quand une bataille est très déséquilibrée et qu'un camp a subi des pertes très lourdes, ses survivants fuient vers la planète alliée ou neutre la plus proche, sauf si un Restrictor adverse est encore en vie.
+
 ## Questions en suspens
 
 Point 4 (combat à l'arrivée) :
 9. Le combat à l'arrivée ne se déclenche que si le groupe qui arrive contient des vaisseaux de combat (chasseurs, frégates, capitaux) ; les vaisseaux non armés (reconnaissance, transports) arrivent en paix. D'accord ?
 10. Illustrations : le combat spatial réutilise l'image `combat.jpg` déjà là ; pour le combat terrestre, je te donne un prompt Gemini pour une nouvelle image. D'accord ?
 11. Après « Résoudre », on garde « Passer » pour sauter l'animation ?
+
+Point 5 (Restrictor et fuite) :
+12. Statistiques proposées du Restrictor : usine lourde, 500 cr, 300 s, vitesse 120, force 20, pas de troupes ni de chasseurs embarqués. D'accord ?
+13. Déclenchement de la fuite : un camp dont la force restante est inférieure à 30 % de celle de l'adversaire ET qui a perdu plus de 70 % de sa force de départ fuit avec ses survivants. D'accord ?
+14. Destination : la planète la plus proche (par la carte) qui est à toi, ou à ton camp pour l'IA, ou neutre (sans camp) ; les fuyards voyagent le temps normal (ils réapparaissent à l'arrivée). D'accord ?
+15. Le Restrictor bloque seulement la fuite des vaisseaux ennemis (pas la sienne) ; s'il meurt pendant la bataille, la fuite redevient possible. D'accord ?
+16. Les flottes IA stationnées (point 3) ne fuient jamais (elles défendent leur planète) ; l'Empire reçoit des Restrictors sur ses grandes planètes (slot 10 et plus) ? Ou pas de Restrictor IA pour l'instant ?
