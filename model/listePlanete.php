@@ -47,9 +47,10 @@ foreach(Planete::listeVisibles($Joueur->id) as $ligne){
     $planetesParSysteme[$ligne->id_systeme][] = $ligne;
 }
 foreach(Systeme::listeVisibles($Joueur->id) as $systeme){
+    $nombrePlanetes = count($planetesParSysteme[$systeme->id] ?? array());
 ?>
 <details class="systeme-details">
-    <summary><?= Vue::emblemeCamp($systeme->getIdCamp(), 24) ?><?= htmlspecialchars($systeme->nom) ?> <span class="md3-secondary">(<?= count($planetesParSysteme[$systeme->id] ?? array()) ?> planètes)</span></summary>
+    <summary><?= Vue::emblemeCamp($systeme->getIdCamp(), 24) ?><?= htmlspecialchars($systeme->nom) ?> <span class="md3-secondary">(<?= $nombrePlanetes ?> <?= __('planete', 'planetes', $nombrePlanetes) ?>)</span></summary>
     <div class="systeme-details__corps">
         <?php foreach($planetesParSysteme[$systeme->id] ?? array() as $ligne){ $p = new Planete($ligne->id); ?>
         <div class="ligne-jeu">

@@ -1,6 +1,8 @@
 <?php
 
 return array(
+    'credit' => 'crédit',
+    'credits' => 'crédits',
     'planete' => 'planète',
     'planetes' => 'planètes',
     'colonie' => 'colonie',

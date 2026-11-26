@@ -24,7 +24,7 @@
         <span class="rang__numero"><?= $rang + 1 ?></span>
         <?= Vue::emblemeCamp($camp->id, 32) ?>
         <span class="rang__nom"><?= htmlspecialchars($camp->nom) ?></span>
-        <span class="rang__score"><?= $ligne['planetes'] ?> / <?= $total ?> planètes</span>
+        <span class="rang__score"><?= $ligne['planetes'] ?> / <?= $total ?> <?= __('planete', 'planetes', $total) ?></span>
     </div>
     <?php } ?>
 </section>
