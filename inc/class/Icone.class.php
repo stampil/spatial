@@ -39,6 +39,7 @@ class Icone {
         'emplacements' => '<rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>',
         'ajouter' => '<path d="M12 5v14M5 12h14"/>',
         'construire' => '<path d="M15 4a4 4 0 0 0-4 5l-7 7 3 3 7-7a4 4 0 0 0 5-4l-3 2-2-2 2-3z"/>',
+        'saboter' => '<path d="M4 20l8-8"/><path d="M14 4l6 6-3 1-2 4-3-3 4-2z"/><path d="M3 6l3 3M6 3l3 3"/>',
         'restrictor' => '<circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/>',
         'attaque' => '<path d="M5 19l9-9"/><path d="M14 4l6 6-4 1-3-3z"/><path d="M8 14l-3 5"/>',
         'attaque_flotte' => '<path d="M4 18l5-5 5 5M4 11l5-5 5 5"/><path d="M16 6l4 4-4 4"/>',

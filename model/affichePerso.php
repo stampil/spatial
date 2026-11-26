@@ -92,9 +92,37 @@ Un héros n'agit pas seul : sa présence renforce vos combats sur cette planète
     }
     elseif($o->role === Perso::ROLE_ASSASSIN){
         $cibles = Perso::ennemis($Joueur, $planete);
-        if(count($cibles) === 0){
+        $lieu = new Planete($planete->id);
+        $saboter = array();
+        foreach(Batiment::CATALOGUE as $batiment => $infosBatiment){
+            if($lieu->gouverneur !== $Joueur->id && $lieu->nombre($batiment) > 0){
+                $saboter[$batiment] = $infosBatiment['nom'].' × '.$lieu->nombre($batiment);
+            }
+        }
+        if(count($cibles) === 0 && $lieu->pnj_endurance === null && count($saboter) === 0){
 ?>
 Aucune cible sur <?= $planete->getNom() ?>.
+<?php
+        }
+        if($lieu->pnj_endurance !== null){
+?>
+<form class="action" method="POST" action="?p=assassinerGouverneur">
+    <input type="hidden" name="perso" value="<?= $o->id ?>" />
+    <?= csrfField() ?>
+    <?= Vue::boutonAction('assassin', 'Assassiner') ?>
+    <span class="md3-secondary">Gouverneur de <?= htmlspecialchars($lieu->nom) ?> (<?= $lieu->pnj_endurance ?> <?= __('etoile', 'etoiles', $lieu->pnj_endurance) ?>) · réussite <?= $o->chanceAssassinatGouverneur($lieu) ?> %, orbite gardée : −<?= $lieu->penaliteOrbite() ?> %</span>
+</form>
+<?php
+        }
+        foreach($saboter as $batiment => $libelleBatiment){
+?>
+<form class="action" method="POST" action="?p=saboter">
+    <input type="hidden" name="perso" value="<?= $o->id ?>" />
+    <input type="hidden" name="batiment" value="<?= $batiment ?>" />
+    <?= csrfField() ?>
+    <?= Vue::boutonAction('saboter', 'Saboter') ?>
+    <span class="md3-secondary"><?= htmlspecialchars($libelleBatiment) ?> · réussite <?= $o->chanceSabotage($lieu) ?> %</span>
+</form>
 <?php
         }
         foreach($cibles as $ligneCible){

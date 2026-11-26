@@ -75,8 +75,8 @@ class Ia {
         Tools::addRapport(array(
             'titre' => 'Raid '.$camp->nom.' sur '.$planete->nom,
             'barres' => array(
-                array('cle' => 'bouclier', 'nom' => 'Bouclier', 'maximum' => max(Planete::bouclierDeBase($planete->slot), $planete->bouclier)),
-                array('cle' => 'canon', 'nom' => 'Canon', 'maximum' => max(Planete::canonDeBase($planete->slot), $planete->canon)),
+                array('cle' => 'bouclier', 'nom' => 'Bouclier', 'maximum' => max($planete->bouclierMax(), $planete->bouclier)),
+                array('cle' => 'canon', 'nom' => 'Canon', 'maximum' => max($planete->canonMax(), $planete->canon)),
             ),
             'etapes' => $etapes,
             'bilan' => $bilan,

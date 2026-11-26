@@ -16,7 +16,11 @@ ALTER TABLE `planete`
   ADD COLUMN `bonus` varchar(16) DEFAULT NULL AFTER `troupes`,
   ADD COLUMN `defense_maj` datetime DEFAULT NULL AFTER `bonus`,
   ADD COLUMN `detournement_fin` datetime DEFAULT NULL AFTER `defense_maj`,
-  ADD COLUMN `flotte_ia` int(11) NOT NULL DEFAULT '0' AFTER `creato`;
+  ADD COLUMN `flotte_ia` int(11) NOT NULL DEFAULT '0' AFTER `creato`,
+  ADD COLUMN `nb_bouclier_planetaire` int(11) NOT NULL DEFAULT '0' AFTER `flotte_ia`,
+  ADD COLUMN `nb_canon_orbital` int(11) NOT NULL DEFAULT '0' AFTER `nb_bouclier_planetaire`,
+  ADD COLUMN `pnj_endurance` tinyint(1) DEFAULT NULL AFTER `nb_canon_orbital`,
+  ADD COLUMN `occupee` tinyint(1) NOT NULL DEFAULT '0' AFTER `pnj_endurance`;
 
 ALTER TABLE `systeme`
   ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `visible`,
@@ -71,6 +75,14 @@ CREATE TABLE IF NOT EXISTS `flotte` (
   `numero` int(11) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `analyse_planete` (
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `donnees` text NOT NULL,
+  `analyse_le` datetime NOT NULL,
+  PRIMARY KEY (`id_joueur`,`id_planete`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `camp` (
@@ -149,7 +161,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('019_aide_icones_masquee'),
 ('020_flotte_numero'),
 ('021_flotte_ia'),
-('022_tuto_restrictor');
+('022_tuto_restrictor'),
+('023_gouverneurs_structures_analyse');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

@@ -119,6 +119,10 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `detournement_fin` datetime DEFAULT NULL,
   `creato` datetime NOT NULL,
   `flotte_ia` int(11) NOT NULL DEFAULT '0',
+  `nb_bouclier_planetaire` int(11) NOT NULL DEFAULT '0',
+  `nb_canon_orbital` int(11) NOT NULL DEFAULT '0',
+  `pnj_endurance` tinyint(1) DEFAULT NULL,
+  `occupee` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 
@@ -223,6 +227,14 @@ CREATE TABLE IF NOT EXISTS `flotte` (
   KEY `id_joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `analyse_planete` (
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `donnees` text NOT NULL,
+  `analyse_le` datetime NOT NULL,
+  PRIMARY KEY (`id_joueur`,`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `camp` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
@@ -298,7 +310,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('019_aide_icones_masquee'),
 ('020_flotte_numero'),
 ('021_flotte_ia'),
-('022_tuto_restrictor');
+('022_tuto_restrictor'),
+('023_gouverneurs_structures_analyse');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

@@ -82,7 +82,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html($infosUsine['icone']) ?><?= $infosUsine['nom'] ?> × <?= $planete->nombre($usine) ?> (<?= Vaisseau::nombreEnProduction($planete->id, $usine) ?> en production)</h2>
     <?php foreach($file as $ligne){ if(Vaisseau::CATALOGUE[$ligne['type']]['usine'] !== $usine){ continue; } ?>
-    <?= Vue::progression(Vaisseau::CATALOGUE[$ligne['type']]['nom'].' · '.$ligne['restants'].' '.__('restant', 'restants', $ligne['restants']), strtotime($ligne['fin']) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$ligne['type']]['duree']), Vaisseau::CATALOGUE[$ligne['type']]['icone']) ?>
+    <?= Vue::progression(Vaisseau::CATALOGUE[$ligne['type']]['nom'].' · '.$ligne['restants'].' '.__('restant', 'restants', $ligne['restants']), strtotime($ligne['fin']) - time(), $planete->dureeProduction($Joueur, Vaisseau::CATALOGUE[$ligne['type']]['duree']), Vaisseau::CATALOGUE[$ligne['type']]['icone']) ?>
     <?php } ?>
     <?php foreach($types as $type){ $infos = Vaisseau::CATALOGUE[$type]; ?>
     <div class="ligne-jeu">
@@ -90,7 +90,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
             <?= Vue::visuelVaisseau($type, $Joueur->id_camp) ?>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $stock[$type] ?? 0 ?> en stock<br>
-                <span class="md3-secondary"><?= $Joueur->prixVaisseau($type) ?> cr · <?= gmdate('i:s', $Joueur->dureeEffective($infos['duree'])) ?></span>
+                <span class="md3-secondary"><?= $Joueur->prixVaisseau($type) ?> cr · <?= gmdate('i:s', $planete->dureeProduction($Joueur, $infos['duree'])) ?></span>
             </div>
         </div>
         <form method="POST" action="?p=produire">

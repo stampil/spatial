@@ -51,6 +51,9 @@ class Perso {
     const ASSASSINAT_PER_STAR_PERCENT = 10;
     const ASSASSINAT_MIN_PERCENT = 10;
     const ASSASSINAT_MAX_PERCENT = 90;
+    const SABOTAGE_BASE_PERCENT = 40;
+    const PENALITE_ORBITE_PAR_VAISSEAU_POURCENT = 10;
+    const PENALITE_ORBITE_MAX_POURCENT = 50;
 
     private MyPDO $bdd;   
     
@@ -229,6 +232,74 @@ class Perso {
         return null;
     }
 
+    public function chanceAssassinatGouverneur(Planete $planete): int {
+        $chance = self::ASSASSINAT_BASE_PERCENT + self::ASSASSINAT_PER_STAR_PERCENT * ($this->FO - $planete->pnj_endurance) - $planete->penaliteOrbite();
+        return max(self::ASSASSINAT_MIN_PERCENT, min($chance, self::ASSASSINAT_MAX_PERCENT));
+    }
+
+    public function assassinerGouverneur(): ?string {
+        $erreur = $this->verifierEspion();
+        if($erreur !== null){
+            return $erreur;
+        }
+        $planete = new Planete($this->sur_planete->id);
+        if($planete->pnj_endurance === null){
+            return "Cette planète n'a pas de gouverneur.";
+        }
+        if(random_int(1, self::MAX_PERCENT) > $this->chanceAssassinatGouverneur($planete)){
+            $this->fail();
+            return null;
+        }
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET pnj_endurance=NULL WHERE id=? AND pnj_endurance IS NOT NULL",$planete->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Le gouverneur a été éliminé entre-temps.';
+        }
+        Tools::addMessage($this->nom.' a assassiné le gouverneur de '.$planete->nom.' : la planète n\'a plus de gouverneur.');
+        return null;
+    }
+
+    public function chanceSabotage(Planete $planete): int {
+        $chance = self::SABOTAGE_BASE_PERCENT + self::ASSASSINAT_PER_STAR_PERCENT * $this->FO - $planete->penaliteOrbite();
+        return max(self::ASSASSINAT_MIN_PERCENT, min($chance, self::ASSASSINAT_MAX_PERCENT));
+    }
+
+    public function saboter(string $batiment): ?string {
+        $erreur = $this->verifierEspion();
+        if($erreur !== null){
+            return $erreur;
+        }
+        if(!isset(Batiment::CATALOGUE[$batiment])){
+            return 'Bâtiment inconnu.';
+        }
+        $planete = new Planete($this->sur_planete->id);
+        if($planete->gouverneur === $this->joueur->id){
+            return 'Impossible de saboter vos propres bâtiments.';
+        }
+        if($planete->nombre($batiment) < 1){
+            return "Ce bâtiment n'existe pas sur cette planète.";
+        }
+        if(random_int(1, self::MAX_PERCENT) > $this->chanceSabotage($planete)){
+            $this->fail();
+            return null;
+        }
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment-1 WHERE id=? AND $batiment>0",$planete->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Le bâtiment a été détruit entre-temps.';
+        }
+        Tools::addMessage($this->nom.' a saboté : '.Batiment::CATALOGUE[$batiment]['nom'].' détruit sur '.$planete->nom.'.');
+        return null;
+    }
+
+    private function verifierEspion(): ?string {
+        if($this->role !== self::ROLE_ASSASSIN){
+            return "Seul un assassin peut mener cette action.";
+        }
+        if(!$this->canAct()){
+            return 'Ce perso ne peut pas agir maintenant.';
+        }
+        return null;
+    }
+
     public function getNom(): string {
         return '<a href="?p=affichePerso&id='.$this->id.'" class="nomPerso">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->joueur->id_camp);
     }  
@@ -333,6 +404,9 @@ class Perso {
         }
         if($action === self::ACTION_CONQUETE && $this->sur_planete->gouverneur !== 0){
             return 'Cette planète a déjà un gouverneur.';
+        }
+        if($action === self::ACTION_CONQUETE && $this->sur_planete->pnj_endurance !== null){
+            return 'Un gouverneur est en place : un assassin doit d\'abord l\'éliminer.';
         }
         if($action === self::ACTION_CONQUETE && $this->sur_planete->id_camp !== null){
             return 'Cette planète est tenue par '.(new Camp($this->sur_planete->id_camp))->nom.'.';

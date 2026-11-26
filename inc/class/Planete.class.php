@@ -15,6 +15,13 @@ class Planete {
     const SLOT_DEPART = 8;
     const BOUCLIER_PAR_SLOT = 2;
     const CANON_PAR_SLOT = 1;
+    const BOUCLIER_PAR_STRUCTURE = 2;
+    const CANON_PAR_STRUCTURE = 1;
+    const STRUCTURES_IA_SLOT_MINIMUM = 6;
+    const GOUVERNEUR_POURCENT = 75;
+    const GOUVERNEUR_NEUTRE_POURCENT = 50;
+    const GOUVERNEUR_ETOILES_MAX = 3;
+    const MALUS_OCCUPATION_POURCENT = 20;
     const TROUPES_DIVISEUR_SLOT = 2;
     const CAPTURE_REVOLTE = 50;
     const REVOLTE_ALERTE = 70;
@@ -48,6 +55,10 @@ class Planete {
     public ?string $bonus;
     public ?string $defense_maj;
     public int $flotte_ia;
+    public int $nb_bouclier_planetaire;
+    public int $nb_canon_orbital;
+    public ?int $pnj_endurance;
+    public bool $occupee;
     public ?string $detournement_fin;
     public Systeme $systeme;
     public static int $min_slot = 1;
@@ -92,23 +103,37 @@ class Planete {
         return $ret[0]->id;
     }
 
-    public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp, ?string $bonus = null): int{
+    public static function create(Systeme $Systeme, int $numero, int $slot, ?int $id_camp, ?string $bonus = null, bool $avecGouverneur = false): int{
         $nom_planete = preg_replace("/-[0-9]+/",' '.$numero,$Systeme->nom);
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,flotte_ia,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,bonus,creato)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "planete(nom,perc_revolte,slot,gouverneur,id_systeme,id_camp,bouclier,canon,troupes,flotte_ia,nb_usine_vaiss_leger,nb_usine_vaiss_moyen,nb_usine_vaiss_lourd,nb_usine_ressource,nb_academie,nb_bouclier_planetaire,nb_canon_orbital,pnj_endurance,bonus,creato)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now());";
         $gouverneur=0;
         $bouclier = 0;
         $canon = 0;
         $troupes = 0;
         $flotteIa = 0;
+        $structures = 0;
         if($id_camp !== null){
-            $bouclier = self::bouclierDeBase($slot);
-            $canon = self::canonDeBase($slot);
+            $structures = $slot >= self::STRUCTURES_IA_SLOT_MINIMUM ? 1 : 0;
+            $bouclier = self::bouclierDeBase($slot) + $structures * self::BOUCLIER_PAR_STRUCTURE;
+            $canon = self::canonDeBase($slot) + $structures * self::CANON_PAR_STRUCTURE;
             $troupes = self::troupesDeBase($slot);
             $flotteIa = self::flotteIADeBase($slot, $id_camp);
         }
-        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,$flotteIa,0,0,0,0,0,$bonus);
+        $pnj = null;
+        if($avecGouverneur && random_int(1, self::PERCENT) <= self::GOUVERNEUR_POURCENT){
+            $pnj = random_int(1, self::GOUVERNEUR_ETOILES_MAX);
+        }
+        MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,$flotteIa,0,0,0,0,0,$structures,$structures,$pnj,$bonus);
         return MyPDO::getInstance()->lastInsertId();
+    }
+
+    public function bouclierMax(): int{
+        return self::bouclierDeBase($this->slot) + $this->nb_bouclier_planetaire * self::BOUCLIER_PAR_STRUCTURE;
+    }
+
+    public function canonMax(): int{
+        return self::canonDeBase($this->slot) + $this->nb_canon_orbital * self::CANON_PAR_STRUCTURE;
     }
 
     public static function bouclierDeBase(int $slot): int{
@@ -158,6 +183,14 @@ class Planete {
         return 0;
     }
 
+    private static function expressionBouclierMax(): string{
+        return "(slot*" . self::BOUCLIER_PAR_SLOT . " + nb_bouclier_planetaire*" . self::BOUCLIER_PAR_STRUCTURE . ")";
+    }
+
+    private static function expressionCanonMax(): string{
+        return "(slot*" . self::CANON_PAR_SLOT . " + nb_canon_orbital*" . self::CANON_PAR_STRUCTURE . ")";
+    }
+
     private static function expressionFlotteDeBase(): string{
         return "IF(id_camp=" . Camp::EMPIRE . ", slot * " . self::FLOTTE_EMPIRE_PAR_SLOT . ", IF(id_camp=" . Camp::PIRATES . ", GREATEST(" . self::FLOTTE_PIRATES_MINIMUM . ", slot DIV " . self::FLOTTE_PIRATES_DIVISEUR_SLOT . "), 0))";
     }
@@ -165,17 +198,17 @@ class Planete {
     public static function regenererDefenses(): void{
         $maintenant = Tools::now();
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET "
-            . self::expressionRegeneration('bouclier', 'slot*' . self::BOUCLIER_PAR_SLOT) . ", "
-            . self::expressionRegeneration('canon', 'slot*' . self::CANON_PAR_SLOT) . ", "
+            . self::expressionRegeneration('bouclier', self::expressionBouclierMax()) . ", "
+            . self::expressionRegeneration('canon', self::expressionCanonMax()) . ", "
             . "flotte_ia = IF(gouverneur=0, " . self::valeurRegeneree('flotte_ia', self::expressionFlotteDeBase()) . ", flotte_ia), "
             . "troupes = IF(gouverneur=0, GREATEST(troupes, LEAST(slot DIV " . self::TROUPES_DIVISEUR_SLOT . " + " . self::TROUPES_DE_BASE_MINIMUM . ", troupes + TIMESTAMPDIFF(HOUR, defense_maj, ?) * " . self::TROUPES_PAR_HEURE . ")), troupes), "
             . "defense_maj = DATE_ADD(defense_maj, INTERVAL TIMESTAMPDIFF(HOUR, defense_maj, ?) HOUR) "
-            . "WHERE id_camp IS NOT NULL AND defense_maj IS NOT NULL AND defense_maj <= ?";
+            . "WHERE defense_maj IS NOT NULL AND defense_maj <= ?";
         $db = MyPDO::getInstance();
         $db->query($query,$maintenant,$maintenant,$maintenant,$maintenant,$maintenant,Tools::formatDate(time() - self::SECONDS_PER_HOUR));
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET defense_maj=NULL
             WHERE defense_maj IS NOT NULL
-            AND (id_camp IS NULL OR (bouclier>=slot*" . self::BOUCLIER_PAR_SLOT . " AND canon>=slot*" . self::CANON_PAR_SLOT . " AND (gouverneur<>0 OR flotte_ia>=" . self::expressionFlotteDeBase() . ") AND (gouverneur<>0 OR troupes>=slot DIV " . self::TROUPES_DIVISEUR_SLOT . " + " . self::TROUPES_DE_BASE_MINIMUM . ")))";
+            AND (bouclier>=" . self::expressionBouclierMax() . " AND canon>=" . self::expressionCanonMax() . " AND (gouverneur<>0 OR flotte_ia>=" . self::expressionFlotteDeBase() . ") AND (gouverneur<>0 OR troupes>=slot DIV " . self::TROUPES_DIVISEUR_SLOT . " + " . self::TROUPES_DE_BASE_MINIMUM . "))";
         $db->query($query);
     }
 
@@ -213,7 +246,7 @@ class Planete {
             if($i==1 && $id_camp_premiere !== null){
                 $id_camp = $id_camp_premiere;
             }
-            self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null);
+            self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null, true);
         }
     }
 
@@ -226,7 +259,7 @@ class Planete {
         $id_camps = array_pad(array_slice($infiltres, 0, $nb_planetes - 1), $nb_planetes, Camp::EMPIRE);
         shuffle($id_camps);
         foreach($id_camps as $i => $id_camp){
-            self::create($Systeme, $i + 1, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null);
+            self::create($Systeme, $i + 1, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null, true);
         }
     }
 
@@ -269,6 +302,10 @@ class Planete {
         $this->bonus = $ret[0]->bonus;
         $this->defense_maj = $ret[0]->defense_maj;
         $this->flotte_ia = $ret[0]->flotte_ia;
+        $this->nb_bouclier_planetaire = $ret[0]->nb_bouclier_planetaire;
+        $this->nb_canon_orbital = $ret[0]->nb_canon_orbital;
+        $this->pnj_endurance = $ret[0]->pnj_endurance === null ? null : (int) $ret[0]->pnj_endurance;
+        $this->occupee = (bool) $ret[0]->occupee;
         $this->detournement_fin = $ret[0]->detournement_fin;
         $this->systeme = new Systeme($this->id_systeme);
         return $this;
@@ -287,7 +324,9 @@ class Planete {
             nb_usine_vaiss_moyen = ?,
             nb_usine_vaiss_lourd = ?,
             nb_usine_ressource = ?,
-            nb_academie = ?
+            nb_academie = ?,
+            nb_bouclier_planetaire = ?,
+            nb_canon_orbital = ?
             WHERE id =?";
         $ret = $this->bdd->query($query,          
                 $this->nom,
@@ -300,6 +339,8 @@ class Planete {
                 $this->nb_usine_vaiss_lourd,
                 $this->nb_usine_ressource,
                 $this->nb_academie,
+                $this->nb_bouclier_planetaire,
+                $this->nb_canon_orbital,
                 $this->id
                 );
     }
@@ -402,13 +443,13 @@ class Planete {
     }
 
     public function gouverner(Joueur $joueur): bool {
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, revolte_maj=?, defense_maj=? WHERE id=? AND gouverneur=0 AND id_camp IS NULL";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, revolte_maj=?, defense_maj=? WHERE id=? AND gouverneur=0 AND id_camp IS NULL AND pnj_endurance IS NULL";
         $this->bdd->query($query,$joueur->id,$joueur->id_camp,Tools::now(),Tools::now(),$this->id);
         return $this->bdd->lastRowCount === 1;
     }
 
     public function capturer(Joueur $joueur, int $troupes): bool {
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, defense_maj=?, detournement_fin=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, flotte_ia=0 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0 AND flotte_ia=0";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, defense_maj=?, detournement_fin=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, flotte_ia=0, occupee=1 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0 AND flotte_ia=0 AND pnj_endurance IS NULL AND nb_bouclier_planetaire=0";
         $this->bdd->query($query,$joueur->id,$joueur->id_camp,$troupes,self::CAPTURE_REVOLTE,Tools::now(),Tools::now(),$this->id,$this->gouverneur);
         if($this->bdd->lastRowCount !== 1){
             return false;
@@ -430,8 +471,35 @@ class Planete {
         return (int) $this->bdd->query($query,$this->gouverneur,$this->id,Vaisseau::TROUPE)[0]->nombre > 0;
     }
 
+    public function redevenirNeutre(): void {
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=0, id_camp=NULL, perc_revolte=?, revolte_maj=NULL, bouclier=0, canon=0, troupes=0, flotte_ia=0, occupee=0, defense_maj=?, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, pnj_endurance=? WHERE id=?";
+        $pnj = null;
+        if(random_int(1, self::PERCENT) <= self::GOUVERNEUR_NEUTRE_POURCENT){
+            $pnj = random_int(1, self::GOUVERNEUR_ETOILES_MAX);
+        }
+        $this->bdd->query($query,rand(0,self::INITIAL_REVOLTE_MAX),Tools::now(),$pnj,$this->id);
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
+    }
+
+    public function dureeProduction(Joueur $joueur, int $duree): int {
+        $effective = $joueur->dureeEffective($duree);
+        if($this->occupee){
+            return intdiv($effective * (self::PERCENT + self::MALUS_OCCUPATION_POURCENT), self::PERCENT);
+        }
+        return $effective;
+    }
+
+    public function penaliteOrbite(): int {
+        return min(Perso::PENALITE_ORBITE_MAX_POURCENT, array_sum(Combat::defenseurs($this)) * Perso::PENALITE_ORBITE_PAR_VAISSEAU_POURCENT);
+    }
+
     public function updateRevolte(): void {
         if($this->gouverneur === 0){
+            return;
+        }
+        if($this->occupee && !$this->estOccupee()){
+            $this->redevenirNeutre();
+            Tools::addMessage($this->nom.' n\'a plus de garnison : elle redevient neutre.');
             return;
         }
         if($this->revolte_maj === null){
@@ -454,9 +522,7 @@ class Planete {
         if($this->bdd->lastRowCount !== 1 || $revolte < self::MAX_REVOLTE){
             return;
         }
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=0, id_camp=NULL, perc_revolte=?, revolte_maj=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0 WHERE id=?";
-        $this->bdd->query($query,rand(0,self::INITIAL_REVOLTE_MAX),$this->id);
-        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
+        $this->redevenirNeutre();
         Tools::addMessage($this->nom.' est devenue indépendante : sa révolte a atteint '.self::MAX_REVOLTE.' %.');
     }
 

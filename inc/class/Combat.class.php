@@ -220,6 +220,12 @@ class Combat {
         if(array_sum(self::defenseurs($planete)) > 0){
             return 'La flotte défenseuse tient encore : détruisez-la d\'abord.';
         }
+        if($planete->pnj_endurance !== null){
+            return 'Un gouverneur est en place : assassinez-le d\'abord.';
+        }
+        if($planete->nb_bouclier_planetaire > 0){
+            return 'Un bouclier planétaire protège la planète : aucune troupe ne peut débarquer, sabotez-le d\'abord.';
+        }
         $troupes = Vaisseau::troupesEnBarge($planete->id, $joueur->id);
         if($troupes === 0){
             return "Aucune troupe d'assaut embarquée dans une barge de débarquement sur cette planète.";

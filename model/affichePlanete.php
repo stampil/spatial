@@ -30,7 +30,7 @@ $defenseurs = Combat::defenseurs($p);
         <?php if($p->gouverneur === $Joueur->id){ echo Vue::pastille('Votre colonie', 'ok'); } ?>
         <?php if($p->detournement_fin !== null && $p->detournement_fin > Tools::now()){ echo Vue::pastille('Revenus détournés', 'alerte'); } ?>
     </div>
-    <p>Gouverneur : <?= $p->getGouverneurNom() ?></p>
+    <p>Gouverneur : <?= $p->gouverneur === 0 ? 'voir la fiche de défense' : $p->getGouverneurNom() ?></p>
     <?php if($p->bonus !== null){ ?>
     <div class="ligne-jeu__info">
         <?= Vue::visuel('bonus', $p->bonus) ?>
@@ -39,19 +39,39 @@ $defenseurs = Combat::defenseurs($p);
     <?php } ?>
 </section>
 
+<?php
+$proprietaire = $p->gouverneur === $Joueur->id;
+$analyse = $proprietaire ? null : Analyse::derniere($Joueur->id, $p->id);
+?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
     <h2 class="panneau__titre"><?= Icone::html('bouclier') ?>Défense</h2>
-    <?= Vue::jauge('Bouclier', $p->bouclier, max(Planete::bouclierDeBase($p->slot), $p->bouclier), 'bouclier', 'bouclier') ?>
-    <?= Vue::jauge('Canon', $p->canon, max(Planete::canonDeBase($p->slot), $p->canon), 'canon', 'canon') ?>
-    <?= Vue::jauge('Garnison', $p->troupes, max(Planete::troupesDeBase($p->slot), $p->troupes), 'persos', 'troupes') ?>
-    <?php if($p->gouverneur === 0 && $p->flotte_ia > 0){ ?>
-    <p class="md3-secondary">Flotte stationnée :</p>
-    <?= Vue::composition(array(Vaisseau::CHASSEUR => $p->flotte_ia), $p->id_camp) ?>
+    <?php if($proprietaire || $analyse !== null){ ?>
+    <?php
+    $bouclier = $proprietaire ? $p->bouclier : $analyse['bouclier'];
+    $canon = $proprietaire ? $p->canon : $analyse['canon'];
+    $troupes = $proprietaire ? $p->troupes : $analyse['troupes'];
+    $flotteStationnee = $proprietaire ? array() : array_filter($analyse['flotte']);
+    $boucliers = $proprietaire ? $p->nb_bouclier_planetaire : $analyse['boucliers'];
+    $canons = $proprietaire ? $p->nb_canon_orbital : $analyse['canons'];
+    ?>
+    <?= Vue::jauge('Bouclier', $bouclier, max($p->bouclierMax(), $bouclier), 'bouclier', 'bouclier') ?>
+    <?= Vue::jauge('Canon', $canon, max($p->canonMax(), $canon), 'canon', 'canon') ?>
+    <?= Vue::jauge('Garnison', $troupes, max(Planete::troupesDeBase($p->slot), $troupes), 'persos', 'troupes') ?>
+    <p class="md3-secondary"><?= $boucliers ?> <?= __('bouclier', 'boucliers', $boucliers) ?> planétaire(s) · <?= $canons ?> <?= __('canon', 'canons', $canons) ?> orbital(aux)</p>
+    <?php if(count($flotteStationnee) > 0){ ?>
+    <p class="md3-secondary">Flotte en orbite :</p>
+    <?= Vue::composition($flotteStationnee, $p->id_camp) ?>
+    <?php } ?>
+    <?php if(!$proprietaire){ ?>
+    <p class="md3-secondary"><?= $analyse['batiments'] ?> <?= __('batiment', 'batiments', $analyse['batiments']) ?> · gouverneur : <?= $analyse['gouverneur'] === null ? 'aucun' : 'en place ('.$analyse['gouverneur'].' '.__('etoile', 'etoiles', $analyse['gouverneur']).')' ?> · analysée le <?= htmlspecialchars($analyse['le']) ?></p>
+    <?php } ?>
+    <?php } else { ?>
+    <p class="md3-secondary">Bouclier, canon, garnison, flotte en orbite, bâtiments et gouverneur : inconnus. Envoyez-y un vaisseau de reconnaissance pour relever la fiche complète.</p>
     <?php } ?>
     <?php if($p->gouverneur !== 0){ ?>
     <?= Vue::jauge('Révolte', $p->perc_revolte, Planete::MAX_REVOLTE, 'revolte', 'revolte') ?>
     <?php } ?>
-    <?php if($p->defense_maj !== null && $p->id_camp !== null){ ?>
+    <?php if($p->defense_maj !== null){ ?>
     <p class="md3-secondary">La défense se reconstitue : +<?= Planete::REGENERATION_POURCENT_PAR_HEURE ?> % par heure.</p>
     <?php } ?>
 </section>

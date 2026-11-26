@@ -30,6 +30,7 @@ foreach(Flotte::liste($Joueur->id) as $ligne){
 <?php
 foreach($systeme->planetes as $p){
     $couleurPlanete = $p->id_camp === null ? Camp::SANS_CAMP_COULEUR : (new Camp($p->id_camp))->couleur;
+    $releve = Analyse::releve($Joueur, $p);
     $map_planete = $p->id % 27;
     if(!$map_planete) $map_planete = 1;
     $stock = $posees[$p->id] ?? array();
@@ -45,9 +46,9 @@ foreach($systeme->planetes as $p){
         </div>
         <div class="pastilles">
             <?= Vue::pastille($p->slot.' '.__('emplacement', 'emplacements', $p->slot)) ?>
-            <?= Vue::pastille('Bouclier '.$p->bouclier) ?>
-            <?= Vue::pastille('Canon '.$p->canon) ?>
-            <?= Vue::pastille('Garnison '.$p->troupes) ?>
+            <?= Vue::pastille('Bouclier '.($releve['bouclier'] ?? '?')) ?>
+            <?= Vue::pastille('Canon '.($releve['canon'] ?? '?')) ?>
+            <?= Vue::pastille('Garnison '.($releve['troupes'] ?? '?')) ?>
             <?php if($p->bonus !== null){ echo Vue::pastille(Bonus::libelle($p->bonus), 'ok'); } ?>
         </div>
         <?php if(count($stock) > 0 || count($flottes) > 0){ ?>

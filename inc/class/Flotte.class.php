@@ -112,6 +112,10 @@ class Flotte {
         if(!$joueur->peutCibler($destination->systeme)){
             return 'Destination inconnue.';
         }
+        $refusTutoriel = Tuto::verifierDestination($joueur, $destination);
+        if($refusTutoriel !== null){
+            return $refusTutoriel;
+        }
         $duree = 0;
         foreach(array_keys($this->composition()) as $type){
             $duree = max($duree, Vaisseau::dureeTrajet($joueur, $type, new Planete($depart), $destination));

@@ -9,18 +9,23 @@ class Tuto {
     const ETAPE_FLOTTE = 6;
     const ETAPE_ENVOI = 7;
     const ETAPE_ASSAUT = 8;
-    const ETAPE_ASSASSIN = 9;
-    const ETAPE_HEROS = 10;
-    const ETAPE_BONUS = 11;
-    const ETAPE_DEMOLITION = 12;
-    const ETAPE_MENACE = 13;
-    const ETAPE_RESTRICTOR = 14;
+    const ETAPE_ANALYSE = 9;
+    const ETAPE_ORBITE = 10;
+    const ETAPE_ASSASSIN = 11;
+    const ETAPE_SABOTAGE = 12;
+    const ETAPE_HEROS = 13;
+    const ETAPE_BONUS = 14;
+    const ETAPE_DEMOLITION = 15;
+    const ETAPE_MENACE = 16;
+    const ETAPE_RESTRICTOR = 17;
     const ETAPES_A_VALIDER = array(self::ETAPE_BONUS, self::ETAPE_DEMOLITION);
     const PRIME_HEROS = 350;
     const PRIME_CREDITS = 800;
-    const PRIME_ASSASSIN = 250;
+    const PRIME_ASSASSIN = 400;
     const PRIME_RESTRICTOR = 1000;
     const FLOTTE_REDUITE = 5;
+    const GOUVERNEUR_ETOILES = 1;
+    const ORBITE_CHASSEURS = 1;
     const CHASSEURS_REQUIS = 3;
     const TROUPES_REQUISES = 3;
     const FREGATES_REQUISES = 1;
@@ -34,6 +39,20 @@ class Tuto {
         while($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && self::objectifAtteint($joueur)){
             self::passerALEtapeSuivante($joueur);
         }
+    }
+
+    public static function verifierDestination(Joueur $joueur, Planete $destination): ?string {
+        if(!$joueur->enTuto() || $joueur->id_systeme_voisin === null || $destination->id_systeme !== $joueur->id_systeme_voisin){
+            return null;
+        }
+        if($destination->id === self::planeteCible($joueur)->id){
+            return null;
+        }
+        $deux = self::planeteDeux($joueur);
+        if($joueur->etape_tuto >= self::ETAPE_ANALYSE && $deux !== null && $destination->id === $deux->id){
+            return null;
+        }
+        return 'Ce secteur est guidé par le tutoriel : terminez-le avant d\'explorer ses autres planètes.';
     }
 
     public static function valider(Joueur $joueur): void {
@@ -52,9 +71,9 @@ class Tuto {
         $joueur->load($joueur->id);
     }
 
-    private static function planeteFlotteReduite(Joueur $joueur): ?Planete {
-        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id_camp=? AND gouverneur=0 ORDER BY id LIMIT 1";
-        $ligne = MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin,Camp::PIRATES)[0] ?? null;
+    private static function planeteDeux(Joueur $joueur): ?Planete {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<>? AND gouverneur=0 ORDER BY id LIMIT 1";
+        $ligne = MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin,self::planeteCible($joueur)->id)[0] ?? null;
         if($ligne === null){
             $idPlanete = Planete::premiereGouvernee($joueur->id);
             $ligne = $idPlanete === null ? null : Ia::sourceLaPlusProche($joueur, new Planete($idPlanete), array(Camp::PIRATES));
@@ -62,8 +81,18 @@ class Tuto {
         return $ligne === null ? null : new Planete($ligne->id);
     }
 
+    private static function preparerPlaneteDeux(Joueur $joueur): void {
+        $cible = self::planeteDeux($joueur);
+        if($cible === null){
+            return;
+        }
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET id_camp=?, gouverneur=0, pnj_endurance=?, flotte_ia=?, nb_bouclier_planetaire=1, nb_canon_orbital=0, bouclier=?, canon=?, troupes=?, defense_maj=NULL WHERE id=?";
+        MyPDO::getInstance()->query($query,Camp::PIRATES,self::GOUVERNEUR_ETOILES,self::ORBITE_CHASSEURS,Planete::bouclierDeBase($cible->slot) + Planete::BOUCLIER_PAR_STRUCTURE,Planete::canonDeBase($cible->slot),Planete::troupesDeBase($cible->slot),$cible->id);
+        Decouverte::ajouter($joueur->id, $cible->id_systeme);
+    }
+
     private static function lancerFlotteReduite(Joueur $joueur): void {
-        $cible = self::planeteFlotteReduite($joueur);
+        $cible = self::planeteDeux($joueur);
         if($cible === null){
             return;
         }
@@ -100,9 +129,13 @@ class Tuto {
             self::lancerFlotteReduite($joueur);
             Tools::addMessage('Tutoriel : prime de '.self::PRIME_RESTRICTOR.' crédits pour une usine lourde et un Restrictor.');
         }
+        elseif($etape === self::ETAPE_ANALYSE){
+            self::preparerPlaneteDeux($joueur);
+            Tools::addMessage('Tutoriel : planète capturée ; la planète voisine vous attend.');
+        }
         elseif($etape === self::ETAPE_ASSASSIN){
             $joueur->crediter(self::PRIME_ASSASSIN);
-            Tools::addMessage('Tutoriel : planète capturée, prime de '.self::PRIME_ASSASSIN.' crédits pour recruter un assassin.');
+            Tools::addMessage('Tutoriel : orbite dégagée, prime de '.self::PRIME_ASSASSIN.' crédits pour un assassin et un transport.');
         }
         elseif($etape === Joueur::TUTO_END_STEP){
             MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET fin_tuto=? WHERE id=?",Tools::now(),$joueur->id);
@@ -127,8 +160,14 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "flotte WHERE id_joueur=?";
                 return $db->query($query,$joueur->id)[0]->nombre > 0;
+            case self::ETAPE_ANALYSE:
+                return Analyse::derniere($joueur->id, self::planeteDeux($joueur)->id) !== null;
+            case self::ETAPE_ORBITE:
+                return array_sum(Combat::defenseurs(self::planeteDeux($joueur))) === 0;
             case self::ETAPE_ASSASSIN:
-                return self::possedePerso($joueur, Perso::ROLE_ASSASSIN);
+                return self::planeteDeux($joueur)->pnj_endurance === null;
+            case self::ETAPE_SABOTAGE:
+                return self::planeteDeux($joueur)->nb_bouclier_planetaire === 0;
             case self::ETAPE_HEROS:
                 return self::possedePerso($joueur, Perso::ROLE_HEROS);
             case self::ETAPE_MENACE:
@@ -191,8 +230,14 @@ class Tuto {
                 return 'Envoyer la flotte';
             case self::ETAPE_ASSAUT:
                 return 'Prendre et tenir la planète pirate';
+            case self::ETAPE_ANALYSE:
+                return 'Reconnaître la planète voisine';
+            case self::ETAPE_ORBITE:
+                return 'Dégager l\'orbite';
             case self::ETAPE_ASSASSIN:
-                return 'Recruter un assassin';
+                return 'Assassiner le gouverneur';
+            case self::ETAPE_SABOTAGE:
+                return 'Saboter le bouclier planétaire';
             case self::ETAPE_HEROS:
                 return 'Recruter un héros';
             case self::ETAPE_BONUS:
@@ -228,8 +273,15 @@ class Tuto {
                 return 'Sur <a href="?p=listeVaisseau">Flottes</a>, ouvrez « Embarquer » sur la barge de votre flotte : réglez le curseur sur '.self::TROUPES_REQUISES.' troupes et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Ensuite « Voyager » sur votre flotte : touchez le système voisin et « Voyager ici » sur '.self::planeteCible($joueur)->getNom().'.';
             case self::ETAPE_ASSAUT:
                 return 'Votre flotte est arrivée. Ouvrez la fiche de '.self::planeteCible($joueur)->getNom().' : attaquez avec votre flotte pour détruire sa défense (les chasseurs embarqués sur la frégate combattent avec elle, pas besoin de les sortir), puis « Débarquer » les troupes de vos barges. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
+            case self::ETAPE_ANALYSE:
+                $deux = self::planeteDeux($joueur);
+                return 'Planète capturée et tenue. Inutile de faire de la diplomatie ni de la rallier à votre cause : tant que votre garnison y reste, ses bâtiments produisent, avec un léger malus de temps ('.Planete::MALUS_OCCUPATION_POURCENT.' %). Si la garnison disparaît ou est détruite, la planète redevient neutre, élit un gouverneur une fois sur deux et reconstruit ses défenses. Place à la planète voisine '.($deux === null ? '' : $deux->getNom()).' : elle a un gouverneur. Envoyez-y votre vaisseau de reconnaissance (<a href="?p=listeVaisseau">Flottes</a>, « Reconnaître ») : une reconnaissance ne déclenche aucun combat (un joueur adverse peut pourtant l\'attaquer) et, à l\'arrivée, elle analyse la planète : garnison, vaisseaux en orbite, bâtiments et gouverneur, qui restaient inconnus.';
+            case self::ETAPE_ORBITE:
+                return 'L\'analyse montre un gouverneur, un bouclier planétaire et seulement '.self::ORBITE_CHASSEURS.' chasseur en orbite. Les chasseurs de votre frégate sont à bord : sur <a href="?p=listeVaisseau">Flottes</a>, « Débarquer » les fait descendre de la frégate. Dans un même système, les vaisseaux légers peuvent se déplacer seuls : envoyez uniquement les chasseurs sur la planète voisine (« Voyager »), l\'arrivée déclenche le combat. Une orbite vide réduit fortement les chances que l\'espion se fasse attraper : chaque vaisseau en orbite retire '.Perso::PENALITE_ORBITE_PAR_VAISSEAU_POURCENT.' % à ses chances.';
             case self::ETAPE_ASSASSIN:
-                return 'Planète capturée et tenue. Recrutez un assassin à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_ASSASSIN]['prix'].' cr) : il peut éliminer un perso adverse présent sur la même planète (chance de base '.Perso::ASSASSINAT_BASE_PERCENT.' %, '.Perso::ASSASSINAT_PER_STAR_PERCENT.' % par étoile d\'écart entre sa force et l\'endurance de la cible).';
+                return 'Orbite dégagée. Tant qu\'un gouverneur est en place, on ne peut ni gouverner la planète ni baisser sa révolte : il faut l\'éliminer. Recrutez un assassin à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_ASSASSIN]['prix'].' cr), produisez un transport personnel, faites-y monter l\'assassin (sa fiche, « Monter dans un transport »), envoyez le transport sur la planète voisine (« Voyager », même système), puis « Assassiner » le gouverneur depuis la fiche de l\'assassin.';
+            case self::ETAPE_SABOTAGE:
+                return 'Le gouverneur est éliminé, mais le bouclier planétaire interdit encore tout débarquement de troupes : tant qu\'il existe, la flotte ne peut pas débarquer. Les espions peuvent saboter les bâtiments : sur la fiche de l\'assassin, « Saboter » le bouclier planétaire.';
             case self::ETAPE_HEROS:
                 return 'Recrutez maintenant un héros à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_HEROS]['prix'].' cr). Présent sur une planète, il ajoute '.Perso::HEROS_SUCCESS_PER_STAR_PERCENT.' % de chances de réussite par étoile de diplomatie aux diplomates qui s\'y trouvent, et '.Combat::HEROS_BONUS_PAR_ETOILE_POURCENT.' % de défense par étoile de force face aux menaces pirates.';
             case self::ETAPE_BONUS:
@@ -239,7 +291,7 @@ class Tuto {
             case self::ETAPE_MENACE:
                 return 'Une flotte pirate menace '.$planete->getNom().'. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : « Combattre » l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; « Laisser » laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour continuer.';
             case self::ETAPE_RESTRICTOR:
-                $cible = self::planeteFlotteReduite($joueur);
+                $cible = self::planeteDeux($joueur);
                 return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' chasseurs) est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue qui a perdu l\'essentiel de ses vaisseaux s\'enfuit vers la planète alliée ou neutre la plus proche. Le Restrictor l\'en empêche : tant qu\'il vit dans votre flotte, l\'ennemi ne peut pas fuir. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr), regroupez-le avec votre frégate dans une flotte (embarquez-y vos chasseurs : ils protègent vos grands vaisseaux, car les chasseurs ennemis frappent doublement les capitaux), puis voyagez vers cette planète : l\'arrivée déclenche le combat, « Résoudre » le joue.';
         }
         return '';

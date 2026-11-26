@@ -236,6 +236,10 @@ class Vaisseau {
         if(!$joueur->peutCibler($destination->systeme)){
             return 'Destination inconnue.';
         }
+        $refusTutoriel = Tuto::verifierDestination($joueur, $destination);
+        if($refusTutoriel !== null){
+            return $refusTutoriel;
+        }
         $nombres = array_filter($nombres, fn($nombre) => $nombre > 0);
         foreach(array_keys($nombres) as $type){
             if(!isset(self::CATALOGUE[$type])){
@@ -474,9 +478,10 @@ class Vaisseau {
                     $planetesArmees[$planete->id] = $planete;
                 }
                 if($ligne->type === self::RECONNAISSANCE){
-                    $analyse = $planete->nom.'.';
+                    Analyse::enregistrer($joueur, $planete);
+                    $analyse = $planete->nom.' : fiche complète relevée.';
                     if(Decouverte::ajouter($joueur->id, $planete->id_systeme)){
-                        $analyse = $planete->nom.' : système '.$planete->systeme->nom.' exploré, '.count($planete->systeme->planetes).' '.__('planete','planetes',count($planete->systeme->planetes)).' '.__('decouverte','decouvertes',count($planete->systeme->planetes)).'.';
+                        $analyse = $planete->nom.' : fiche complète relevée, système '.$planete->systeme->nom.' exploré, '.count($planete->systeme->planetes).' '.__('planete','planetes',count($planete->systeme->planetes)).' '.__('decouverte','decouvertes',count($planete->systeme->planetes)).'.';
                     }
                     Tools::addInfo('Planète analysée', $analyse);
                 }
@@ -511,7 +516,7 @@ class Vaisseau {
         if(!$joueur->payer($nombre * $joueur->prixVaisseau($type))){
             return 'Crédits insuffisants.';
         }
-        foreach(self::finsDeFile($planete, $usine, $nombre, $joueur->dureeEffective($infos['duree'])) as $fin){
+        foreach(self::finsDeFile($planete, $usine, $nombre, $planete->dureeProduction($joueur, $infos['duree'])) as $fin){
             MyPDO::getInstance()->query("INSERT INTO " . MyPDO::DB_FLAG . "production (id_joueur,id_planete,type,fin) VALUES (?,?,?,?)",$joueur->id,$planete->id,$type,$fin);
         }
         return null;
