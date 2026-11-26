@@ -890,6 +890,13 @@
     }
 }
 
+.action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+}
+
 .curseur {
     display: inline-flex;
     flex: 1 1 200px;

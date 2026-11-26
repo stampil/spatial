@@ -78,28 +78,31 @@ if($p->gouverneur !== $Joueur->id){
     <?php } ?>
     <div class="md3-actions">
     <?php if($attaque){ ?>
-        <form method="POST" action="?p=combattre">
+        <form class="action" method="POST" action="?p=combattre">
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <input type="submit" value="Attaquer avec <?= $escadre ?> <?= __('vaisseau', 'vaisseaux', $escadre) ?> de combat" />
+            <?= Vue::boutonAction('attaque', 'Attaquer') ?>
+            <span class="md3-secondary"><?= $escadre ?> <?= __('vaisseau', 'vaisseaux', $escadre) ?></span>
         </form>
     <?php } ?>
     <?php foreach($flottesPresentes as $presente){ ?>
-        <form method="POST" action="?p=combattre">
+        <form class="action" method="POST" action="?p=combattre">
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="flotte" value="<?= $presente['flotte']->id ?>" />
             <input type="hidden" name="action" value="attaquer" />
             <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--tonal" value="Attaquer avec <?= htmlspecialchars($presente['flotte']->nom) ?> (<?= $presente['engages'] ?> <?= __('vaisseau', 'vaisseaux', $presente['engages']) ?>)" />
+            <?= Vue::boutonAction('attaque_flotte', 'Attaquer', 'md3-button--tonal') ?>
+            <span class="md3-secondary"><?= htmlspecialchars($presente['flotte']->nom) ?> · <?= $presente['engages'] ?> <?= __('vaisseau', 'vaisseaux', $presente['engages']) ?></span>
         </form>
     <?php } ?>
     <?php if($debarquement){ ?>
-        <form method="POST" action="?p=combattre">
+        <form class="action" method="POST" action="?p=combattre">
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="debarquer" />
             <?= csrfField() ?>
-            <input type="submit" value="Débarquer <?= $troupes ?> <?= __('troupe', 'troupes', $troupes) ?> des barges" />
+            <?= Vue::boutonAction('debarquement', 'Débarquer') ?>
+            <span class="md3-secondary"><?= $troupes ?> <?= __('troupe', 'troupes', $troupes) ?></span>
         </form>
     <?php } ?>
     </div>

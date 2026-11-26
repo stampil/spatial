@@ -188,7 +188,7 @@ class Tuto {
             case self::ETAPE_RECONNAISSANCE:
                 return 'Sur la fiche de '.$planete->getNom().', l\'usine de vaisseaux légers peut produire un vaisseau de reconnaissance. Lancez sa production : pendant le tutoriel, les durées sont divisées par '.Joueur::TUTO_DIVISEUR_DUREES.'.';
             case self::ETAPE_EXPLORATION:
-                return 'Un système voisin, encore inconnu, existe près du vôtre. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : sur '.$planete->getNom().', « Chercher un système » envoie votre vaisseau de reconnaissance dans l\'inconnu, et il revient avec ce qu\'il a trouvé. Pendant le tutoriel il réussit à coup sûr ; plus tard il peut ne rien trouver, voire ne pas revenir.';
+                return 'Un système voisin, encore inconnu, existe près du vôtre. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : sur '.$planete->getNom().', « Chercher » (la loupe) envoie votre vaisseau de reconnaissance chercher un système dans l\'inconnu, et il revient avec ce qu\'il a trouvé. Pendant le tutoriel il réussit à coup sûr ; plus tard il peut ne rien trouver, voire ne pas revenir.';
             case self::ETAPE_PREPARATION:
                 return 'Le système voisin est découvert : sa planète '.self::planeteCible($joueur)->getNom().' est aux mains des Pirates. Préparez l\'assaut sur la fiche de '.$planete->getNom().' : construisez une usine de vaisseaux moyens et une académie, puis produisez '.self::FREGATES_REQUISES.' frégate, '.self::BARGES_REQUISES.' barge de débarquement, '.self::TROUPES_REQUISES.' troupes d\'assaut et '.self::CHASSEURS_REQUIS.' chasseurs (réglez le curseur avant « Produire » : les unités sortent une par une). La frégate détruit la défense avec les chasseurs qu\'elle embarque ('.Vaisseau::CATALOGUE['fregate']['chasseurs'].' au plus) ; seule la barge débarque les troupes, et seules les troupes embarquées dans une barge débarquent ('.Vaisseau::CATALOGUE['barge']['troupes'].' au plus). Vous les embarquerez vous-même.';
             case self::ETAPE_FLOTTE:
@@ -206,7 +206,7 @@ class Tuto {
             case self::ETAPE_DEMOLITION:
                 return 'Sur la fiche d\'une de vos planètes, « Démolir » supprime un bâtiment et rembourse '.Batiment::REFUND_PERCENT.' % de son prix : l\'emplacement redevient libre. C\'est impossible tant qu\'une production occupe toutes les usines de ce type. Quand vous avez compris, validez.';
             case self::ETAPE_MENACE:
-                return 'Une flotte pirate menace '.$planete->getNom().'. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : « Combattre » l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; « Laisser faire » laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour terminer le tutoriel.';
+                return 'Une flotte pirate menace '.$planete->getNom().'. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : « Combattre » l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; « Laisser » laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour terminer le tutoriel.';
         }
         return '';
     }

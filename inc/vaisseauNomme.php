@@ -18,7 +18,7 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
             </div>
         </div>
         <?php if($avecVoyage){ ?>
-        <a class="md3-button hors-creation" href="?p=carte&ordre=<?= $vaisseau->id_planete ?>&vaisseau=<?= $vaisseau->id ?>">Voyager</a>
+        <?= Vue::lienAction('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager', 'hors-creation') ?>
         <?php } ?>
     </div>
     <details class="systeme-details hors-creation">
@@ -32,7 +32,7 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
                 <div class="ligne-jeu">
                     <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
                     <?= Vue::curseur('nombre', min(1, $place), $place, min(1, $place), 'Nombre à embarquer sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
-                    <input type="submit" class="md3-button md3-button--tonal" value="Embarquer"<?= $place === 0 ? ' disabled' : '' ?> />
+                    <?= Vue::boutonAction('embarquer', 'Embarquer', 'md3-button--tonal', $place === 0 ? ' disabled' : '') ?>
                 </div>
             </form>
             <?php } ?>
@@ -40,7 +40,7 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
             <form method="POST" action="?p=debarquer">
                 <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
                 <?= csrfField() ?>
-                <input type="submit" class="md3-button md3-button--outlined" value="Débarquer" />
+                <?= Vue::boutonAction('decharger', 'Débarquer', 'md3-button--outlined') ?>
             </form>
             <?php } ?>
         </div>
@@ -52,7 +52,7 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
             <?= csrfField() ?>
             <div class="ligne-jeu">
                 <input type="text" class="md3-text" name="nom" maxlength="<?= Vaisseau::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($vaisseau->nom) ?>" required aria-label="Nom du vaisseau" />
-                <input type="submit" class="md3-button md3-button--tonal" value="Renommer" />
+                <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
             </div>
         </form>
     </details>

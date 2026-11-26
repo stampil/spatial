@@ -22,12 +22,12 @@ if($menace !== null){
     <p>Une flotte pirate de <?= array_sum(Menace::flotte($source->slot)) ?> <?= __('vaisseau', 'vaisseaux', array_sum(Menace::flotte($source->slot))) ?>, venue de <?= $source->getNom() ?>, menace <?= $cible->getNom() ?>. Combattez-la avec vos vaisseaux présents sur la planète, ou laissez-la détourner une part des revenus. Sans réponse sous <?= intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR) ?> h, elle détourne.</p>
     <?= Vue::composition(Menace::flotte($source->slot), Camp::PIRATES) ?>
     <div class="md3-actions">
-        <?php foreach(array(Menace::ACTION_COMBATTRE => 'Combattre', Menace::ACTION_LAISSER => 'Laisser faire') as $action => $libelle){ ?>
+        <?php foreach(array(Menace::ACTION_COMBATTRE => 'Combattre', Menace::ACTION_LAISSER => 'Laisser') as $action => $libelle){ ?>
         <form method="POST" action="?p=repondreMenace">
             <input type="hidden" name="menace" value="<?= $menace->id ?>" />
             <input type="hidden" name="action" value="<?= $action ?>" />
             <?= csrfField() ?>
-            <input type="submit" class="md3-button<?= $action === Menace::ACTION_LAISSER ? ' md3-button--outlined' : '' ?>" value="<?= $libelle ?>" />
+            <?= Vue::boutonAction($action === Menace::ACTION_LAISSER ? 'laisser' : 'combattre', $libelle, $action === Menace::ACTION_LAISSER ? 'md3-button--outlined' : '') ?>
         </form>
         <?php } ?>
     </div>
@@ -45,13 +45,13 @@ foreach($flottes as $ligne){
     <?php if($auRepos !== null){ $planete = new Planete($auRepos); $libres = Vaisseau::stockLibre($planete->id, $Joueur->id); ?>
     <p>Au repos sur <?= $planete->getNom() ?></p>
     <div class="md3-actions">
-        <a class="md3-button" href="?p=carte&ordre=<?= $planete->id ?>&flotte=<?= $flotte->id ?>">Voyager</a>
-        <a class="md3-button md3-button--tonal" href="?p=carte&systeme=<?= $planete->id_systeme ?>">Voir sur la carte</a>
+        <?= Vue::lienAction('?p=carte&ordre='.$planete->id.'&flotte='.$flotte->id, 'voyager', 'Voyager') ?>
+        <?= Vue::lienAction('?p=carte&systeme='.$planete->id_systeme, 'carte', 'Carte', 'md3-button--tonal') ?>
         <form method="POST" action="?p=gererFlotte">
             <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
             <input type="hidden" name="action" value="dissoudre" />
             <?= csrfField() ?>
-            <input type="submit" class="md3-button md3-button--outlined" value="Dissoudre" />
+            <?= Vue::boutonAction('dissoudre', 'Dissoudre', 'md3-button--outlined') ?>
         </form>
     </div>
     <details class="systeme-details">
@@ -61,7 +61,7 @@ foreach($flottes as $ligne){
             <?= csrfField() ?>
             <div class="ligne-jeu">
                 <input type="text" class="md3-text" name="nom" maxlength="<?= Flotte::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($flotte->nom) ?>" required aria-label="Nom de la flotte" />
-                <input type="submit" class="md3-button md3-button--tonal" value="Renommer" />
+                <?= Vue::boutonAction('renommer', 'Renommer', 'md3-button--tonal') ?>
             </div>
         </form>
     </details>
@@ -124,11 +124,11 @@ foreach(array_keys($posees) as $planeteId){
                 <input type="hidden" name="destination" value="<?= Vaisseau::DESTINATION_EXPLORATION ?>" />
                 <input type="hidden" name="nombre[<?= Vaisseau::RECONNAISSANCE ?>]" value="1" />
                 <?= csrfField() ?>
-                <input type="submit" class="md3-button md3-button--tonal" value="Chercher un système" />
+                <?= Vue::boutonAction('chercher', 'Chercher', 'md3-button--tonal') ?>
             </form>
-            <a class="md3-button" href="?p=carte&ordre=<?= $planete->id ?>&type=<?= $type ?>">Reconnaître une planète</a>
+            <?= Vue::lienAction('?p=carte&ordre='.$planete->id.'&type='.$type, 'reconnaitre', 'Reconnaître') ?>
             <?php } else { ?>
-            <a class="md3-button" href="?p=carte&ordre=<?= $planete->id ?>&type=<?= $type ?>">Voyager</a>
+            <?= Vue::lienAction('?p=carte&ordre='.$planete->id.'&type='.$type, 'voyager', 'Voyager') ?>
             <?php } ?>
         </div>
     </div>

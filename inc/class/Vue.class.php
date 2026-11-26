@@ -123,6 +123,14 @@ class Vue {
             .'</span>';
     }
 
+    public static function boutonAction(string $icone, string $libelle, string $classes = '', string $attributs = ''): string {
+        return '<button type="submit" class="md3-button'.($classes === '' ? '' : ' '.$classes).'"'.$attributs.'>'.Icone::html($icone).'<span>'.htmlspecialchars($libelle).'</span></button>';
+    }
+
+    public static function lienAction(string $adresse, string $icone, string $libelle, string $classes = ''): string {
+        return '<a class="md3-button'.($classes === '' ? '' : ' '.$classes).'" href="'.htmlspecialchars($adresse).'">'.Icone::html($icone).'<span>'.htmlspecialchars($libelle).'</span></a>';
+    }
+
     public static function emblemeCamp(?int $idCamp, int $taille = self::EMBLEME_TAILLE): string {
         if($idCamp === null || !isset(self::EMBLEMES[$idCamp])){
             return '';
