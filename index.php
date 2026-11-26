@@ -65,6 +65,8 @@ if(!empty($_SESSION['Sid'])){
         <script src="<?= Vue::ressource('js/rapport.js') ?>" defer></script>
         <?php if(isset($Joueur)){ ?>
         <script src="<?= Vue::ressource('js/musique.js') ?>" defer></script>
+        <?php } else { ?>
+        <script src="<?= Vue::ressource('js/autoconnexion.js') ?>" data-cle="<?= CONNEXION_CLE_STOCKAGE ?>" data-reconnexion="?p=<?= RECONNEXION_PAGE ?>" data-accueil="?p=<?= HOME_PAGE ?>"></script>
         <?php } ?>
                 <?php
         if(is_file('js/'.$p.'.js')){

@@ -255,6 +255,14 @@ CREATE TABLE IF NOT EXISTS `menace` (
   UNIQUE KEY `joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `jeton_connexion` (
+  `empreinte` char(64) NOT NULL,
+  `id_joueur` int(11) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`empreinte`),
+  KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(64) NOT NULL,
   PRIMARY KEY (`version`)
@@ -276,7 +284,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('013_sans_email'),
 ('014_pirates_ia'),
 ('015_menaces_pirates'),
-('016_exploration_risquee');
+('016_exploration_risquee'),
+('017_connexion_automatique');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

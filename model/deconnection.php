@@ -1,5 +1,8 @@
 <?php
+if(isset($Joueur)){
+    $Joueur->oublierJetons();
+}
 session_destroy();
-header('Location: ?p=connection');
+require 'inc/oublier.php';
 exit();
 ?>

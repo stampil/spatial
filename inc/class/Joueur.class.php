@@ -21,6 +21,8 @@ class Joueur {
     
     const TUTO_END_STEP = 8;
     const TUTO_DIVISEUR_DUREES = 5;
+    const JETON_OCTETS = 32;
+    const JETON_DUREE_SECONDES = 90 * 24 * 3600;
     const VISIBILITE_APRES_TUTO_SECONDES = 7 * 24 * 3600;
 
     private static int $credits_depart = 500;
@@ -69,6 +71,24 @@ class Joueur {
         return $ret[0];
     }
         
+    public function creerJeton(): string{
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "jeton_connexion WHERE creato<=?",Tools::formatDate(time() - self::JETON_DUREE_SECONDES));
+        $jeton = bin2hex(random_bytes(self::JETON_OCTETS));
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "jeton_connexion (empreinte,id_joueur,creato) VALUES (?,?,?)";
+        $this->bdd->query($query,hash('sha256', $jeton),$this->id,Tools::now());
+        return $jeton;
+    }
+
+    public static function connecterParJeton(string $jeton): ?object{
+        $query = "SELECT j.* FROM " . MyPDO::DB_FLAG . "jeton_connexion t JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=t.id_joueur WHERE t.empreinte=? AND t.creato>?";
+        $ret = MyPDO::getInstance()->query($query,hash('sha256', $jeton),Tools::formatDate(time() - self::JETON_DUREE_SECONDES));
+        return $ret[0] ?? null;
+    }
+
+    public function oublierJetons(): void{
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "jeton_connexion WHERE id_joueur=?",$this->id);
+    }
+
     public static function liste(): array{
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "joueur ";

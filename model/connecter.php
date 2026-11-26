@@ -14,8 +14,8 @@ if($nom !== '' && $mdp !== ''){
     if($info){
         $Joueur = new Joueur($info->id);
         $Joueur->ouvrirSession();
-
-        header('Location: index.php?p='.HOME_PAGE);
+        $jeton = $Joueur->creerJeton();
+        require 'inc/memoriser.php';
         exit();
     }
     else{
