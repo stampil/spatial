@@ -21,4 +21,7 @@ Ce que je comprends : pas d'événement quand un autre joueur te prend une plan�
 ## Questions en suspens
 
 1. Illustrations : 3 images à générer avec toi (rejoint, révolte, conquise par la force), les mêmes pour tous les clans, le clan étant rappelé par son emblème et son nom dans la fenêtre. Je recommande cela.
-2. « Se révolte » : la fenêtre s'ouvre à ta prochaine page chargée après le passage à 100 %. Je recommande oui.
+2. « Se révolte » : « Se revolte c a partir de 51 hein » (26/11). Dans le jeu, une planète devient indépendante à 100 % de révolte (\`Planete::MAX_REVOLTE\`) ; une planète capturée démarre à 50 % (\`CAPTURE_REVOLTE\`) et l'alerte « Révolte élevée » apparaît à 70 %. Deux lectures :
+   - A : la fenêtre « se révolte » s'ouvre dès que la révolte dépasse 50 % (51 %), la planète restant à toi jusqu'à 100 %. Un seul passage de seuil, une fois, à la prochaine page chargée ; la planète occupée par une garnison ne progresse pas, donc pas de fenêtre tant que la garnison tient. Je recommande cette lecture : aucune règle de jeu ne change.
+   - B : la planète passe indépendante dès 51 % au lieu de 100 %. Cela change la règle : une planète capturée (50 %) quitterait ton camp 1 h après la fin de l'occupation. Je ne le fais pas sans ton accord.
+   Quelle lecture, A ou B ? Dans les deux cas, la fenêtre d'indépendance à 100 % (A) ou à 51 % (B) montre l'illustration « révolte ».
