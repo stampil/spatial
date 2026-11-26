@@ -18,8 +18,13 @@ Lu (rien codé) : les planètes s'affichent avec une texture 2:1 (1440×720 ou 1
 
 Ce que je comprends : générer avec toi, une par une, de nouvelles textures dans le même format (2:1, projection plane en bande horizontale, raccord gauche-droite sans couture, vue à plat sans disque ni étoiles), et pour chaque prompt je te donne en référence une image existante à joindre dans Gemini pour garder le même rendu. Puis je les importe (\`27.jpg\`, \`28.jpg\`…) et je change le choix de la texture pour qu'il utilise toutes les images disponibles.
 
+Précision du 26/11 : « il fau sassurer que sa fasse pas un trait au defilement que le debut corresponde a la fin ». Les images générées par Gemini ne se raccordent jamais d'elles-mêmes : le bord gauche et le bord droit sont différents, ce qui trace une ligne verticale à chaque tour de défilement. J'ai mesuré les 26 textures existantes : 8 ont une couture nette (2, 12, 16, 5, 8, 18, 15, 10).
+
+Ce que je comprends : je fais un outil de raccord (\`tools/raccorder-planete.py\`) qui fond la fin de l'image dans son début sur une bande, pour que le dernier pixel se prolonge naturellement dans le premier ; il tourne automatiquement à l'import de chaque nouvelle texture, et je vérifie ensuite par la mesure que la couture n'est plus plus marquée qu'entre deux colonnes voisines. Aucune texture ne sera importée sans raccord vérifié.
+
 ## Questions en suspens
 
 1. Combien : ta précision du 26/11, « fait des tellurique » : uniquement des planètes telluriques (rocheuses, à surface solide), pas de géantes gazeuses. 12 nouvelles textures (38 au total) : monde océan, dunes dorées, jungle dense, archipel, toundra, canyons rouges, plaines de sel, volcanique sombre, cendres et fissures, minéral violet, minéral vert, cratères sombres. Je recommande ces 12.
 2. Le choix de la texture se fait par l'identifiant de la planète : avec plus d'images, les planètes existantes changeront d'aspect (l'univers est reconstruit à chaque remise à zéro de toute façon). Je recommande d'accepter ce changement.
 3. Références : je te dis pour chaque prompt quelle image existante joindre (par exemple \`img/planete/7.jpg\` pour un monde lisse, \`15.jpg\` pour un monde terrestre, \`17.jpg\` pour la lave). Je recommande oui.
+4. Je passe aussi l'outil sur les 8 textures existantes à couture visible (2, 12, 16, 5, 8, 18, 15, 10), pour que le défilement soit propre partout. Chacune perd environ 10 % de sa largeur, sans effet visible. Je recommande oui.
