@@ -207,7 +207,7 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 | `icone-diplomatie` | `A balance scale: the horizontal beam and the central post in white, the two round hanging pans in dark grey.` |
 | `icone-emplacements` | `A two-by-two grid of four square tiles in dark grey, one of the tiles in white and topped with a small building shape.` |
 | `icone-construire` | `A hammer in white and a wrench in dark grey crossed in an X.` |
-| `icone-ancre` | `Two small identical spaceships seen from above, placed side by side with their noses pointing up: the left one in white, the right one in dark grey.` |
+| `icone-flotte` | `Two small identical spaceships seen from above, placed side by side with their noses pointing up: the left one in white, the right one in dark grey.` |
 | `icone-route` | `A short dotted path in dark grey curving from a small round start dot to a bold white arrowhead pointing right.` |
 | `icone-actions` | `A single bold lightning bolt in white, with a larger dark grey bolt shape slightly offset behind it.` |
 | `icone-quartier` | `A compact command building with a flat roof in white and a row of window cut-outs, its small satellite dish and short antenna on top in dark grey.` |

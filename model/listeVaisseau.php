@@ -40,7 +40,7 @@ foreach($flottes as $ligne){
     $trajet = $flotte->enRoute();
 ?>
 <section class="panneau">
-    <h2 class="panneau__titre"><?= Icone::html('persos') ?><?= htmlspecialchars($flotte->nom) ?></h2>
+    <h2 class="panneau__titre"><?= Icone::html('flotte') ?><?= htmlspecialchars($flotte->nom) ?></h2>
     <?= Vue::composition($flotte->composition(), $Joueur->id_camp) ?>
     <?php if($auRepos !== null){ $planete = new Planete($auRepos); $libres = Vaisseau::stockLibre($planete->id, $Joueur->id); ?>
     <p>Au repos sur <?= $planete->getNom() ?></p>
@@ -89,7 +89,7 @@ foreach(array_keys($posees) as $planeteId){
 ?>
 <section class="panneau" id="planete-<?= $planete->id ?>" data-minimum="<?= Flotte::VAISSEAUX_MINIMUM ?>">
     <div class="panneau__tete">
-        <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
+        <h2 class="panneau__titre"><?= Icone::html('flotte') ?><?= $planete->getNom() ?></h2>
         <?php if($creationPossible){ ?>
         <div class="panneau__outils">
             <button type="button" class="lien-action" data-flotte-creer>Créer une flotte</button>

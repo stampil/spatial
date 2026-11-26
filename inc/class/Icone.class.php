@@ -39,7 +39,7 @@ class Icone {
         'emplacements' => '<rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>',
         'ajouter' => '<path d="M12 5v14M5 12h14"/>',
         'construire' => '<path d="M15 4a4 4 0 0 0-4 5l-7 7 3 3 7-7a4 4 0 0 0 5-4l-3 2-2-2 2-3z"/>',
-        'ancre' => '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M7 11h10M4 15c0 4 3.5 6 8 6s8-2 8-6"/>',
+        'flotte' => '<path d="M7 3c1.5 1.5 3 4 3 8v7H4v-7c0-4 1.5-6.5 3-8z"/><path d="M17 3c1.5 1.5 3 4 3 8v7h-6v-7c0-4 1.5-6.5 3-8z"/>',
         'route' => '<path d="M3 12h14M13 6l6 6-6 6"/>',
         'info' => '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
         'actions' => '<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',
