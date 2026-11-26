@@ -21,7 +21,7 @@ Ce que je comprends : pas d'événement quand un autre joueur te prend une plan�
 ## Questions en suspens
 
 1. Illustrations : 3 images à générer avec toi (rejoint, révolte, conquise par la force), les mêmes pour tous les clans, le clan étant rappelé par son emblème et son nom dans la fenêtre. Je recommande cela.
-2. « Se révolte » : « Se revolte c a partir de 51 hein » (26/11). Dans le jeu, une planète devient indépendante à 100 % de révolte (\`Planete::MAX_REVOLTE\`) ; une planète capturée démarre à 50 % (\`CAPTURE_REVOLTE\`) et l'alerte « Révolte élevée » apparaît à 70 %. Deux lectures :
-   - A : la fenêtre « se révolte » s'ouvre dès que la révolte dépasse 50 % (51 %), la planète restant à toi jusqu'à 100 %. Un seul passage de seuil, une fois, à la prochaine page chargée ; la planète occupée par une garnison ne progresse pas, donc pas de fenêtre tant que la garnison tient. Je recommande cette lecture : aucune règle de jeu ne change.
-   - B : la planète passe indépendante dès 51 % au lieu de 100 %. Cela change la règle : une planète capturée (50 %) quitterait ton camp 1 h après la fin de l'occupation. Je ne le fais pas sans ton accord.
-   Quelle lecture, A ou B ? Dans les deux cas, la fenêtre d'indépendance à 100 % (A) ou à 51 % (B) montre l'illustration « révolte ».
+2. Révolte : ta réponse du 26/11, « les 2 mais indépendante c que si y a plus de troupe de stationné hein !!! ». Je le comprends ainsi : à partir de 51 % de révolte, une planète devient indépendante (elle quitte ton camp) seulement s'il n'y a plus aucune troupe stationnée dessus (garnison de la planète ou tes vaisseaux de troupes posés, ce que le jeu appelle « occupée »). Tant que des troupes sont stationnées, elle reste à toi, la révolte ne progresse pas, quelle que soit sa valeur. Quand elle devient indépendante, la fenêtre illustrée « révolte » s'ouvre. Il n'y a donc pas de fenêtre d'alerte séparée : le seul moment qui fait quitter le camp est celui-là. Conséquences à valider :
+   - Le seuil passe de 100 % à 51 % : une planète à 60 % sans aucune troupe deviendrait indépendante dès ta prochaine page chargée.
+   - L'alerte « Révolte élevée » est à 70 % : elle ne verrait plus que les planètes tenues par des troupes. Je la descends à 40 % pour qu'elle prévienne avant 51 %. Je recommande oui.
+   C'est bien cela ?
