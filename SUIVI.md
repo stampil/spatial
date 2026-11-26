@@ -2,14 +2,15 @@
 
 ## À faire
 
-### 1. Boutons icône lisibles : glyphe blanc, plus de violet sur violet (26/11)
+### 1. Stats des persos en étoiles, plus de barre étirée sur PC (26/11)
 
-Ta phrase : « l'aisse le btn blanc, car la le violet sur un gris violet c illisible, pas assez conrasté » (avec une capture : le bouton de diplomatie, glyphe sombre sur fond lavande plein).
+Ta phrase : « les stats tu me les remet en etoiles, la la bare hiper allongé en pc c moche a crever ».
 
-Lu (rien codé) : les boutons icône sans classe tonale ont le fond lavande plein (couleur principale) et le glyphe prend la couleur du texte du bouton (violet foncé) ; la partie secondaire, à 35 % d'opacité, devient un gris violet qui se fond dans le fond. Touchés : tous les boutons icône « principaux » (négocier, voyager, construire, attaquer, combattre, résoudre, recruter, voyager des vaisseaux et de la flotte…).
+Lu (rien codé) : Force, Endurance et Diplomatie d'un perso (fiche `model/affichePerso.php` et liste `model/listePerso.php`) s'affichent en barres pleine largeur (`Vue::jauge`), donc très longues sur ordinateur. Avant les jauges (commit a75a00c), la diplomatie était écrite en texte « N/5 étoiles ».
 
-Ce que je comprends : le glyphe reste blanc, comme sur les images générées (blanc pur pour la forme principale, gris foncé translucide pour la secondaire), sur un fond sombre ; plus aucun glyphe teinté de violet sur fond lavande.
+Ce que je comprends : chaque stat devient une rangée de 5 étoiles (pleines pour la valeur, vides pour le reste), avec son icône et son nom, sans barre. Les autres jauges (bouclier, canon, garnison, révolte, planètes des camps) ne sont pas des stats d'étoiles : elles restent des barres.
 
 ## Questions en suspens
 
-1. Fond : tous les boutons icône passent sur le fond sombre déjà utilisé par les boutons tonaux (comme les icônes d'embarquer et de renommer), glyphe blanc pur. L'action principale n'a plus de fond lavande ; elle se distingue par un liseré lavande. Je recommande cela.
+1. Étoiles dessinées en SVG (pleine / vide), même couleur lavande que le thème, avec le texte « 3/5 » pour les lecteurs d'écran. Je recommande cela.
+2. Les autres barres (bouclier, canon, garnison, révolte, camps) sont aussi très étirées sur PC : je limite leur largeur à 360 px sur grand écran, inchangées sur téléphone. Je recommande oui.
