@@ -7,12 +7,14 @@ import sys
 import numpy
 from PIL import Image
 
-OBJETS = ('vaisseau', 'batiment', 'role', 'bonus', 'logo')
+OBJETS = ('vaisseau', 'batiment', 'role', 'bonus', 'logo', 'icone')
 FONDS = {'camp-pirates': 'camp/pirates', 'camp-empire': 'camp/empire', 'camp-rebellion': 'camp/rebellion', 'carte': 'carte', 'accueil': 'accueil', 'combat': 'combat'}
 FONDS.update({'page-' + page: 'page/' + page for page in ('tableauBord', 'listePlanete', 'listeVaisseau', 'listePerso', 'classement', 'listeCamp', 'inscription', 'connection')})
 EXTENSIONS = ('.png', '.jpg', '.jpeg', '.webp')
 COTE_OBJET = 512
 COTE_LOGO = 128
+COTE_ICONE = 128
+COTES_PETITS = {'logo': COTE_LOGO, 'icone': COTE_ICONE}
 DIVISEUR_MARGE = 20
 LARGEUR_FOND = 1600
 RATIO_FOND = 16 / 9
@@ -77,7 +79,7 @@ def traiter(chemin, nom, destination):
             return False
         sortie = os.path.join(destination, dossier, *cle.split('-', 1)) + '.png'
         os.makedirs(os.path.dirname(sortie), exist_ok=True)
-        cadrer(image, COTE_LOGO if dossier == 'logo' else COTE_OBJET).save(sortie, optimize=True)
+        cadrer(image, COTES_PETITS.get(dossier, COTE_OBJET)).save(sortie, optimize=True)
         print('  %s -> %s' % (nom, sortie))
         return True
     if base in FONDS:

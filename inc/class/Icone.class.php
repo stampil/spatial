@@ -4,6 +4,7 @@ class Icone {
 
     const VUE = 24;
     const TRAIT = 2;
+    const DOSSIER_IMAGES = 'icone';
     const DESSINS = array(
         'credits' => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
         'revenu' => '<polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/>',
@@ -52,6 +53,10 @@ class Icone {
     public static function html(string $nom): string {
         if(!isset(self::DESSINS[$nom])){
             throw new UnexpectedValueException("Icône inconnue : ".$nom);
+        }
+        $chemin = Vue::DOSSIER_IMAGES.'/'.self::DOSSIER_IMAGES.'/'.$nom.'.'.Vue::EXTENSION_OBJET;
+        if(is_file($chemin)){
+            return '<span class="icone icone--image" style="width:'.self::VUE.'px;height:'.self::VUE.'px;background-image:url('.$chemin.')" aria-hidden="true"></span>';
         }
         return '<svg class="icone" width="'.self::VUE.'" height="'.self::VUE.'" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
     }

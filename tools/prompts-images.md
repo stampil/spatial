@@ -1,7 +1,7 @@
 # Prompts d'images photo-réalistes (Gemini)
 
 37 images à générer : 23 objets sur fond magenta (transformés en PNG transparent par le script) et 14 fonds plein cadre, plus 21 vaisseaux par camp (section « Vaisseaux par camp »).
-Les petites icônes de l'interface (menu, barre d'état, boutons) restent en SVG : elles ne se génèrent pas.
+Les icônes de l'interface ont leur propre section « Icônes de l'interface » (style plat, pas de réalisme : elles s'affichent à 24 px). Seuls les pictogrammes fonctionnels (menu, son, muet, ajouter, info) restent en SVG.
 
 Les designs sont volontairement originaux : aucune silhouette, aucun nom ni aucun style reconnaissable d'une franchise existante. Aucune garantie juridique n'est possible, mais ne garde pas une image qui rappelle clairement une œuvre connue : régénère-la.
 
@@ -27,7 +27,7 @@ Photorealistic, ultra detailed, documentary realism, realistic materials (brushe
 Completely original design, not resembling any existing film, series, game, comic or franchise. Realistic industrial engineering look: modular cylindrical and boxy sections like orbital stations and cargo freighters, exposed truss frames, large radiator panels, fuel tanks, mast antennas, asymmetrical layouts, weathered muted colors (rust, ochre, teal, olive, off-white). Avoid wedge-shaped or triangular hulls, avoid symmetrical twin-fin or X-shaped fighters, avoid white plastic armor with black visors, avoid robes, capes and glowing swords, avoid glowing red or green laser bolts, avoid any recognizable logo or emblem.
 ```
 
-## Bloc FOND MAGENTA (objets seulement : vaisseau-, batiment-, role-, bonus-)
+## Bloc FOND MAGENTA (objets seulement : vaisseau-, batiment-, role-, bonus-, icone-)
 
 ```
 The subject is isolated on a perfectly flat, uniform, solid pure magenta background (hex #FF00FF, RGB 255 0 255) that fills the whole image up to the edges: no gradient, no vignette, no blur, no noise, no texture, no floor, no cast shadow, no reflection, no glow or atmosphere around the subject. The subject is centered and fully inside the frame with a clear margin on every side, with crisp sharp edges. The subject itself contains no magenta, pink or purple tones. Square image, 1:1.
@@ -180,3 +180,38 @@ Photorealistic macro photograph of a physical metal badge, ultra detailed, reali
 | `logo-pirates` | `A circular badge with a hammered brass rim and dark iron face, two bold crossed diagonal bars forming a large X in the center, rust-red enamel inlay in the bars, rivets and scratches, worn and scavenged look.` |
 | `logo-empire` | `A hexagonal badge with a brushed silver rim and a polished blue-steel face, a solid raised equilateral triangle in the center with its apex up, fine concentric engraved lines, cold blue enamel, clean and disciplined look.` |
 | `logo-rebellion` | `A diamond-shaped badge (a square rotated by 45 degrees) with a worn bronze rim and forest-green enamel face, a round raised dot in the center, slightly uneven hand-hammered and improvised look, a few rivets.` |
+
+## Icônes de l'interface : `icone-<clé>`
+
+24 icônes affichées à 24 px dans la barre du haut, les titres, le menu et les panneaux. Un style photo-réaliste y serait illisible : pour ces images, remplace le bloc STYLE et le bloc DESIGN ORIGINAL par le bloc ICÔNE ci-dessous, puis ajoute le bloc FOND MAGENTA et le prompt. Le script les met en 128 px dans `img/icone/<clé>.png`. Les images absentes ne cassent rien : le jeu garde l'icône SVG.
+
+```
+Flat vector-style video game interface icon, not photorealistic: bold simple shapes, thick clean dark navy outlines, two to four flat saturated colors with a single small light highlight, no gradients, no texture, no shadow, no text, no letters, no logo. One single centered object with a very simple silhouette and large shapes, designed to stay instantly readable when shrunk to 24 pixels, high contrast, no fine details. Completely original design. Avoid magenta, pink and purple tones.
+```
+
+| Fichier | Prompt |
+|---|---|
+| `icone-credits` | `A stack of three thick golden coins seen slightly from the side, the top coin showing a plain ring in relief.` |
+| `icone-revenu` | `One thick golden coin with a bold green arrow rising from behind it and pointing up and to the right.` |
+| `icone-planetes` | `A round planet with teal oceans and green continents and one thin tilted ring around it.` |
+| `icone-fusee` | `A small spaceship flying diagonally toward the upper right, a short orange flame trail behind it and two short speed lines.` |
+| `icone-carte` | `A folded star chart, three panels, with a dotted orange route line across it ending in a small round marker.` |
+| `icone-persos` | `Two head-and-shoulders human busts side by side, one slightly in front of the other, plain faces without details.` |
+| `icone-classement` | `A three-step winner podium in three shades of blue-grey, a gold star floating above the tallest middle step.` |
+| `icone-mission` | `A bold orange flag on a short pole planted on a small round mound.` |
+| `icone-bouclier` | `A classic heater-shaped shield in steel blue with a lighter rim and one bold central vertical band.` |
+| `icone-canon` | `A short stubby cannon on a round base, barrel pointing to the upper right with a small yellow muzzle flash.` |
+| `icone-revolte` | `A raised clenched fist in strong red-orange, seen from the front, with simple thick fingers.` |
+| `icone-force` | `A flexed muscular arm showing the biceps, skin tone in warm tan, seen from the side.` |
+| `icone-endurance` | `A bold strong red heart with a small white pulse line across it.` |
+| `icone-diplomatie` | `A golden balance scale with two small round pans hanging level from a horizontal beam on a central post.` |
+| `icone-emplacements` | `A two-by-two grid of square building plots on a dark tile, three plots empty and flat, one holding a small yellow building.` |
+| `icone-construire` | `A hammer and a wrench crossed in an X, steel grey heads and orange handles.` |
+| `icone-ancre` | `A classic ship anchor in steel blue with a round ring on top and a curved double hook at the bottom.` |
+| `icone-route` | `A short dotted path curving from a small round start dot to a bold green arrowhead pointing right.` |
+| `icone-actions` | `A single bold yellow lightning bolt.` |
+| `icone-quartier` | `A compact command building with a flat roof, a small satellite dish and a short antenna on top, a lit window row, in blue-grey tones.` |
+| `icone-journal` | `A closed notebook seen from the front with a ribbon bookmark hanging out of the bottom, plain cover with two horizontal lines.` |
+| `icone-trophee` | `A golden trophy cup with two curved handles on a small base.` |
+| `icone-connexion` | `An open doorway in a wall with a bold green arrow pointing into it from the left.` |
+| `icone-inscription` | `A head-and-shoulders human bust with a small round green badge showing a bold white plus sign at its lower right.` |

@@ -987,3 +987,11 @@
     display: inline-flex;
     align-items: center;
 }
+
+.icone--image {
+    display: inline-block;
+    flex: none;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
