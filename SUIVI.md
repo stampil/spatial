@@ -8,6 +8,10 @@ Ta phrase : « genere des sprites les vaisseaux doivent avoir leur propre look p
 
 Compris : je ne génère pas d'images moi-même ; comme pour les premières, je rédige les prompts Gemini (fond magenta uni, design original, pas de ressemblance avec des licences existantes), un par un dans le chat, et je traite les images que tu génères (détourage). 7 types de vaisseaux × 3 camps = 21 images, rangées par camp. Pirates : bricolés, rafistolés de pièces disparates. Rébellion : vieux vaisseaux usés. Empire : lignes propres, un même langage de design pour toute la gamme. Photoréaliste de science-fiction. Voir Q1.
 
+### 1bis. Aperçu des vaisseaux à l'inscription (26/11)
+
+Ta phrase : « limite atteinte, traite les image deja recu, a l'iscription dans le choix des camps, pour chaque camps met le vaisseau de debarquement avec la troupe a coté pour qu'on choisisse aussi ledesign que l'on souhaite jouer ». Compris : sur la page d'inscription, chaque carte de camp jouable (Empire, Rébellion ; les Pirates restent une IA) affiche la barge de débarquement et le soldat de ce camp côte à côte, pour choisir aussi le design. Le soldat impérial n'est pas encore généré : en attendant, l'image générique s'affiche à sa place.
+
 ### 2. Tuto : mécaniques non encore couvertes (26/11)
 
 Ta phrase : « Faitbun tuto complet avec toutes les mecanique, assassinat etc... ». Le tuto couvre maintenant : diplomatie, usine, reconnaissance, exploration dans l'inconnu, préparation (frégate, troupes, chasseurs, académie), flotte, ordre depuis la vue Flottes, assaut, occupation, assassin, icônes du haut. Il ne couvre pas encore : la menace pirate (combattre ou laisser faire), le héros, la démolition et les bonus de planète.
