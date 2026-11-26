@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Usage: detourer-magenta.py <folder of generated images> [game img folder].
 Names and prompts: tools/prompts-images.md. An icone- image is turned into a white mask whose grey tone becomes partial transparency. A name like vaisseau-pirates-chasseur goes to img/vaisseau/pirates/chasseur.png."""
+import importlib.util
 import os
 import sys
 
@@ -81,9 +82,28 @@ def cadrer(image, cote):
     return carre
 
 
+def charger_raccord():
+    spec = importlib.util.spec_from_file_location('raccorder_planete', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'raccorder-planete.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def traiter(chemin, nom, destination):
     base = nom.rsplit('.', 1)[0]
     dossier, _, cle = base.partition('-')
+    if dossier == 'planete' and cle.isdigit():
+        raccord = charger_raccord()
+        image = raccord.raccorder(Image.open(chemin))
+        rapport = raccord.rapport_couture(image)
+        if rapport > raccord.SEUIL_COUTURE:
+            print('  ignoré %s : la couture reste visible (rapport %.2f)' % (nom, rapport))
+            return False
+        sortie = os.path.join(destination, 'planete', cle + '.jpg')
+        os.makedirs(os.path.dirname(sortie), exist_ok=True)
+        image.save(sortie, quality=raccord.QUALITE_JPEG)
+        print('  %s -> %s (couture %.2f)' % (nom, sortie, rapport))
+        return True
     if dossier in OBJETS and cle != '':
         image = detourer(Image.open(chemin))
         if image is None:

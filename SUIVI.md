@@ -22,7 +22,17 @@ Précision du 26/11 : « il fau sassurer que sa fasse pas un trait au defilement
 
 Ce que je comprends : je fais un outil de raccord (\`tools/raccorder-planete.py\`) qui fond la fin de l'image dans son début sur une bande, pour que le dernier pixel se prolonge naturellement dans le premier ; il tourne automatiquement à l'import de chaque nouvelle texture, et je vérifie ensuite par la mesure que la couture n'est plus plus marquée qu'entre deux colonnes voisines. Aucune texture ne sera importée sans raccord vérifié.
 
+### 3. Pluriels en dur « planétaire(s) · orbital(aux) » (26/11)
+
+Ta phrase : « er planétaire(s) · 0 canon orbital(aux) putain d'enculer de merde __(à » (la fiche de planète affiche « 1 bouclier planétaire(s) · 0 canon orbital(aux) » au lieu d'accorder les mots avec \`__()\`).
+
+Lu (rien codé) : la ligne \`model/affichePlanete.php:60\` accorde « bouclier » et « canon » avec \`__()\` mais écrit « planétaire(s) » et « orbital(aux) » à la main : c'est contraire à ta règle, les pluriels passent tous par \`__($cle, $clePluriel, $nombre)\`. J'ai cherché dans tout le code ce motif (\`(s)\`, \`(aux)\`, \`(x)\`) : cette ligne est la seule.
+
+Ce que je comprends : j'ajoute les mots complets dans \`inc/lang.fr.php\` (« bouclier planétaire » / « boucliers planétaires », « canon orbital » / « canons orbitaux ») et la ligne les utilise, pour afficher « 1 bouclier planétaire · 0 canon orbital » ou « 2 boucliers planétaires · 3 canons orbitaux » sans parenthèses.
+
 ## Questions en suspens
+
+0. Go pour corriger cette ligne ?
 
 1. Combien : ta précision du 26/11, « fait des tellurique » : uniquement des planètes telluriques (rocheuses, à surface solide), pas de géantes gazeuses. 12 nouvelles textures (38 au total) : monde océan, dunes dorées, jungle dense, archipel, toundra, canyons rouges, plaines de sel, volcanique sombre, cendres et fissures, minéral violet, minéral vert, cratères sombres. Je recommande ces 12.
 2. Le choix de la texture se fait par l'identifiant de la planète : avec plus d'images, les planètes existantes changeront d'aspect (l'univers est reconstruit à chaque remise à zéro de toute façon). Je recommande d'accepter ce changement.

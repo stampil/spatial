@@ -287,3 +287,24 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 | `evenement-rien` | `Wide 16:9 cinematic scene of a small reconnaissance spacecraft (a long thin sensor boom with a dish, two solar panel wings, a small cylindrical body) drifting alone in an empty dark region of deep space, only faint distant stars and a thin cloud of cosmic dust around it, its dish pointed at nothing, a single thin scanner beam fading into the darkness, cold blue light, the craft in the horizontal middle band.` |
 | `evenement-perdu` | `Wide 16:9 cinematic scene of a lost reconnaissance spacecraft: a small wrecked craft tumbling beside a jagged asteroid field, one solar panel torn off, its sensor dish bent and broken, sparks and venting gas, a faint red distress light blinking on its hull, deep dark space, the craft in the horizontal middle band.` |
 | `evenement-analyse` | `Wide 16:9 cinematic scene of a planet being analyzed: a small reconnaissance spacecraft in high orbit above the night side of a planet, projecting a thin green-blue grid beam onto it, the planet surface showing scattered city lights, a few orbital defense platforms and small warships in orbit each outlined by thin light brackets, the action in the horizontal middle band.` |
+
+## Textures de planètes telluriques : `planete-<n>` (2:1, raccord automatique)
+
+12 nouvelles textures de surface (27 à 38) : projection plane 2:1 d'un monde rocheux entier, sans sphère ni halo ni étoiles. Joindre dans Gemini l'image de référence indiquée (un fichier de `img/planete/`) et coller le prompt. Le script `tools/detourer-magenta.py` raccorde le bord gauche au bord droit (fondu) pour que le défilement n'ait aucune couture, puis range le résultat dans `img/planete/<n>.jpg`.
+
+Début de chaque prompt (bloc TEXTURE) : `Flat equirectangular surface texture map of an entire rocky planet, exact 2:1 aspect ratio, seen straight on as a flat rectangular map with no sphere, no curvature, no atmosphere glow, no stars, no clouds shadow, no text, no labels, no grid lines. Same flat, realistic satellite-map look and level of detail as the attached reference image.`
+
+| Fichier | Référence à joindre | Prompt (après le bloc TEXTURE) |
+|---|---|---|
+| `planete-27` | `13.jpg` | `A deep blue ocean world: a global dark-blue ocean with a few small scattered green and brown islands and thin white cloud swirls, subtle lighter shallow-water rings around the islands.` |
+| `planete-28` | `22.jpg` | `A golden desert world: huge sweeping dunes in ochre and gold with long wind-carved ridges, dark rocky outcrops, and a few pale dry salt basins, no water.` |
+| `planete-29` | `19.jpg` | `A dense jungle world: continents covered in deep green forest canopy with darker river valleys, small blue lakes, brown mountain ranges and thin white mist, surrounded by a dark teal ocean.` |
+| `planete-30` | `13.jpg` | `An archipelago world: hundreds of small and medium green and sand-colored islands grouped in chains over a bright turquoise and deep blue shallow sea, a few white cloud bands.` |
+| `planete-31` | `15.jpg` | `A tundra world: grey-brown frozen plains with pale green moss patches, white snow-covered mountain ranges, frozen lakes and long glacial rivers, a thin white polar cap at top and bottom.` |
+| `planete-32` | `25.jpg` | `A red canyon world: a vast network of deep rust-red and orange canyons and mesas, layered sandstone cliffs with pale strata, a few dark dust fans, no water.` |
+| `planete-33` | `26.jpg` | `A salt flat world: enormous pale white and cream salt plains with cracked polygon patterns, a few turquoise mineral lakes and brown rocky ridges.` |
+| `planete-34` | `17.jpg` | `A dark volcanic world: black basalt plains crossed by networks of glowing orange lava rivers, several large dark volcano calderas with red rims, scattered grey ash plumes.` |
+| `planete-35` | `24.jpg` | `An ash and fissure world: charcoal grey and dark brown ash plains split by long pale cracks and rifts, scattered rust-colored rocky patches and a few pale dust streaks.` |
+| `planete-36` | `21.jpg` | `A violet mineral world: purple, magenta and deep blue crystalline rock plains with lighter lilac ridges and veins, glittering mineral deposits, no vegetation, no water.` |
+| `planete-37` | `19.jpg` | `A green mineral world: emerald and olive green copper-oxide rock plains with teal veins, lighter green ridges, dark crater fields and yellow sulfur patches, no vegetation, no water.` |
+| `planete-38` | `10.jpg` | `A dark cratered world: charcoal and dark brown rock covered in overlapping impact craters of all sizes, bright fresh-ejecta rays around the youngest craters, subtle grey dust plains, no atmosphere.` |
