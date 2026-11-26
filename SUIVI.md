@@ -23,7 +23,7 @@ Tes phrases : « sa affiche erreur 404 pour le btn diplomatie », « 404 sur err
 
 Cause trouvée (ma faute, rien codé) : `js/main.js` poste vers `formulaire.action`. Quand le formulaire contient un champ nommé `action`, le navigateur renvoie ce champ (un `<input>`) au lieu de l'adresse : l'adresse devient `[object HTMLInputElement]`, l'hébergeur la redirige vers `/errors/404/`. Vérifié dans le code : 9 formulaires ont un champ `name="action"` : diplomatie (conquête, apaiser), embarquer, descendre (`affichePerso.php`), combattre, laisser, dissoudre (`listeVaisseau.php`), attaquer, débarquer (`affichePlanete.php`). Tous échouent en ajax depuis que j'ai introduit l'ajax ; les formulaires sans ce champ (construire, produire…) marchent.
 
-Proposition (rien codé) : poster vers `formulaire.getAttribute('action')` (l'attribut écrit dans le HTML, résolu par le navigateur). Une seule ligne de `js/main.js`.
+Codé (à valider, non publié) : `js/main.js` poste vers `formulaire.getAttribute('action')`. Testé en navigateur sur le formulaire de diplomatie : le POST part vers `?p=faireDiplomatie`, la diplomatie démarre (« En mission », compte à rebours), aucune erreur.
 
 ## Questions en suspens
 

@@ -211,7 +211,7 @@ $(function(){
         $(formulaire).data('principal', principal);
         $(formulaire).find(':submit').not(principal).prop('disabled', true);
         window.Occupation.demarrer(principal);
-        window.Requete.demander(formulaire.action, {method: 'POST', body: corps, credentials: 'same-origin'}).then(function() {
+        window.Requete.demander(formulaire.getAttribute('action'), {method: 'POST', body: corps, credentials: 'same-origin'}).then(function() {
             return rafraichirApresAction();
         }).then(function(cause) {
             if (cause !== null) {
