@@ -51,7 +51,7 @@ foreach($systeme->planetes as $p){
             <?php if($p->bonus !== null){ echo Vue::pastille(Bonus::libelle($p->bonus), 'ok'); } ?>
         </div>
         <?php if(count($stock) > 0 || count($flottes) > 0){ ?>
-        <?php if(count($stock) > 0){ echo Vue::composition($stock); } ?>
+        <?php if(count($stock) > 0){ echo Vue::composition($stock, $Joueur->id_camp); } ?>
         <?php foreach($flottes as $flotte){ ?>
         <p class="md3-secondary">Flotte <?= htmlspecialchars($flotte->nom) ?> : <?= array_sum($flotte->composition()) ?> <?= __('vaisseau', 'vaisseaux', array_sum($flotte->composition())) ?></p>
         <?php } ?>

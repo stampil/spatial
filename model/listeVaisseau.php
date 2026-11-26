@@ -41,7 +41,7 @@ foreach($flottes as $ligne){
 ?>
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html('persos') ?>Flotte <?= htmlspecialchars($flotte->nom) ?></h2>
-    <?= Vue::composition($flotte->composition()) ?>
+    <?= Vue::composition($flotte->composition(), $Joueur->id_camp) ?>
     <?php if($auRepos !== null){ $planete = new Planete($auRepos); ?>
     <p>Au repos sur <?= $planete->getNom() ?></p>
     <div class="md3-actions">
@@ -82,7 +82,7 @@ foreach($planetesAvecUnites as $planeteId){
 ?>
 <section class="panneau" id="planete-<?= $planete->id ?>">
     <h2 class="panneau__titre"><?= Icone::html('ancre') ?><?= $planete->getNom() ?></h2>
-    <?= Vue::composition($types) ?>
+    <?= Vue::composition($types, $Joueur->id_camp) ?>
     <?php if(($types[Vaisseau::TRANSPORT_PERSO] ?? 0) > 0){ ?>
     <?php
     $embarques = array();

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Usage: detourer-magenta.py <folder of generated images> [game img folder].
-Names and prompts: tools/prompts-images.md."""
+Names and prompts: tools/prompts-images.md. A name like vaisseau-pirates-chasseur goes to img/vaisseau/pirates/chasseur.png."""
 import os
 import sys
 
@@ -75,7 +75,7 @@ def traiter(chemin, nom, destination):
         if image is None:
             print('  ignoré %s : le fond n\'est pas un magenta uni dans les 4 coins' % nom)
             return False
-        sortie = os.path.join(destination, dossier, cle + '.png')
+        sortie = os.path.join(destination, dossier, *cle.split('-', 1)) + '.png'
         os.makedirs(os.path.dirname(sortie), exist_ok=True)
         cadrer(image, COTE_LOGO if dossier == 'logo' else COTE_OBJET).save(sortie, optimize=True)
         print('  %s -> %s' % (nom, sortie))

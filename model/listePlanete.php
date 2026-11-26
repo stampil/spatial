@@ -35,7 +35,7 @@ foreach($gouvernees as $ligne){
         <?php foreach($file as $ligneFile){ ?>
         <?= Vue::progression(Vaisseau::CATALOGUE[$ligneFile['type']]['nom'].' · '.$ligneFile['restants'].' '.__('restant', 'restants', $ligneFile['restants']), strtotime($ligneFile['fin']) - time(), $Joueur->dureeEffective(Vaisseau::CATALOGUE[$ligneFile['type']]['duree']), Vaisseau::CATALOGUE[$ligneFile['type']]['icone']) ?>
         <?php } ?>
-        <?php if(count($stock) > 0){ echo Vue::composition($stock); } ?>
+        <?php if(count($stock) > 0){ echo Vue::composition($stock, $Joueur->id_camp); } ?>
     </section>
 <?php } ?>
 </div>

@@ -87,7 +87,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
     <?php foreach($types as $type){ $infos = Vaisseau::CATALOGUE[$type]; ?>
     <div class="ligne-jeu">
         <div class="ligne-jeu__info">
-            <?= Vue::visuel('vaisseau', $type, $infos['icone']) ?>
+            <?= Vue::visuelVaisseau($type, $Joueur->id_camp) ?>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $stock[$type] ?? 0 ?> en stock<br>
                 <span class="md3-secondary"><?= $Joueur->prixVaisseau($type) ?> cr · <?= gmdate('i:s', $Joueur->dureeEffective($infos['duree'])) ?></span>

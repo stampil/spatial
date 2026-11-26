@@ -30,6 +30,16 @@ class Vue {
         return Icone::html($iconeSecours);
     }
 
+    public static function visuelVaisseau(string $type, ?int $idCamp): string {
+        if($idCamp !== null && isset(Camp::VISUELS[$idCamp])){
+            $chemin = self::DOSSIER_IMAGES.'/vaisseau/'.Camp::VISUELS[$idCamp].'/'.$type.'.'.self::EXTENSION_OBJET;
+            if(is_file($chemin)){
+                return '<span class="visuel visuel--image" style="background-image:url('.$chemin.')" aria-hidden="true"></span>';
+            }
+        }
+        return self::visuel('vaisseau', $type, Vaisseau::CATALOGUE[$type]['icone']);
+    }
+
     public static function banniereCamp(?int $idCamp): string {
         if($idCamp === null || !isset(Camp::VISUELS[$idCamp])){
             return '';
@@ -79,10 +89,10 @@ class Vue {
         return '<span class="pastille'.($variante === '' ? '' : ' pastille--'.$variante).'">'.htmlspecialchars($texte).'</span>';
     }
 
-    public static function composition(array $nombres): string {
+    public static function composition(array $nombres, ?int $idCamp = null): string {
         $html = '<div class="composition">';
         foreach($nombres as $type => $nombre){
-            $html .= '<span class="composition__element">'.self::visuel('vaisseau', $type, Vaisseau::CATALOGUE[$type]['icone']).$nombre.' × '.htmlspecialchars(Vaisseau::CATALOGUE[$type]['nom']).'</span>';
+            $html .= '<span class="composition__element">'.self::visuelVaisseau($type, $idCamp).$nombre.' × '.htmlspecialchars(Vaisseau::CATALOGUE[$type]['nom']).'</span>';
         }
         return $html.'</div>';
     }
