@@ -14,8 +14,12 @@ La fenêtre d'information existe (`Tools::addInfo`, `inc/info.php`), mais sans i
 
 Ce que je comprends : chacun des trois moments ouvre une fenêtre avec une grande illustration, un titre, deux lignes de texte et l'emblème et le nom du clan concerné (Empire, Rébellion ou Pirates, quel que soit le clan du joueur), en plus de la ligne de journal.
 
+Précisions du 26/11 : « Go, recommandé », puis « non reconquise alors » (en réponse à ma question sur « conquise »).
+
+Ce que je comprends de ta précision : pas d'événement quand un autre joueur prend une de tes planètes (donc pas besoin de prévenir un joueur absent : tout se passe dans ta propre session). Et l'événement de conquête par la force s'appelle « reconquise », pas « conquise ».
+
 ## Questions en suspens
 
-1. Illustrations : 3 images à générer avec toi (rejoint, révolte, conquise), les mêmes pour tous les clans, le clan étant rappelé par son emblème et son nom dans la fenêtre. Je recommande 3 images plutôt que 9 (une par clan).
-2. « Conquise » : par la force par toi (débarquement réussi), comme je le comprends ; et aussi quand un autre joueur te prend une de tes planètes ? Je recommande de couvrir les deux, avec un texte adapté.
-3. « Se révolte » : la fenêtre s'ouvre à ta prochaine page chargée après le passage à 100 %, comme les autres messages différés. Je recommande oui.
+1. « Reconquise » : je le comprends comme la planète qui était à toi (révoltée ou perdue) et que tu reprends par la force. Pour que le jeu sache qu'elle était à toi, il faut mémoriser le dernier gouverneur d'une planète devenue neutre (une colonne de plus, migration 025). Une conquête par la force d'une planète qui n'a jamais été à toi (un pirate, une planète neutre) n'a alors pas d'événement illustré. C'est bien cela ? Sinon, dis-moi : « reconquise » désigne-t-il toute conquête par la force ?
+2. Illustrations : 3 images à générer avec toi (rejoint, révolte, reconquise), les mêmes pour tous les clans, le clan étant rappelé par son emblème et son nom. Je recommande 3 images.
+3. « Se révolte » : la fenêtre s'ouvre à ta prochaine page chargée après le passage à 100 %. Je recommande oui.
