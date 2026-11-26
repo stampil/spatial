@@ -57,6 +57,7 @@
     const feuilleCorps = document.getElementById('carte-feuille-corps');
     const bandeau = document.getElementById('carte-bandeau');
     const bandeauTexte = document.getElementById('carte-bandeau-texte');
+    const bandeauSuite = document.getElementById('carte-bandeau-suite');
     const boutonTrajets = document.getElementById('carte-trajets');
 
     const systemes = {};
@@ -141,6 +142,8 @@
             window.Occupation.liberer(declencheur);
             document.dispatchEvent(new Event('sante-verifier'));
             bandeauTexte.textContent = MESSAGE_ECHEC_ENVOI_AVANT + erreur.message + MESSAGE_ECHEC_ENVOI_APRES;
+            bandeau.classList.add('carte__bandeau--erreur');
+            bandeauSuite.hidden = true;
         });
     }
 
@@ -407,7 +410,9 @@
     function commencerOrdre(nouvelOrdre) {
         ordre = nouvelOrdre;
         fermerFeuille();
-        bandeauTexte.textContent = ordre.libelle + ' : touchez le système de destination.';
+        bandeauTexte.textContent = ordre.libelle;
+        bandeauSuite.hidden = false;
+        bandeau.classList.remove('carte__bandeau--erreur');
         bandeau.hidden = false;
     }
 

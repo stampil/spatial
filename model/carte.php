@@ -8,10 +8,10 @@
     </div>
     <button type="button" class="carte__trajets" id="carte-trajets" hidden></button>
     <div class="carte__bandeau" id="carte-bandeau" hidden role="status">
-        <span id="carte-bandeau-texte"></span>
-        <span class="md3-actions">
-            <button type="button" class="md3-button md3-button--outlined" id="carte-annuler">Annuler</button>
-        </span>
+        <span class="carte__bandeau-texte" id="carte-bandeau-texte"></span>
+        <span class="carte__bandeau-suite" id="carte-bandeau-suite">: choisir le système</span>
+        <span aria-hidden="true">·</span>
+        <button type="button" class="carte__lien" id="carte-annuler">Annuler</button>
     </div>
     <aside class="carte__feuille" id="carte-feuille" hidden role="dialog" aria-labelledby="carte-feuille-titre">
         <div class="carte__poignee" aria-hidden="true"></div>
