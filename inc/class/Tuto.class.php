@@ -14,10 +14,13 @@ class Tuto {
     const ETAPE_BONUS = 11;
     const ETAPE_DEMOLITION = 12;
     const ETAPE_MENACE = 13;
+    const ETAPE_RESTRICTOR = 14;
     const ETAPES_A_VALIDER = array(self::ETAPE_BONUS, self::ETAPE_DEMOLITION);
     const PRIME_HEROS = 350;
     const PRIME_CREDITS = 800;
     const PRIME_ASSASSIN = 250;
+    const PRIME_RESTRICTOR = 1000;
+    const FLOTTE_REDUITE = 5;
     const CHASSEURS_REQUIS = 3;
     const TROUPES_REQUISES = 3;
     const FREGATES_REQUISES = 1;
@@ -49,6 +52,25 @@ class Tuto {
         $joueur->load($joueur->id);
     }
 
+    private static function planeteFlotteReduite(Joueur $joueur): ?Planete {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id_camp=? AND gouverneur=0 ORDER BY id LIMIT 1";
+        $ligne = MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin,Camp::PIRATES)[0] ?? null;
+        if($ligne === null){
+            $idPlanete = Planete::premiereGouvernee($joueur->id);
+            $ligne = $idPlanete === null ? null : Ia::sourceLaPlusProche($joueur, new Planete($idPlanete), array(Camp::PIRATES));
+        }
+        return $ligne === null ? null : new Planete($ligne->id);
+    }
+
+    private static function lancerFlotteReduite(Joueur $joueur): void {
+        $cible = self::planeteFlotteReduite($joueur);
+        if($cible === null){
+            return;
+        }
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "planete SET flotte_ia=?, defense_maj=COALESCE(defense_maj, ?) WHERE id=?",self::FLOTTE_REDUITE,Tools::now(),$cible->id);
+        Decouverte::ajouter($joueur->id, $cible->id_systeme);
+    }
+
     private static function lancerMenace(Joueur $joueur): void {
         $idPlanete = Planete::premiereGouvernee($joueur->id);
         if($idPlanete === null){
@@ -72,6 +94,11 @@ class Tuto {
         }
         elseif($etape === self::ETAPE_MENACE){
             self::lancerMenace($joueur);
+        }
+        elseif($etape === self::ETAPE_RESTRICTOR){
+            $joueur->crediter(self::PRIME_RESTRICTOR);
+            self::lancerFlotteReduite($joueur);
+            Tools::addMessage('Tutoriel : prime de '.self::PRIME_RESTRICTOR.' crédits pour une usine lourde et un Restrictor.');
         }
         elseif($etape === self::ETAPE_ASSASSIN){
             $joueur->crediter(self::PRIME_ASSASSIN);
@@ -106,6 +133,8 @@ class Tuto {
                 return self::possedePerso($joueur, Perso::ROLE_HEROS);
             case self::ETAPE_MENACE:
                 return Menace::enCours($joueur->id) === null;
+            case self::ETAPE_RESTRICTOR:
+                return (int) $db->query("SELECT tuto_aneantie FROM " . MyPDO::DB_FLAG . "joueur WHERE id=?",$joueur->id)[0]->tuto_aneantie === 1;
             case self::ETAPE_PREPARATION:
                 $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? GROUP BY type";
                 return self::atteint($db->query($query,$joueur->id), self::requis());
@@ -172,6 +201,8 @@ class Tuto {
                 return 'Démolir un bâtiment';
             case self::ETAPE_MENACE:
                 return 'Répondre à une menace pirate';
+            case self::ETAPE_RESTRICTOR:
+                return 'Anéantir une flotte avec un Restrictor';
         }
         return '';
     }
@@ -206,7 +237,10 @@ class Tuto {
             case self::ETAPE_DEMOLITION:
                 return 'Sur la fiche d\'une de vos planètes, « Démolir » supprime un bâtiment et rembourse '.Batiment::REFUND_PERCENT.' % de son prix : l\'emplacement redevient libre. C\'est impossible tant qu\'une production occupe toutes les usines de ce type. Quand vous avez compris, validez.';
             case self::ETAPE_MENACE:
-                return 'Une flotte pirate menace '.$planete->getNom().'. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : « Combattre » l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; « Laisser » laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour terminer le tutoriel.';
+                return 'Une flotte pirate menace '.$planete->getNom().'. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : « Combattre » l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; « Laisser » laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour continuer.';
+            case self::ETAPE_RESTRICTOR:
+                $cible = self::planeteFlotteReduite($joueur);
+                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' chasseurs) est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue qui a perdu l\'essentiel de ses vaisseaux s\'enfuit vers la planète alliée ou neutre la plus proche. Le Restrictor l\'en empêche : tant qu\'il vit dans votre flotte, l\'ennemi ne peut pas fuir. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr), regroupez-le avec votre frégate dans une flotte (embarquez-y vos chasseurs : ils protègent vos grands vaisseaux, car les chasseurs ennemis frappent doublement les capitaux), puis voyagez vers cette planète : l\'arrivée déclenche le combat, « Résoudre » le joue.';
         }
         return '';
     }

@@ -27,10 +27,12 @@
         const journal = dialogue.querySelector('.rapport__journal');
         const bilan = dialogue.querySelector('.rapport__bilan');
         const passer = dialogue.querySelector('.rapport__passer');
+        const resoudre = dialogue.querySelector('.rapport__resoudre');
         const fermer = dialogue.querySelector('.rapport__fermer');
         const barres = {};
         const minuteurs = [];
         let termine = false;
+        let demarre = false;
 
         rapport.barres.forEach((barre) => {
             const remplissage = creer('div', 'rapport__remplissage rapport__remplissage--' + barre.cle);
@@ -82,9 +84,29 @@
             jouer(indice + 1);
         }
 
+        function demarrer() {
+            if (demarre) {
+                return;
+            }
+            demarre = true;
+            resoudre.hidden = true;
+            passer.hidden = false;
+            passer.focus();
+            if (mouvementReduit) {
+                conclure();
+                return;
+            }
+            rapport.etapes.forEach((etape, position) => {
+                minuteurs.push(setTimeout(() => montrerEtape(etape), DELAI_ETAPE * (position + 1)));
+            });
+            minuteurs.push(setTimeout(conclure, DELAI_ETAPE * (rapport.etapes.length + 1)));
+        }
+
         function surTouche(evenement) {
             if (evenement.key === TOUCHE_ECHAP) {
-                if (termine) {
+                if (!demarre) {
+                    demarrer();
+                } else if (termine) {
                     fermerDialogue();
                 } else {
                     conclure();
@@ -92,21 +114,13 @@
             }
         }
 
+        resoudre.addEventListener('click', demarrer);
         passer.addEventListener('click', conclure);
         fermer.addEventListener('click', fermerDialogue);
         document.addEventListener('keydown', surTouche);
         dialogue.hidden = false;
         document.body.classList.add('md3-dialog-ouvert');
-        passer.focus();
-
-        if (mouvementReduit) {
-            conclure();
-            return;
-        }
-        rapport.etapes.forEach((etape, position) => {
-            minuteurs.push(setTimeout(() => montrerEtape(etape), DELAI_ETAPE * (position + 1)));
-        });
-        minuteurs.push(setTimeout(conclure, DELAI_ETAPE * (rapport.etapes.length + 1)));
+        resoudre.focus();
     }
 
     function lancer() {

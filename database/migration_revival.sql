@@ -28,7 +28,8 @@ ALTER TABLE `joueur`
   ADD COLUMN `id_systeme_voisin` int(11) DEFAULT NULL AFTER `id_camp`,
   ADD COLUMN `fin_tuto` datetime DEFAULT NULL AFTER `id_systeme_voisin`,
   ADD COLUMN `raid_maj` datetime DEFAULT NULL AFTER `fin_tuto`,
-  ADD COLUMN `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0' AFTER `raid_maj`;
+  ADD COLUMN `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0' AFTER `raid_maj`,
+  ADD COLUMN `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0' AFTER `aide_icones_masquee`;
 
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -147,7 +148,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('018_vaisseaux_nommes_embarques'),
 ('019_aide_icones_masquee'),
 ('020_flotte_numero'),
-('021_flotte_ia');
+('021_flotte_ia'),
+('022_tuto_restrictor');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

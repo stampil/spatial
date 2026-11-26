@@ -1,12 +1,14 @@
 <div class="md3-dialog" role="dialog" aria-modal="true" aria-label="<?= htmlspecialchars($rapport['titre']) ?>" hidden>
     <div class="md3-dialog__fenetre">
-        <?= Vue::bandeau('combat') ?>
+        <?php $illustration = $rapport['illustration'] ?? Combat::ILLUSTRATION_SPATIALE; ?>
+        <?= Vue::bandeau(is_file(Vue::DOSSIER_IMAGES.'/'.$illustration.'.'.Vue::EXTENSION_FOND) ? $illustration : Combat::ILLUSTRATION_SPATIALE) ?>
         <h2><?= htmlspecialchars($rapport['titre']) ?></h2>
         <div class="rapport__barres"></div>
         <ol class="rapport__journal" aria-live="polite"></ol>
         <p class="rapport__bilan" hidden></p>
         <div class="md3-actions">
-            <button type="button" class="md3-button md3-button--outlined rapport__passer">Passer</button>
+            <button type="button" class="md3-button rapport__resoudre">Résoudre</button>
+            <button type="button" class="md3-button md3-button--outlined rapport__passer" hidden>Passer</button>
             <button type="button" class="md3-button rapport__fermer" hidden>Fermer</button>
         </div>
     </div>

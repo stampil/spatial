@@ -9,6 +9,7 @@ class Vaisseau {
     const CHASSEUR = 'chasseur';
     const BARGE = 'barge';
     const TROUPE = 'troupe_assaut';
+    const RESTRICTOR = 'restrictor';
     const DESTINATION_EXPLORATION = 'explorer';
     const EXPLORATION_SECONDES = 900;
     const EXPLORATION_PERTE_POURCENT = 20;
@@ -28,6 +29,7 @@ class Vaisseau {
         'fregate' => array('icone' => 'fregate', 'nom' => 'Frégate', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 120, 'duree' => 90, 'vitesse' => 100, 'force' => 15, 'troupes' => 10, 'chasseurs' => 3, 'prefixe' => 'Frégate'),
         'barge' => array('icone' => 'barge', 'nom' => 'Barge de débarquement', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 150, 'duree' => 120, 'vitesse' => 200, 'force' => 0, 'troupes' => 10, 'chasseurs' => 0, 'prefixe' => 'Barge'),
         'capital' => array('icone' => 'fusee', 'nom' => 'Vaisseau capital', 'usine' => Batiment::USINE_LOURDE, 'prix' => 400, 'duree' => 300, 'vitesse' => 150, 'force' => 50, 'troupes' => 20, 'chasseurs' => 6, 'prefixe' => 'Capital'),
+        'restrictor' => array('icone' => 'restrictor', 'nom' => 'Restrictor', 'usine' => Batiment::USINE_LOURDE, 'prix' => 500, 'duree' => 300, 'vitesse' => 120, 'force' => 20, 'troupes' => 0, 'chasseurs' => 0, 'prefixe' => 'Restrictor'),
         'troupe_assaut' => array('icone' => 'troupe', 'nom' => 'Troupe d\'assaut', 'usine' => Batiment::ACADEMIE, 'prix' => 60, 'duree' => 20, 'vitesse' => 200, 'force' => 10, 'troupes' => 0, 'chasseurs' => 0),
     );
 
@@ -287,6 +289,39 @@ class Vaisseau {
         return (int) MyPDO::getInstance()->query("SELECT COUNT(*) AS nombre" . self::TROUPES_EN_BARGE,$joueurId,$planeteId,self::TROUPE,self::BARGE)[0]->nombre;
     }
 
+    public static function fuir(Joueur $joueur, Planete $depart, Planete $refuge, ?int $flotteId): void {
+        if($flotteId !== null){
+            (new Flotte($flotteId))->deplacer($joueur, $refuge);
+            return;
+        }
+        $marques = implode(',', array_fill(0, count(Combat::ESCADRE), '?'));
+        $query = "SELECT id, type, nom FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND arrivee IS NULL AND id_flotte IS NULL AND id_hote IS NULL AND type IN ($marques)";
+        $parametres = array_merge(array($joueur->id, $depart->id), Combat::ESCADRE);
+        $chasseurs = 0;
+        foreach(MyPDO::getInstance()->query($query,...$parametres) as $ligne){
+            if(self::estNomme($ligne->type)){
+                $ligne->id = (int) $ligne->id;
+                self::envoyerNomme($joueur, $depart, $refuge, $ligne);
+            }
+            else{
+                $chasseurs++;
+            }
+        }
+        if($chasseurs > 0){
+            self::envoyerType($joueur, $depart, $refuge, self::CHASSEUR, $chasseurs);
+        }
+    }
+
+    public static function fuirTous(Joueur $joueur, Planete $depart, Planete $refuge): void {
+        foreach(Flotte::liste($joueur->id) as $ligne){
+            $flotte = new Flotte($ligne->id);
+            if($flotte->planeteAuRepos() === $depart->id){
+                $flotte->deplacer($joueur, $refuge);
+            }
+        }
+        self::fuir($joueur, $depart, $refuge, null);
+    }
+
     public static function estNomme(string $type): bool {
         return isset(self::CATALOGUE[$type][self::CLE_PREFIXE]);
     }
@@ -426,6 +461,7 @@ class Vaisseau {
 
     public static function resolveArrivees(Joueur $joueur): void {
         $db = MyPDO::getInstance();
+        $planetesArmees = array();
         $query = "SELECT id_destination, type FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND exploration=0 AND arrivee IS NOT NULL AND arrivee<=? GROUP BY id_destination, type";
         foreach($db->query($query,$joueur->id,Tools::now()) as $ligne){
             $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_planete=id_destination, id_destination=NULL, depart=NULL, arrivee=NULL WHERE id_joueur=? AND id_destination=? AND type=? AND exploration=0 AND arrivee IS NOT NULL AND arrivee<=?";
@@ -434,6 +470,9 @@ class Vaisseau {
             if($nombre > 0){
                 $planete = new Planete($ligne->id_destination);
                 Tools::addMessage($nombre.' × '.self::CATALOGUE[$ligne->type]['nom'].' : arrivée sur '.$planete->nom.'.');
+                if(in_array($ligne->type, Combat::ESCADRE, true)){
+                    $planetesArmees[$planete->id] = $planete;
+                }
                 if($ligne->type === self::RECONNAISSANCE){
                     $analyse = $planete->nom.'.';
                     if(Decouverte::ajouter($joueur->id, $planete->id_systeme)){
@@ -442,6 +481,9 @@ class Vaisseau {
                     Tools::addInfo('Planète analysée', $analyse);
                 }
             }
+        }
+        foreach($planetesArmees as $planete){
+            Combat::arrivee($joueur, new Planete($planete->id));
         }
     }
 

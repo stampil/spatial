@@ -32,7 +32,7 @@ class Univers {
         $ancre = $depart === null ? null : array($depart->x, $depart->y);
         $Systeme = new Systeme(Systeme::create(false, Systeme::positionLibre($ancre)));
         Planete::fillSystemeIA($Systeme, array(Camp::PIRATES, null), Camp::PIRATES);
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=?, troupes=? WHERE id_systeme=? ORDER BY id LIMIT 1";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=?, troupes=?, flotte_ia=0 WHERE id_systeme=? ORDER BY id LIMIT 1";
         MyPDO::getInstance()->query($query,self::TUTO_BOUCLIER,self::TUTO_CANON,self::TUTO_TROUPES,$Systeme->id);
         $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET id_systeme_voisin=? WHERE id=?";
         MyPDO::getInstance()->query($query,$Systeme->id,$joueur->id);

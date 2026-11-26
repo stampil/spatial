@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `fin_tuto` datetime DEFAULT NULL,
   `raid_maj` datetime DEFAULT NULL,
   `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0',
+  `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
@@ -296,7 +297,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('018_vaisseaux_nommes_embarques'),
 ('019_aide_icones_masquee'),
 ('020_flotte_numero'),
-('021_flotte_ia');
+('021_flotte_ia'),
+('022_tuto_restrictor');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

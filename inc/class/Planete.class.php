@@ -21,6 +21,7 @@ class Planete {
     const REGENERATION_POURCENT_PAR_HEURE = 10;
     const REGENERATION_MINIMUM_PAR_HEURE = 1;
     const FLOTTE_EMPIRE_PAR_SLOT = 1;
+    const REFUGES_CANDIDATS = 12;
     const FLOTTE_PIRATES_DIVISEUR_SLOT = 2;
     const FLOTTE_PIRATES_MINIMUM = 1;
     const TROUPES_PAR_HEURE = 1;
@@ -120,6 +121,31 @@ class Planete {
 
     public static function troupesDeBase(int $slot): int{
         return intdiv($slot, self::TROUPES_DIVISEUR_SLOT) + self::TROUPES_DE_BASE_MINIMUM;
+    }
+
+    public function refugePour(Joueur $joueur): ?Planete{
+        $query = "SELECT p.id FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "systeme s ON s.id=p.id_systeme
+            WHERE p.id<>? AND (p.gouverneur=? OR (p.gouverneur=0 AND p.id_camp IS NULL))
+            ORDER BY (s.x-?)*(s.x-?)+(s.y-?)*(s.y-?), p.id LIMIT " . self::REFUGES_CANDIDATS;
+        $x = $this->systeme->x;
+        $y = $this->systeme->y;
+        foreach($this->bdd->query($query,$this->id,$joueur->id,$x,$x,$y,$y) as $ligne){
+            $candidate = new Planete($ligne->id);
+            if($joueur->peutCibler($candidate->systeme)){
+                return $candidate;
+            }
+        }
+        return null;
+    }
+
+    public function refugeIA(): ?Planete{
+        $query = "SELECT p.id FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "systeme s ON s.id=p.id_systeme
+            WHERE p.id<>? AND p.gouverneur=0 AND p.id_camp=?
+            ORDER BY (s.x-?)*(s.x-?)+(s.y-?)*(s.y-?), p.id LIMIT 1";
+        $x = $this->systeme->x;
+        $y = $this->systeme->y;
+        $ligne = $this->bdd->query($query,$this->id,$this->id_camp,$x,$x,$y,$y)[0] ?? null;
+        return $ligne === null ? null : new Planete($ligne->id);
     }
 
     public static function flotteIADeBase(int $slot, ?int $idCamp): int{

@@ -11,11 +11,12 @@ class Menace {
     const ACTION_LAISSER = 'laisser';
 
     public static function flotte(int $slot): array {
-        return array_combine(Combat::ESCADRE, array(
-            intdiv($slot, self::CHASSEURS_DIVISEUR_SLOT) + self::CHASSEURS_MINIMUM,
-            intdiv($slot, self::FREGATES_DIVISEUR_SLOT),
-            intdiv($slot, self::CAPITAUX_DIVISEUR_SLOT),
-        ));
+        return array(
+            Vaisseau::CHASSEUR => intdiv($slot, self::CHASSEURS_DIVISEUR_SLOT) + self::CHASSEURS_MINIMUM,
+            'fregate' => intdiv($slot, self::FREGATES_DIVISEUR_SLOT),
+            'capital' => intdiv($slot, self::CAPITAUX_DIVISEUR_SLOT),
+            Vaisseau::RESTRICTOR => 0,
+        );
     }
 
     public static function enCours(int $joueurId): ?object {
