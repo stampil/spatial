@@ -21,7 +21,14 @@ $libres = $planete->slot - $planete->batimentsTotal();
     <?php foreach(Batiment::CATALOGUE as $batiment => $infos){ ?>
     <div class="ligne-jeu" id="bat-<?= $batiment ?>">
         <div class="ligne-jeu__info">
-            <?= Vue::visuel('batiment', $infos['icone'], $infos['icone']) ?>
+            <button type="button" class="visuel-bouton" data-popin="popin-<?= $batiment ?>" aria-label="Détails : <?= $infos['nom'] ?>"><?= Vue::visuel('batiment', $infos['icone'], $infos['icone']) ?></button>
+            <dialog class="popin" id="popin-<?= $batiment ?>">
+                <div class="popin__image"><?= Vue::visuel('batiment', $infos['icone'], $infos['icone']) ?></div>
+                <h3><?= $infos['nom'] ?></h3>
+                <p><?= htmlspecialchars(Batiment::description($batiment)) ?></p>
+                <p class="md3-secondary"><?= $infos['prix'] ?> cr · maintenance <?= $infos['maintenance'] ?> cr/h</p>
+                <form method="dialog"><button class="md3-button md3-button--tonal">Fermer</button></form>
+            </dialog>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $planete->nombre($batiment) ?><br>
                 <span class="md3-secondary"><?= $infos['prix'] ?> cr · maintenance <?= $infos['maintenance'] ?> cr/h</span>

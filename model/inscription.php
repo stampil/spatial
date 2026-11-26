@@ -7,7 +7,7 @@
 
 <h1 class="titre-vue"><?= Icone::html('inscription') ?>Inscription</h1>
 
-<form method="POST" action="index.php?p=inscrire">
+<form method="POST" action="index.php?p=inscrire" data-navigation>
 
 
 <fieldset class="factions">

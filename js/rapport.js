@@ -4,7 +4,7 @@
     const DELAI_ETAPE = 1400;
     const POURCENT = 100;
     const TOUCHE_ECHAP = 'Escape';
-    const dialogues = Array.from(document.querySelectorAll('.md3-dialog'));
+    let dialogues = [];
     const mouvementReduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function creer(nom, classe, texte) {
@@ -109,7 +109,13 @@
         minuteurs.push(setTimeout(conclure, DELAI_ETAPE * (rapport.etapes.length + 1)));
     }
 
-    if (dialogues.length > 0) {
-        jouer(0);
+    function lancer() {
+        dialogues = Array.from(document.querySelectorAll('.md3-dialog'));
+        if (dialogues.length > 0) {
+            jouer(0);
+        }
     }
+
+    document.addEventListener('page-rafraichie', lancer);
+    lancer();
 })();

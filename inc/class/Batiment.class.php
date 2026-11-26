@@ -19,6 +19,25 @@ class Batiment {
         self::ACADEMIE => array('nom' => 'Académie', 'court' => 'Académie', 'icone' => 'academie', 'prix' => 250, 'maintenance' => 5),
     );
 
+    public static function description(string $batiment): string {
+        if($batiment === self::FERME){
+            return 'Rapporte '.self::FERME_INCOME.' cr/h.';
+        }
+        $noms = array();
+        foreach(Vaisseau::typesDeLUsine($batiment) as $type){
+            array_push($noms, Vaisseau::CATALOGUE[$type]['nom']);
+        }
+        $texte = 'Produit : '.implode(', ', $noms).'.';
+        if($batiment === self::ACADEMIE){
+            $roles = array();
+            foreach(Perso::ROLES as $infosRole){
+                array_push($roles, $infosRole['nom']);
+            }
+            $texte = 'Recrute des persos ('.implode(', ', $roles).'). '.$texte;
+        }
+        return $texte;
+    }
+
     public static function remboursement(string $batiment): int {
         return intdiv(self::CATALOGUE[$batiment]['prix'] * self::REFUND_PERCENT, self::MAX_PERCENT);
     }

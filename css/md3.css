@@ -219,25 +219,28 @@ body {
 
 .md3-button,
 .md3-page input[type="submit"] {
+    --coupe: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     height: 48px;
     padding: 0 28px;
-    border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
-    background-color: var(--md-sys-color-primary);
-    background-image: linear-gradient(135deg, color-mix(in srgb, var(--md-sys-color-primary) 100%, white 12%), color-mix(in srgb, var(--md-sys-color-primary) 78%, #6F4BFF));
-    box-shadow: 0 1px 0 color-mix(in srgb, white 45%, transparent) inset, 0 6px 18px color-mix(in srgb, var(--md-sys-color-primary) 38%, transparent);
+    border: 1px solid transparent;
+    border-radius: 0;
+    clip-path: polygon(var(--coupe) 0, 100% 0, 100% calc(100% - var(--coupe)), calc(100% - var(--coupe)) 100%, 0 100%, 0 var(--coupe));
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--md-sys-color-primary) 100%, white 12%), color-mix(in srgb, var(--md-sys-color-primary) 70%, #6F4BFF)) padding-box,
+        linear-gradient(135deg, white, var(--md-sys-color-primary) 55%, #6F4BFF) border-box;
     color: var(--md-sys-color-on-primary);
     font-family: inherit;
     font-size: var(--md-sys-typescale-label-large-size);
     font-weight: 600;
     line-height: var(--md-sys-typescale-label-large-line-height);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+    transition: transform 0.12s ease, filter 0.12s ease;
 }
 
 .md3-page .md3-button {
@@ -247,13 +250,13 @@ body {
 
 .md3-button:hover,
 .md3-page input[type="submit"]:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.12) saturate(1.1);
     transform: translateY(-1px);
 }
 
 .md3-button:active,
 .md3-page input[type="submit"]:active {
-    filter: brightness(0.95);
+    filter: brightness(0.92);
     transform: translateY(1px);
 }
 
@@ -264,22 +267,23 @@ body {
 }
 
 .md3-page .md3-button.md3-button--tonal {
-    background-color: var(--md-sys-color-secondary-container);
-    background-image: none;
-    box-shadow: 0 1px 0 color-mix(in srgb, white 14%, transparent) inset;
+    background:
+        linear-gradient(135deg, var(--md-sys-color-secondary-container), color-mix(in srgb, var(--md-sys-color-secondary-container) 80%, black)) padding-box,
+        linear-gradient(135deg, color-mix(in srgb, white 70%, transparent), var(--md-sys-color-outline)) border-box;
     color: var(--md-sys-color-on-secondary-container);
 }
 
 .md3-page .md3-button.md3-button--outlined {
-    background-color: transparent;
-    background-image: none;
-    box-shadow: inset 0 0 0 1.5px var(--md-sys-color-outline);
+    background:
+        linear-gradient(transparent, transparent) padding-box,
+        linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-outline)) border-box;
     color: var(--md-sys-color-primary);
 }
 
 .md3-page .md3-button.md3-button--outlined:hover {
-    background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
-    box-shadow: inset 0 0 0 1.5px var(--md-sys-color-primary);
+    background:
+        linear-gradient(color-mix(in srgb, var(--md-sys-color-primary) 14%, transparent), color-mix(in srgb, var(--md-sys-color-primary) 14%, transparent)) padding-box,
+        linear-gradient(135deg, var(--md-sys-color-primary), var(--md-sys-color-primary)) border-box;
 }
 
 .md3-page .md3-button.md3-button--grand,
@@ -291,9 +295,7 @@ body {
 
 .md3-page .md3-button:disabled,
 .md3-page input[type="submit"]:disabled {
-    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
-    background-image: none;
-    box-shadow: none;
+    background: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
     color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
     cursor: not-allowed;
     filter: none;
