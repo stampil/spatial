@@ -21,7 +21,7 @@ $libres = $planete->slot - $planete->batimentsTotal();
     <?php foreach(Batiment::CATALOGUE as $batiment => $infos){ ?>
     <div class="ligne-jeu" id="bat-<?= $batiment ?>">
         <div class="ligne-jeu__info">
-            <button type="button" class="visuel-bouton" data-popin="popin-<?= $batiment ?>" aria-label="Détails : <?= $infos['nom'] ?>"><?= Vue::visuel('batiment', $infos['icone'], $infos['icone']) ?></button>
+            <button type="button" class="visuel-bouton" data-popin="popin-<?= $batiment ?>" aria-label="Détails : <?= $infos['nom'] ?>"><?= Icone::html($infos['icone'], Vue::ICONE_STRUCTURE_TAILLE) ?></button>
             <dialog class="popin" id="popin-<?= $batiment ?>">
                 <div class="popin__image"><?= Vue::visuel('batiment', $infos['icone'], $infos['icone']) ?></div>
                 <h3><?= $infos['nom'] ?></h3>

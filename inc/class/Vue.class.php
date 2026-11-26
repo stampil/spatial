@@ -9,6 +9,7 @@ class Vue {
     const ICONE_VAISSEAU_TAILLE = 24;
     const ICONE_FLOTTE_TAILLE = 32;
     const ICONE_TEXTE_TAILLE = 20;
+    const ICONE_STRUCTURE_TAILLE = 28;
     const ETOILE_VUE = 24;
     const ETOILE_DESSIN = 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z';
     const ETOILE_MOITIE_DESSIN = 'M12 3L9.4 8.6 3.3 9.3 7.8 13.5 6.6 19.5 12 16.5z';
