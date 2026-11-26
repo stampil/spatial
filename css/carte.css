@@ -91,11 +91,6 @@ main.md3-page > .mission {
     stroke: #FFFFFF;
 }
 
-.carte__systeme--inconnu .carte__disque {
-    fill: none;
-    stroke-dasharray: 3 3;
-}
-
 .carte__zone {
     fill: transparent;
     pointer-events: all;

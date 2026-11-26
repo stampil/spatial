@@ -10,6 +10,8 @@ class Planete {
     const OPERATION_DEMOLIR = 'demolir';
     const MIN_PLANETES = 3;
     const MAX_PLANETES = 12;
+    const IMPERIAL_REBELLES_MAX = 2;
+    const IMPERIAL_PIRATES_MAX = 1;
     const SLOT_DEPART = 8;
     const BOUCLIER_PAR_SLOT = 2;
     const CANON_PAR_SLOT = 1;
@@ -162,6 +164,19 @@ class Planete {
                 $id_camp = $id_camp_premiere;
             }
             self::create($Systeme, $i, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null);
+        }
+    }
+
+    public static function fillSystemeImperial(Systeme $Systeme, bool $avecBonus = false): void{
+        $nb_planetes = rand(self::MIN_PLANETES, self::MAX_PLANETES);
+        $infiltres = array_merge(
+            array_fill(0, rand(0, self::IMPERIAL_REBELLES_MAX), Camp::REBELLION),
+            array_fill(0, rand(0, self::IMPERIAL_PIRATES_MAX), Camp::PIRATES)
+        );
+        $id_camps = array_pad(array_slice($infiltres, 0, $nb_planetes - 1), $nb_planetes, Camp::EMPIRE);
+        shuffle($id_camps);
+        foreach($id_camps as $i => $id_camp){
+            self::create($Systeme, $i + 1, rand(self::$min_slot,self::$max_slot), $id_camp, $avecBonus ? Bonus::tirer() : null);
         }
     }
 

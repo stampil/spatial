@@ -147,14 +147,25 @@ class Vaisseau {
                 continue;
             }
             $planete = new Planete($ligne->id_planete);
-            if(random_int(1, self::PERCENT) <= self::EXPLORATION_DECOUVERTE_POURCENT){
-                $systeme = Systeme::decouvrir($joueur, $planete->systeme);
+            $systeme = self::decouverteDeLExpedition($joueur, $planete);
+            if($systeme !== null){
                 Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' : système '.$systeme->nom.' découvert ('.count($systeme->planetes).' '.__('planete','planetes',count($systeme->planetes)).').');
             }
             else{
                 Tools::addMessage('Un vaisseau de reconnaissance est revenu sur '.$planete->nom.' sans rien trouver.');
             }
         }
+    }
+
+    private static function decouverteDeLExpedition(Joueur $joueur, Planete $depart): ?Systeme {
+        if($joueur->enTuto() && $joueur->id_systeme_voisin !== null && !Decouverte::existe($joueur->id, $joueur->id_systeme_voisin)){
+            Decouverte::ajouter($joueur->id, $joueur->id_systeme_voisin);
+            return new Systeme($joueur->id_systeme_voisin);
+        }
+        if(random_int(1, self::PERCENT) <= self::EXPLORATION_DECOUVERTE_POURCENT){
+            return Systeme::decouvrir($joueur, $depart->systeme);
+        }
+        return null;
     }
 
     public static function typesDeFlotte(): array {

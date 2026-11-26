@@ -22,6 +22,9 @@ const MENU_PLAYER = array('carte' => 'Carte', 'tableauBord' => 'Quartier génér
 const PAGES_TITRES = MENU_PLAYER + MENU_GUEST + array('afficheSysteme' => 'Système', 'affichePlanete' => 'Planète', 'affichePerso' => 'Perso', 'afficheJoueur' => 'Joueur', 'tuto_0' => 'Bienvenue');
 const MENU_BAS = array('carte' => 'carte', 'listePlanete' => 'planetes', 'listeVaisseau' => 'fusee', 'listePerso' => 'persos', 'classement' => 'classement');
 const MENU_ICON_LABEL = 'Menu';
+const RESET_PAGE = 'reset';
+const RESET_LABEL = 'Reset';
+const RESET_CONFIRMATION = 'Supprimer toutes les planètes, vaisseaux et persos, recréer l\'univers et relancer le tutoriel de chaque compte ? Les comptes sont conservés.';
 const MUSIQUE_LABEL = 'Musique d\'ambiance';
 const MUSIQUE_FICHIER = 'audio/conquete-spatiale.mp3';
 const PAGE_PARENTS = array('afficheSysteme' => 'carte', 'affichePerso' => 'listePerso', 'affichePlanete' => 'listePlanete', 'afficheJoueur' => 'classement');

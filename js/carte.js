@@ -75,9 +75,6 @@
         systemes[systeme.id] = systeme;
         positions[systeme.id] = {x: systeme.x, y: systeme.y};
     });
-    if (DONNEES.voisin) {
-        positions[DONNEES.voisin.id] = {x: DONNEES.voisin.x, y: DONNEES.voisin.y};
-    }
 
     function maintenant() {
         return (Date.now() + decalage) / MILLISECONDES;
@@ -301,39 +298,6 @@
         });
     }
 
-    function dessinerVoisin() {
-        const voisin = DONNEES.voisin;
-        const groupe = creerSvg('g', {
-            'class': 'carte__systeme carte__systeme--inconnu',
-            'data-systeme': voisin.id,
-            role: 'button',
-            tabindex: '0',
-            'aria-label': 'Secteur inconnu'
-        });
-        const disque = creerSvg('circle', {'class': 'carte__disque', cx: voisin.x, cy: voisin.y});
-        const zone = creerSvg('circle', {'class': 'carte__zone', cx: voisin.x, cy: voisin.y});
-        const nom = creerSvg('text', {'class': 'carte__nom', x: voisin.x, 'text-anchor': 'middle'});
-        nom.textContent = 'Secteur inconnu';
-        groupe.appendChild(disque);
-        groupe.appendChild(nom);
-        groupe.appendChild(zone);
-        groupe.addEventListener('keydown', (evenement) => {
-            if (evenement.key === TOUCHE_ENTREE || evenement.key === TOUCHE_ESPACE) {
-                evenement.preventDefault();
-                toucherSysteme(voisin.id);
-            }
-        });
-        calqueSystemes.appendChild(groupe);
-        noeuds[voisin.id] = groupe;
-        adapter((echelle) => {
-            disque.setAttribute('r', RAYON_NOEUD / echelle);
-            zone.setAttribute('r', RAYON_TOUCHER / echelle);
-            nom.setAttribute('y', voisin.y + (RAYON_NOEUD + DECALAGE_NOM) / echelle);
-            nom.setAttribute('font-size', TAILLE_POLICE_NOM / echelle);
-            nom.setAttribute('stroke-width', CONTOUR_NOM / echelle);
-        });
-    }
-
     function dessinerTrajet(trajet) {
         if (trajet.expedition || trajet.vers === null || !positions[trajet.de] || !positions[trajet.vers]) {
             return;
@@ -391,10 +355,6 @@
         });
     }
 
-    function ligneInfo(texte) {
-        return creer('p', {classe: 'md3-secondary', texte: texte});
-    }
-
     function secondesDeOrdre(systemeId) {
         const embarques = [TYPE_TROUPE];
         if (systemeId !== ordre.systeme) {
@@ -438,12 +398,6 @@
     function ouvrirDestination(systemeId) {
         const duree = secondesDeOrdre(systemeId);
         marquerSelection(systemeId);
-        if (DONNEES.voisin && systemeId === DONNEES.voisin.id) {
-            ouvrirFeuille('Secteur inconnu', 'Trajet : ' + formaterDuree(duree), null);
-            feuilleCorps.appendChild(ligneInfo('Ce secteur voisin n’est pas encore exploré.'));
-            feuilleCorps.appendChild(bouton('Envoyer ici', 'md3-button', () => confirmerOrdre(DONNEES.voisin.planete)));
-            return;
-        }
         const systeme = systemes[systemeId];
         ouvrirFeuille('Envoyer vers ' + systeme.nom, 'Trajet : ' + formaterDuree(duree), systeme.couleur);
         systeme.planetes.filter((planete) => planete.id !== ordre.planete).forEach((planete) => {
@@ -469,12 +423,6 @@
         fermerFeuille();
     }
 
-    function ouvrirVoisin() {
-        marquerSelection(DONNEES.voisin.id);
-        ouvrirFeuille('Secteur inconnu', 'Non explor\u00e9', null);
-        feuilleCorps.appendChild(ligneInfo('Envoyez un vaisseau de reconnaissance : \u00e0 son arriv\u00e9e, le syst\u00e8me sera explor\u00e9.'));
-    }
-
     function reprendreOrdre(demande) {
         const stock = stockDePlanete(demande.planete);
         const flottes = DONNEES.flottes.filter((flotte) => flotte.planete === demande.planete && demande.flottes.includes(flotte.id));
@@ -497,10 +445,8 @@
     function toucherSysteme(systemeId) {
         if (ordre) {
             ouvrirDestination(systemeId);
-        } else if (systemes[systemeId]) {
-            location.href = ADRESSE_SYSTEME + systemeId;
         } else {
-            ouvrirVoisin();
+            location.href = ADRESSE_SYSTEME + systemeId;
         }
     }
 
@@ -643,9 +589,6 @@
     dessinerEtoiles();
     DONNEES.enRoute.forEach(dessinerTrajet);
     DONNEES.systemes.forEach(dessinerSysteme);
-    if (DONNEES.voisin) {
-        dessinerVoisin();
-    }
     installerGestes();
 
     document.getElementById('carte-zoom-avant').addEventListener('click', () => zoomerAuCentre(PAS_ZOOM));

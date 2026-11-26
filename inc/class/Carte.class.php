@@ -11,29 +11,19 @@ class Carte {
         foreach(Systeme::listeVisibles($joueur->id) as $systeme){
             $systemes[$systeme->id] = $systeme;
         }
-        $voisin = null;
-        $destinations = $systemes;
-        if($joueur->id_systeme_voisin !== null && !isset($systemes[$joueur->id_systeme_voisin])){
-            $voisin = new Systeme($joueur->id_systeme_voisin);
-            $destinations[$voisin->id] = $voisin;
-        }
 
-        $enRoute = self::enRoute($joueur, $destinations);
+        $enRoute = self::enRoute($joueur, $systemes);
         $donnees = array(
             'maintenant' => time(),
             'base' => self::systemeDeBase($joueur),
             'systemes' => array(),
-            'voisin' => null,
-            'stocks' => self::stocks($joueur, $systemes, $destinations),
-            'flottes' => self::flottes($joueur, $systemes, $destinations),
+            'stocks' => self::stocks($joueur, $systemes, $systemes),
+            'flottes' => self::flottes($joueur, $systemes, $systemes),
             'enRoute' => $enRoute,
             'enRouteLibelle' => count($enRoute).' '.__('deplacement','deplacements',count($enRoute)),
         );
         foreach($systemes as $systeme){
             array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps));
-        }
-        if($voisin !== null){
-            $donnees['voisin'] = array('id' => $voisin->id, 'x' => $voisin->x, 'y' => $voisin->y, 'planete' => $voisin->planetes[0]->id);
         }
         return $donnees;
     }

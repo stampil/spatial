@@ -50,21 +50,31 @@ class Systeme {
         return $visibles;
     }
 
-    public static function explorables(int $joueurId): array {
-        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "systeme
-                WHERE visible=1 OR id IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")";
-        $explorables = array();
+    public static function explorablesDeJoueurs(int $joueurId): array {
+        return self::nonDecouverts("id IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")", $joueurId);
+    }
+
+    public static function explorablesCaches(int $joueurId): array {
+        return self::nonDecouverts("visible=1 AND id NOT IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")", $joueurId);
+    }
+
+    private static function nonDecouverts(string $condition, int $joueurId): array {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "systeme WHERE " . $condition;
+        $nonDecouverts = array();
         foreach(MyPDO::getInstance()->query($query,self::limiteAnciens()) as $ligne){
             $systeme = new Systeme($ligne->id);
             if(!$systeme->estConnuDe($joueurId)){
-                array_push($explorables, $systeme);
+                array_push($nonDecouverts, $systeme);
             }
         }
-        return $explorables;
+        return $nonDecouverts;
     }
 
     public static function decouvrir(Joueur $joueur, Systeme $origine): Systeme {
-        $explorables = self::explorables($joueur->id);
+        $explorables = self::explorablesDeJoueurs($joueur->id);
+        if(count($explorables) === 0){
+            $explorables = self::explorablesCaches($joueur->id);
+        }
         if(count($explorables) > 0){
             $systeme = $explorables[random_int(0, count($explorables) - 1)];
         }

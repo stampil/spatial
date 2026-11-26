@@ -36,6 +36,12 @@ class Joueur {
         // pour chaque joueur crée on crée un systeme qui sera celui de départ ( id_joueur = id_systeme départ)
         $id_joueur =  MyPDO::getInstance()->lastInsertId();
         $joueur = new Joueur($id_joueur);
+        self::demarrer($joueur);
+
+        return $joueur;
+    }
+
+    private static function demarrer(Joueur $joueur): void{
         $id_systeme = Systeme::create();
         $systeme = new Systeme($id_systeme);
         $id_perso = Perso::create($joueur);
@@ -43,8 +49,13 @@ class Joueur {
         Planete::fillSysteme($perso,$systeme);
         Decouverte::ajouter($joueur->id, $id_systeme);
         Univers::creerVoisin($joueur, $systeme);
-        
-        return $joueur;
+    }
+
+    public static function repartirDeZero(): void{
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=?, etape_tuto=0, id_systeme_voisin=NULL, fin_tuto=NULL, raid_maj=NULL, credits_maj=NULL",self::$credits_depart);
+        foreach(self::liste() as $ligne){
+            self::demarrer(new Joueur($ligne->id));
+        }
     }
     
    
@@ -229,7 +240,7 @@ class Joueur {
     }
 
     public function peutCibler(Systeme $systeme): bool {
-        return $systeme->estConnuDe($this->id) || $systeme->id === $this->id_systeme_voisin;
+        return $systeme->estConnuDe($this->id);
     }
 
     public function ouvrirSession(): void {

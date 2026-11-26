@@ -57,6 +57,12 @@ class Vue {
         return '<div class="fond" style="background-image:url('.$chemin.')" aria-hidden="true"></div>';
     }
 
+    public static function boutonReset(): string {
+        return '<form class="reset" method="POST" action="?p='.RESET_PAGE.'" data-navigation onsubmit="return confirm('.htmlspecialchars(json_encode(RESET_CONFIRMATION, JSON_UNESCAPED_UNICODE), ENT_QUOTES).')">'
+            .csrfField()
+            .'<button type="submit" class="md3-nav-link md3-nav-link--bouton">'.RESET_LABEL.'</button></form>';
+    }
+
     public static function filAriane(array $etapes): string {
         $html = '<nav class="fil" aria-label="Fil d\'Ariane"><ol>';
         foreach($etapes as list($libelle, $adresse)){

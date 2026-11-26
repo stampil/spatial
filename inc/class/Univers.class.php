@@ -3,10 +3,10 @@
 class Univers {
 
     const PLAN = array(
-        array('nombre' => 6, 'camps' => array(Camp::EMPIRE)),
+        array('nombre' => 6, 'imperial' => true),
         array('nombre' => 3, 'camps' => array(Camp::PIRATES)),
         array('nombre' => 3, 'camps' => array(Camp::EMPIRE, Camp::PIRATES, null)),
-        array('nombre' => 4, 'camps' => array(null)),
+        array('nombre' => 4, 'camps' => array(Camp::REBELLION)),
     );
 
     const POSITIONS = array(
@@ -16,7 +16,7 @@ class Univers {
         array(140, 480), array(480, 780), array(270, 740), array(880, 520),
     );
 
-    const CAMPS_DECOUVERTE = array(Camp::EMPIRE, Camp::PIRATES, null);
+    const CAMPS_DECOUVERTE = array(Camp::PIRATES, null);
 
     const TUTO_BOUCLIER = 5;
     const TUTO_CANON = 5;
@@ -45,7 +45,12 @@ class Univers {
         foreach(self::PLAN as $etape){
             for($i=0; $i<$etape['nombre']; $i++){
                 $Systeme = new Systeme(Systeme::create(true, self::POSITIONS[$numero]));
-                Planete::fillSystemeIA($Systeme, $etape['camps'], null, true);
+                if(isset($etape['imperial'])){
+                    Planete::fillSystemeImperial($Systeme, true);
+                }
+                else{
+                    Planete::fillSystemeIA($Systeme, $etape['camps'], null, true);
+                }
                 array_push($noms, $Systeme->nom);
                 $numero++;
             }
