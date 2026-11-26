@@ -19,17 +19,17 @@ Codé (à valider, non publié) dans `js/main.js` et `js/carte.js` :
 
 ### 3. Bouton diplomatie : erreur 404 (26/11)
 
-Ta phrase : « sa affiche erreur 404 pour le btn diplomatie ».
+Ta phrase : « sa affiche erreur 404 pour le btn diplomatie », puis « 404 sur erreur /errors/404/ ».
 
-Lu dans le code (rien codé) :
-- Le bouton poste vers `?p=faireDiplomatie` (`model/affichePerso.php`), et `model/faireDiplomatie.php` existe.
-- Mon code ne renvoie jamais de statut 404 : pas de `http_response_code(404)`, pas de `.htaccess`. Une page inconnue répond 200 avec le texte « 404 - Page … non trouvée ».
-- Donc le 404 vient de l'hébergeur (ou d'une autre adresse que celle que je crois), pas de mon PHP. Je ne sais pas encore si c'est le POST ou le rafraîchissement qui suit : le message actuel ne donne pas l'adresse.
+Lu (rien codé) :
+- `/errors/404/` est l'adresse FINALE : l'hébergeur a redirigé la requête vers sa propre page d'erreur 404. Mon message n'affiche que cette adresse finale, pas celle demandée au départ : je ne sais donc toujours pas si c'est le POST vers `?p=faireDiplomatie` ou le rafraîchissement.
+- Mon `.htaccess` (`tools/package.sh`) refuse `inc/`, `model/`, `database/` en accès direct : cela donnerait un 403, pas un 404.
+- Mon PHP ne renvoie jamais 404 : seul l'hébergeur le fait.
 
-Codé (à valider, non publié) : `js/main.js`, le message d'erreur indique l'adresse en échec, ex. « erreur HTTP 404 sur /?p=faireDiplomatie » ou « échec réseau sur /?p=… ». À la prochaine occurrence, le message dit si c'est le POST ou le rafraîchissement.
+Proposition (rien codé) : en cas de redirection, le message donne les deux adresses (demandée et finale), ex. « erreur HTTP 404 sur /errors/404/ (demandé : /?p=faireDiplomatie) ».
 
 ## Questions en suspens
 
-1. Le message exact affiché : « Action non confirmée (erreur HTTP 404) … » ou « Action effectuée, mais la page n'a pas pu être rafraîchie (erreur HTTP 404) … » ?
+1. Les autres boutons (construire, produire) marchent-ils en ligne ?
 2. La diplomatie démarre-t-elle quand même (compte à rebours après rechargement) ?
-3. Les autres boutons (construire, produire) marchent-ils en ligne ?
+3. Quelle adresse as-tu dans la barre du navigateur quand tu cliques (je n'ai pas l'adresse du site) ?
