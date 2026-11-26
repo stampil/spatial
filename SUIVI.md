@@ -29,11 +29,22 @@ Lu (rien codé) : une planète tenue par un camp IA (pirates, empire, rébellion
 
 Ce que je comprends : une planète IA peut avoir une flotte stationnée (des chasseurs, frégates, capitaux comme les tiens). Quand tu l'attaques, cette flotte défend avec le bouclier et le canon : sa force s'ajoute à la défense, elle subit des dégâts, peut être détruite, et tes pertes en tiennent compte.
 
-Proposition (à valider) : un petit stock de vaisseaux par planète IA (type + nombre, dans une table dédiée, pas des vaisseaux de joueur), dimensionné par la taille de la planète et le camp ; il apparaît à la génération de l'univers, se reconstitue lentement comme la défense, et se voit sur la fiche de la planète (« Flotte pirate stationnée : N vaisseaux »). Dans le combat, ses vaisseaux tirent dans les mêmes phases que les tiens et absorbent des dégâts avant le canon.
+Précision (26/11) : « les flottes joueur advrse participe aussi bien sur, mais tuto c ia ». Compris :
+- Les flottes d'un joueur adverse stationnées sur la planète attaquée défendent aussi (tous ses vaisseaux de combat présents au repos, en flotte, hors flotte ou chasseurs embarqués). Aujourd'hui `Combat::attaquer` ne regarde que le bouclier et le canon de la planète : les vaisseaux du défenseur ne tirent pas. Leurs pertes s'appliquent comme les tiennes, et le défenseur en est averti dans son journal.
+- Le tutoriel utilise une planète IA (pirate) : le modèle de flotte IA s'y applique donc aussi.
+
+Proposition (à valider) : un petit stock de vaisseaux par planète IA (type + nombre, dans une table dédiée, pas des vaisseaux de joueur), dimensionné par la taille de la planète et le camp ; il apparaît à la génération de l'univers, se reconstitue lentement comme la défense, et se voit sur la fiche de la planète (« Flotte pirate stationnée : N vaisseaux »). Dans le combat, les vaisseaux défenseurs (IA ou joueur adverse) tirent dans les mêmes phases que les tiens et absorbent des dégâts avant le canon.
 
 ## Questions en suspens
 
-1. Force : par défaut, 1 vaisseau de combat par slot de la planète pour l'Empire, moins pour les pirates (et rien pour la Rébellion discrète) ; ça te va, ou autre barème ?
-2. Tutoriel : la planète pirate du tutoriel garde un petit stock (ex. 1 chasseur) ou aucun, pour que l'assaut avec 1 frégate + 3 chasseurs reste gagnable ?
+Flottes IA et défense (point 3) :
+1. Force IA : par défaut, 1 vaisseau de combat par slot de la planète pour l'Empire, moins pour les pirates (et rien pour la Rébellion discrète) ; ça te va, ou autre barème ?
+2. Tutoriel : la planète pirate du tutoriel a une toute petite flotte (ex. 1 chasseur) pour que l'assaut avec 1 frégate + 3 chasseurs reste gagnable ; d'accord ?
 3. La flotte stationnée est-elle visible dès qu'on connaît la planète, ou seulement après une reconnaissance ?
-4. Se reconstitue-t-elle (comme bouclier et canon, x % par heure) ou est-elle définitivement détruite quand tu la bats ?
+4. La flotte IA se reconstitue-t-elle (comme bouclier et canon, 10 % par heure) ou est-elle définitivement détruite quand tu la bats ?
+
+Icônes des boutons d'action (point 2) :
+5. Bouton : icône seule avec infobulle, ou icône + un seul mot court (« Attaquer », « Voyager »…) ? Sur mobile, l'icône seule est plus compacte mais moins claire.
+6. Les infos du libellé actuel (nombre de vaisseaux, durée, chance de réussite) : en petit texte à côté du bouton ?
+7. Périmètre : on commence par le combat (attaquer avec les vaisseaux, avec la flotte, avec les chasseurs, débarquer les troupes) et la page Flottes (voyager, chercher, reconnaître, embarquer, débarquer, renommer, dissoudre), le reste ensuite ?
+8. « Attaque de chasseurs » : une action propre aux chasseurs, distincte de l'attaque des vaisseaux de combat, ou juste l'icône d'attaque quand les chasseurs sont là ?
