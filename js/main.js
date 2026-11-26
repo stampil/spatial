@@ -104,6 +104,11 @@ $(function(){
         $('.jauge[data-restant]').each(function() {
             $(this).data('debut', Date.now());
         });
+        $('dialog[data-auto]').each(function() {
+            if (!this.open) {
+                this.showModal();
+            }
+        });
     }
 
     function appliquerPage(html) {

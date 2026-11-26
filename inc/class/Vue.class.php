@@ -116,9 +116,9 @@ class Vue {
             .'</div>';
     }
 
-    public static function curseur(string $nom, int $maximum, int $valeur, string $libelle): string {
+    public static function curseur(string $nom, int $minimum, int $maximum, int $valeur, string $libelle): string {
         return '<span class="curseur">'
-            .'<input type="range" class="curseur__piste" name="'.htmlspecialchars($nom).'" min="0" max="'.$maximum.'" step="1" value="'.$valeur.'"'.($maximum === 0 ? ' disabled' : '').' aria-label="'.htmlspecialchars($libelle).'" />'
+            .'<input type="range" class="curseur__piste" name="'.htmlspecialchars($nom).'" min="'.$minimum.'" max="'.$maximum.'" step="1" value="'.$valeur.'"'.($maximum === 0 ? ' disabled' : '').' aria-label="'.htmlspecialchars($libelle).'" />'
             .'<output class="curseur__valeur">'.$valeur.'</output><span class="curseur__maximum">/ '.$maximum.'</span>'
             .'</span>';
     }

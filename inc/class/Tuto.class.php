@@ -21,6 +21,7 @@ class Tuto {
     const CHASSEURS_REQUIS = 3;
     const TROUPES_REQUISES = 3;
     const FREGATES_REQUISES = 1;
+    const BARGES_REQUISES = 1;
 
     public static function avancer(Joueur $joueur): void {
         if($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && $joueur->id_systeme_voisin === null){
@@ -109,8 +110,9 @@ class Tuto {
                 $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? GROUP BY type";
                 return self::atteint($db->query($query,$joueur->id), self::requis());
             case self::ETAPE_ENVOI:
+                $cible = self::planeteCible($joueur);
                 $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND arrivee IS NULL GROUP BY type";
-                return self::atteint($db->query($query,$joueur->id,self::planeteCible($joueur)->id), array(Vaisseau::CHASSEUR => 1, Vaisseau::TROUPE => 1));
+                return Vaisseau::troupesEnBarge($cible->id, $joueur->id) > 0 && self::atteint($db->query($query,$joueur->id,$cible->id), array(Vaisseau::CHASSEUR => 1));
             case self::ETAPE_ASSAUT:
                 return self::planeteCible($joueur)->gouverneur === $joueur->id;
         }
@@ -123,7 +125,7 @@ class Tuto {
     }
 
     private static function requis(): array {
-        return array(Vaisseau::CHASSEUR => self::CHASSEURS_REQUIS, Vaisseau::TROUPE => self::TROUPES_REQUISES, 'fregate' => self::FREGATES_REQUISES);
+        return array(Vaisseau::CHASSEUR => self::CHASSEURS_REQUIS, Vaisseau::TROUPE => self::TROUPES_REQUISES, 'fregate' => self::FREGATES_REQUISES, Vaisseau::BARGE => self::BARGES_REQUISES);
     }
 
     private static function atteint(array $lignes, array $requis): bool {
@@ -188,13 +190,13 @@ class Tuto {
             case self::ETAPE_EXPLORATION:
                 return 'Un système voisin, encore inconnu, existe près du vôtre. Ouvrez <a href="?p=listeVaisseau">Flottes</a> : sur '.$planete->getNom().', « Chercher un système » envoie votre vaisseau de reconnaissance dans l\'inconnu, et il revient avec ce qu\'il a trouvé. Pendant le tutoriel il réussit à coup sûr ; plus tard il peut ne rien trouver, voire ne pas revenir.';
             case self::ETAPE_PREPARATION:
-                return 'Le système voisin est découvert : sa planète '.self::planeteCible($joueur)->getNom().' est aux mains des Pirates. Préparez l\'assaut sur la fiche de '.$planete->getNom().' : construisez une usine de vaisseaux moyens et une académie, puis produisez '.self::FREGATES_REQUISES.' frégate, '.self::TROUPES_REQUISES.' troupes d\'assaut et '.self::CHASSEURS_REQUIS.' chasseurs (réglez le curseur avant « Produire » : les unités sortent une par une). Les troupes et les chasseurs ne voyagent jamais seuls entre systèmes : vous les embarquerez vous-même sur la frégate ('.Vaisseau::CATALOGUE['fregate']['troupes'].' troupes et '.Vaisseau::CATALOGUE['fregate']['chasseurs'].' chasseurs).';
+                return 'Le système voisin est découvert : sa planète '.self::planeteCible($joueur)->getNom().' est aux mains des Pirates. Préparez l\'assaut sur la fiche de '.$planete->getNom().' : construisez une usine de vaisseaux moyens et une académie, puis produisez '.self::FREGATES_REQUISES.' frégate, '.self::BARGES_REQUISES.' barge de débarquement, '.self::TROUPES_REQUISES.' troupes d\'assaut et '.self::CHASSEURS_REQUIS.' chasseurs (réglez le curseur avant « Produire » : les unités sortent une par une). La frégate détruit la défense avec les chasseurs qu\'elle embarque ('.Vaisseau::CATALOGUE['fregate']['chasseurs'].' au plus) ; seule la barge débarque les troupes, et seules les troupes embarquées dans une barge débarquent ('.Vaisseau::CATALOGUE['barge']['troupes'].' au plus). Vous les embarquerez vous-même.';
             case self::ETAPE_FLOTTE:
-                return 'Une flotte regroupe vos vaisseaux moyens et lourds (frégate, barge, capital). Ouvrez <a href="?p=listeVaisseau">Flottes</a>, « Créer une flotte » sur '.$planete->getNom().' : réglez le curseur de la frégate sur '.self::FREGATES_REQUISES.' et donnez un nom à la flotte.';
+                return 'Une flotte regroupe vos vaisseaux moyens et lourds (frégate, barge, capital). Ouvrez <a href="?p=listeVaisseau">Flottes</a>, « Créer une flotte » sur '.$planete->getNom().' : cochez la frégate et la barge (curseurs sur '.self::FREGATES_REQUISES.' et '.self::BARGES_REQUISES.'), puis donnez un nom à la flotte.';
             case self::ETAPE_ENVOI:
-                return 'Sur <a href="?p=listeVaisseau">Flottes</a>, ouvrez « Embarquer » sur la frégate de votre flotte : réglez les curseurs sur '.self::TROUPES_REQUISES.' troupes et '.self::CHASSEURS_REQUIS.' chasseurs, puis validez chacun. Ensuite « Voyager » sur votre flotte : touchez le système voisin et « Voyager ici » sur '.self::planeteCible($joueur)->getNom().'.';
+                return 'Sur <a href="?p=listeVaisseau">Flottes</a>, ouvrez « Embarquer » sur la barge de votre flotte : réglez le curseur sur '.self::TROUPES_REQUISES.' troupes et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Ensuite « Voyager » sur votre flotte : touchez le système voisin et « Voyager ici » sur '.self::planeteCible($joueur)->getNom().'.';
             case self::ETAPE_ASSAUT:
-                return 'Votre flotte est arrivée. Ouvrez la fiche de '.self::planeteCible($joueur)->getNom().' : attaquez avec vos vaisseaux pour détruire sa défense, puis débarquez vos troupes. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
+                return 'Votre flotte est arrivée. Ouvrez la fiche de '.self::planeteCible($joueur)->getNom().' : attaquez avec vos vaisseaux pour détruire sa défense, puis « Débarquer » les troupes de vos barges. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
             case self::ETAPE_ASSASSIN:
                 return 'Planète capturée et tenue. Recrutez un assassin à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_ASSASSIN]['prix'].' cr) : il peut éliminer un perso adverse présent sur la même planète (chance de base '.Perso::ASSASSINAT_BASE_PERCENT.' %, '.Perso::ASSASSINAT_PER_STAR_PERCENT.' % par étoile d\'écart entre sa force et l\'endurance de la cible).';
             case self::ETAPE_HEROS:

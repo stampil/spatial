@@ -21,15 +21,15 @@ $capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHA
     <details class="systeme-details">
         <summary>Embarquer</summary>
         <div class="systeme-details__corps">
-            <?php foreach($capacites as $typeEmbarque => $cle){ if($infos[$cle] === 0){ continue; } $deja = $embarques[$typeEmbarque] ?? 0; ?>
+            <?php foreach($capacites as $typeEmbarque => $cle){ if($infos[$cle] === 0){ continue; } $place = max(0, min($infos[$cle] - ($embarques[$typeEmbarque] ?? 0), $libres[$typeEmbarque] ?? 0)); ?>
             <form method="POST" action="?p=embarquer">
                 <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
                 <input type="hidden" name="type" value="<?= $typeEmbarque ?>" />
                 <?= csrfField() ?>
                 <div class="ligne-jeu">
                     <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
-                    <?= Vue::curseur('nombre', min($infos[$cle], $deja + ($libres[$typeEmbarque] ?? 0)), $deja, 'Embarqués sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
-                    <input type="submit" class="md3-button md3-button--tonal" value="Embarquer" />
+                    <?= Vue::curseur('nombre', min(1, $place), $place, min(1, $place), 'Nombre à embarquer sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
+                    <input type="submit" class="md3-button md3-button--tonal" value="Embarquer"<?= $place === 0 ? ' disabled' : '' ?> />
                 </div>
             </form>
             <?php } ?>

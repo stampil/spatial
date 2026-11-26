@@ -100,6 +100,9 @@ if(!empty($_SESSION['Sid'])){
     foreach(Tools::takeRapports() as $rapport){
         require 'inc/rapport.php';
     }
+    foreach(Tools::takeInfos() as $info){
+        require 'inc/info.php';
+    }
     echo Vue::bandeau('page/'.$p);
 
     try{

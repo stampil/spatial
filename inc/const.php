@@ -15,6 +15,7 @@ const PUBLIC_PAGES = array('welcome', 'connection', 'connecter', 'inscription', 
 const CSRF_KEY = 'csrf_token';
 const MESSAGES_KEY = 'messages';
 const RAPPORTS_KEY = 'rapports';
+const INFOS_KEY = 'infos';
 const CSRF_TOKEN_BYTES = 32;
 const APP_TITLE = 'Novarche';
 const HOME_PAGE = 'carte';

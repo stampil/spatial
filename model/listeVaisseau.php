@@ -119,8 +119,8 @@ foreach(array_keys($posees) as $planeteId){
             <?= csrfField() ?>
             <?php foreach(Vaisseau::typesDeFlotte() as $type){ $nombre = $types[$type] ?? 0; ?>
             <div class="ligne-jeu">
-                <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type][Vaisseau::CLE_PREFIXE] ?></span>
-                <?= Vue::curseur('nombre['.$type.']', $nombre, 0, 'Nombre dans la flotte : '.Vaisseau::CATALOGUE[$type]['nom']) ?>
+                <label class="ligne-jeu__info"><input type="checkbox" name="inclure[<?= $type ?>]"<?= $nombre === 0 ? ' disabled' : '' ?> /><?= Icone::html(Vaisseau::CATALOGUE[$type]['icone']) ?><?= Vaisseau::CATALOGUE[$type][Vaisseau::CLE_PREFIXE] ?></label>
+                <?= Vue::curseur('nombre['.$type.']', min(1, $nombre), $nombre, min(1, $nombre), 'Nombre dans la flotte : '.Vaisseau::CATALOGUE[$type]['nom']) ?>
             </div>
             <?php } ?>
             <div class="ligne-jeu">

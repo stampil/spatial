@@ -98,7 +98,7 @@ foreach(Batiment::CATALOGUE as $usine => $infosUsine){
             <input type="hidden" name="type" value="<?= $type ?>" />
             <?= csrfField() ?>
             <?php $maximum = $type === Vaisseau::TROUPE ? Vaisseau::placeTroupes($planete, $Joueur->id) : intdiv($Joueur->credits, $Joueur->prixVaisseau($type)); ?>
-            <?= Vue::curseur('nombre', $maximum, min(1, $maximum), 'Nombre à produire : '.$infos['nom']) ?>
+            <?= Vue::curseur('nombre', min(1, $maximum), $maximum, min(1, $maximum), 'Nombre à produire : '.$infos['nom']) ?>
             <input type="submit" class="md3-button md3-button--tonal" value="Produire"<?= $maximum === 0 ? ' disabled' : '' ?> />
         </form>
     </div>

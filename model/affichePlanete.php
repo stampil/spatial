@@ -57,7 +57,7 @@ if($p->gouverneur !== $Joueur->id){
     foreach(Combat::ESCADRE as $type){
         $escadre += $presents[$type] ?? 0;
     }
-    $troupes = $presents[Vaisseau::TROUPE] ?? 0;
+    $troupes = Vaisseau::troupesEnBarge($p->id, $Joueur->id);
     $flottesPresentes = array();
     foreach(Flotte::liste($Joueur->id) as $ligne){
         $flotte = new Flotte($ligne->id);
@@ -96,7 +96,7 @@ if($p->gouverneur !== $Joueur->id){
             <input type="hidden" name="planete" value="<?= $p->id ?>" />
             <input type="hidden" name="action" value="debarquer" />
             <?= csrfField() ?>
-            <input type="submit" value="Débarquer <?= $troupes ?> <?= __('troupe', 'troupes', $troupes) ?> d'assaut" />
+            <input type="submit" value="Débarquer <?= $troupes ?> <?= __('troupe', 'troupes', $troupes) ?> des barges" />
         </form>
     <?php } ?>
     </div>
