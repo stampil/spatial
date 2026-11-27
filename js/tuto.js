@@ -4,12 +4,14 @@
     const MARGE_ECRAN = 96;
     const HAUT_ENTETE = 120;
     const DEFILEMENT_FLUIDE = 'smooth';
+    const DEFILEMENT_IMMEDIAT = 'instant';
     const ATTRIBUTS_SANS_RECHARGEMENT = '[data-bascule], [data-flotte-creer], [data-flotte-annuler]';
     let fleche = null;
     let cible = null;
     let derniereCible = null;
     let attenteRafraichissement = false;
     let miseAJourPrevue = false;
+    let explicationMontree = false;
     let observateur = null;
 
     function visible(noeud) {
@@ -125,9 +127,24 @@
         }
     }
 
+    function montrerExplication() {
+        const bloc = document.querySelector('details.mission[data-explication]');
+        if (!bloc) {
+            explicationMontree = false;
+            return;
+        }
+        if (explicationMontree) {
+            return;
+        }
+        explicationMontree = true;
+        bloc.open = true;
+        window.scrollTo({top: 0, behavior: DEFILEMENT_IMMEDIAT});
+    }
+
     function relancer() {
         attenteRafraichissement = false;
         surveiller();
+        montrerExplication();
         afficher();
     }
 
