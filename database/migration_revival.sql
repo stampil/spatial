@@ -168,12 +168,13 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('023_gouverneurs_structures_analyse'),
 ('024_perso_demi_etoiles'),
 ('025_positions_planetes'),
-('026_planete_nom_origine');
+('026_planete_nom_origine'),
+('027_orbites_ecartees');
 
 UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
 
 ALTER TABLE `planete` ADD INDEX `tmp_positions_systeme` (`id_systeme`);
-UPDATE `planete` p JOIN (SELECT a.`id`, (SELECT COUNT(*) FROM `planete` b WHERE b.`id_systeme` = a.`id_systeme` AND b.`id` < a.`id`) AS `rang` FROM `planete` a) r ON r.`id` = p.`id` SET p.`x` = ROUND((24 + r.`rang` * 14) * COS(r.`rang` * 2.399963229728653 + p.`id_systeme`)), p.`y` = ROUND((24 + r.`rang` * 14) * SIN(r.`rang` * 2.399963229728653 + p.`id_systeme`));
+UPDATE `planete` p JOIN (SELECT a.`id`, (SELECT COUNT(*) FROM `planete` b WHERE b.`id_systeme` = a.`id_systeme` AND b.`id` < a.`id`) AS `rang` FROM `planete` a) r ON r.`id` = p.`id` SET p.`x` = ROUND((100 + r.`rang` * 30) * COS(r.`rang` * 2.399963229728653 + p.`id_systeme`)), p.`y` = ROUND((100 + r.`rang` * 30) * SIN(r.`rang` * 2.399963229728653 + p.`id_systeme`));
 ALTER TABLE `planete` DROP INDEX `tmp_positions_systeme`;
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));

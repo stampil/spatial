@@ -317,7 +317,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('023_gouverneurs_structures_analyse'),
 ('024_perso_demi_etoiles'),
 ('025_positions_planetes'),
-('026_planete_nom_origine');
+('026_planete_nom_origine'),
+('027_orbites_ecartees');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

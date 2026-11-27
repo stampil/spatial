@@ -10,6 +10,7 @@ class Systeme {
     const AGRANDISSEMENT = 100;
     const DEGRES_TOUR = 360;
     const DISTANCE_MINIMUM = 1;
+    const COULEURS_ETOILES = array('#9BB0FF', '#CAD7FF', '#F8F7FF', '#FFE9A8', '#FFB56C', '#FF8A5B');
     const REQUETE_SYSTEMES_DES_ANCIENS = "SELECT p.id_systeme FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=p.gouverneur WHERE j.fin_tuto<=?";
 
     private MyPDO $bdd;
@@ -174,6 +175,10 @@ class Systeme {
             }
         }
         return true;
+    }
+
+    public function couleurEtoile(): string {
+        return self::COULEURS_ETOILES[crc32('etoile'.$this->id) % count(self::COULEURS_ETOILES)];
     }
 
     public function distanceA(Systeme $autre): int {

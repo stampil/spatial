@@ -102,7 +102,7 @@ main.md3-page > .mission {
 .carte__voile {
     display: none;
     fill: #000000;
-    opacity: 0.75;
+    opacity: 0.7;
     pointer-events: none;
 }
 
@@ -112,6 +112,28 @@ main.md3-page > .mission {
 
 .carte__planete--inexploree .carte__nom {
     opacity: 0.25;
+}
+
+.carte__anneau {
+    fill: none;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+}
+
+.carte__rotation {
+    animation: carte-rotation 90s linear infinite;
+}
+
+@keyframes carte-rotation {
+    to {
+        transform: translateX(var(--decalage));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carte__rotation {
+        animation: none;
+    }
 }
 
 .carte__orbite {

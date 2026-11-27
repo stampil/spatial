@@ -91,6 +91,8 @@ class Carte {
                 'couleur' => $planete->id_camp === null ? Camp::SANS_CAMP_COULEUR : $camps[$planete->id_camp]->couleur,
                 'statut' => $planete->gouverneur === $joueur->id ? self::STATUT_MIEN : ($planete->gouverneur === 0 ? self::STATUT_LIBRE : self::STATUT_OCCUPE),
                 'moi' => $planete->gouverneur === $joueur->id,
+                'diametre' => Planete::diametreAffiche($planete->slot),
+                'texture' => Planete::cheminTextureDe($planete->id),
                 'exploree' => $planete->gouverneur === $joueur->id || isset($analysees[$planete->id]),
             ));
         }
@@ -100,6 +102,7 @@ class Carte {
             'x' => $systeme->x,
             'y' => $systeme->y,
             'couleur' => $idCamp === null ? Camp::SANS_CAMP_COULEUR : $camps[$idCamp]->couleur,
+            'etoile' => $systeme->couleurEtoile(),
             'camp' => $idCamp === null ? Camp::SANS_CAMP_NOM : $camps[$idCamp]->nom,
             'moi' => $moi,
             'planetes' => $planetes,

@@ -40,11 +40,19 @@
     const CLE_ETOILE = 'etoile';
     const CLASSE_CACHEE = 'carte__monde--cache';
     const ECHELLE_SYSTEME_MAX = 3;
-    const RAYON_ETOILE_SYSTEME = 14;
-    const RAYON_PLANETE_MONDE = 5;
-    const RAYON_PLANETE_ECRAN_MIN = 7;
+    const RAYON_LUEUR_ETOILE = 56;
+    const ETOILE_COEUR = 0.15;
+    const ETOILE_DISQUE = 0.5;
     const RAYON_TOUCHER_PLANETE = 14;
-    const VOILE_DEBORD = 1;
+    const ECART_ANNEAU = 4;
+    const RAPPORT_TEXTURE = 2;
+    const PREFIXE_DECOUPE = 'carte-decoupe-';
+    const DEGRADE_OMBRE = 'carte-ombre';
+    const DEGRADE_ETOILE = 'carte-etoile';
+    const OMBRE_CENTRE_X = 0.68;
+    const OMBRE_RAYON = 0.72;
+    const OMBRE_DEBUT = 0.45;
+    const OMBRE_OPACITE = 0.92;
     const TOUCHE_ENTREE = 'Enter';
     const TOUCHE_ESPACE = ' ';
     const TOUCHE_ECHAP = 'Escape';
@@ -479,8 +487,39 @@
         commencerOrdre({planete: demande.planete, systeme: systemeId, stock: stock, nombres: nombres, flottes: flottes, vaisseau: demande.vaisseau, libelle: demande.libelle});
     }
 
-    function dessinerPlanete(planete, systeme) {
+    function creerDegrade(identifiant, arrets, attributs) {
+        const degrade = creerSvg('radialGradient', Object.assign({id: identifiant}, attributs));
+        arrets.forEach((arret) => {
+            degrade.appendChild(creerSvg('stop', {offset: arret.decalage, 'stop-color': arret.couleur, 'stop-opacity': arret.opacite}));
+        });
+        return degrade;
+    }
+
+    function creerSphere(planete, definitions) {
+        const rayon = planete.diametre / 2;
+        const decoupe = creerSvg('clipPath', {id: PREFIXE_DECOUPE + planete.id});
+        decoupe.appendChild(creerSvg('circle', {cx: planete.x, cy: planete.y, r: rayon}));
+        definitions.appendChild(decoupe);
+        const largeurTexture = planete.diametre * RAPPORT_TEXTURE;
+        const rotation = creerSvg('g', {'class': 'carte__rotation', style: '--decalage:' + (-largeurTexture) + 'px'});
+        [0, largeurTexture].forEach((decalageTexture) => {
+            rotation.appendChild(creerSvg('image', {
+                href: planete.texture,
+                x: planete.x - rayon + decalageTexture,
+                y: planete.y - rayon,
+                width: largeurTexture,
+                height: planete.diametre
+            }));
+        });
+        const sphere = creerSvg('g', {'clip-path': 'url(#' + PREFIXE_DECOUPE + planete.id + ')'});
+        sphere.appendChild(rotation);
+        sphere.appendChild(creerSvg('circle', {cx: planete.x, cy: planete.y, r: rayon, fill: 'url(#' + DEGRADE_OMBRE + ')'}));
+        return sphere;
+    }
+
+    function dessinerPlanete(planete, systeme, definitions) {
         positionsPlanetes[planete.id] = {x: planete.x, y: planete.y};
+        const rayon = planete.diametre / 2;
         const groupe = creerSvg('g', {
             'class': 'carte__planete',
             'data-tuto': 'planete-' + planete.id,
@@ -490,13 +529,14 @@
             'aria-label': planete.nom + ', ' + planete.statut
         });
         const halo = creerSvg('circle', {'class': 'carte__halo', cx: planete.x, cy: planete.y});
-        const disque = creerSvg('circle', {'class': 'carte__disque', cx: planete.x, cy: planete.y, fill: planete.couleur});
-        const voile = creerSvg('circle', {'class': 'carte__voile', cx: planete.x, cy: planete.y});
+        const anneau = creerSvg('circle', {'class': 'carte__anneau', cx: planete.x, cy: planete.y, stroke: planete.couleur});
+        const voile = creerSvg('circle', {'class': 'carte__voile', cx: planete.x, cy: planete.y, r: rayon});
         const zone = creerSvg('circle', {'class': 'carte__zone', cx: planete.x, cy: planete.y});
         const nom = creerSvg('text', {'class': 'carte__nom', x: planete.x, 'text-anchor': 'middle'});
         nom.textContent = planete.nom;
         groupe.appendChild(halo);
-        groupe.appendChild(disque);
+        groupe.appendChild(anneau);
+        groupe.appendChild(creerSphere(planete, definitions));
         groupe.appendChild(voile);
         groupe.appendChild(nom);
         groupe.appendChild(zone);
@@ -515,10 +555,8 @@
         calquePlanetes.appendChild(groupe);
         noeudsPlanetes[planete.id] = groupe;
         adapter((echelle) => {
-            const rayon = Math.max(RAYON_PLANETE_ECRAN_MIN / echelle, RAYON_PLANETE_MONDE);
             halo.setAttribute('r', rayon + ECART_HALO / echelle);
-            disque.setAttribute('r', rayon);
-            voile.setAttribute('r', rayon + VOILE_DEBORD / echelle);
+            anneau.setAttribute('r', rayon + ECART_ANNEAU / echelle);
             zone.setAttribute('r', Math.max(rayon, RAYON_TOUCHER_PLANETE / echelle));
             nom.setAttribute('y', planete.y + rayon + DECALAGE_NOM / echelle);
             nom.setAttribute('font-size', TAILLE_POLICE_NOM / echelle);
@@ -535,16 +573,24 @@
             });
         });
         positionsPlanetes[CLE_ETOILE] = {x: 0, y: 0};
-        const etoile = creerSvg('circle', {'class': 'carte__disque', cx: 0, cy: 0, fill: systeme.couleur});
+        const definitions = creerSvg('defs');
+        definitions.appendChild(creerDegrade(DEGRADE_OMBRE, [
+            {decalage: OMBRE_DEBUT, couleur: '#000000', opacite: 0},
+            {decalage: 1, couleur: '#000000', opacite: OMBRE_OPACITE}
+        ], {cx: OMBRE_CENTRE_X, cy: 0.5, r: OMBRE_RAYON}));
+        definitions.appendChild(creerDegrade(DEGRADE_ETOILE, [
+            {decalage: 0, couleur: '#FFFFFF', opacite: 1},
+            {decalage: ETOILE_COEUR, couleur: systeme.etoile, opacite: 1},
+            {decalage: ETOILE_DISQUE, couleur: systeme.etoile, opacite: 1},
+            {decalage: 1, couleur: systeme.etoile, opacite: 0}
+        ], {}));
+        calquePlanetes.appendChild(definitions);
         systeme.planetes.forEach((planete) => {
             calquePlanetes.appendChild(creerSvg('circle', {'class': 'carte__orbite', cx: 0, cy: 0, r: Math.hypot(planete.x, planete.y)}));
         });
-        calquePlanetes.appendChild(etoile);
-        adapter((echelle) => {
-            etoile.setAttribute('r', RAYON_ETOILE_SYSTEME / echelle);
-        }, adaptablesPlanetes);
+        calquePlanetes.appendChild(creerSvg('circle', {cx: 0, cy: 0, r: RAYON_LUEUR_ETOILE, fill: 'url(#' + DEGRADE_ETOILE + ')'}));
         systeme.planetes.forEach((planete) => {
-            dessinerPlanete(planete, systeme);
+            dessinerPlanete(planete, systeme, definitions);
         });
     }
 

@@ -29,10 +29,12 @@ class Planete {
     const TEXTURES = 50;
     const NOM_LONGUEUR_MAX = 32;
     const DOSSIER_TEXTURES = 'img/texture';
-    const ORBITE_RAYON_MINIMUM = 24;
-    const ORBITE_PAS = 14;
+    const ORBITE_RAYON_MINIMUM = 100;
+    const ORBITE_PAS = 30;
     const ORBITE_ANGLE_RADIANS = 2.399963229728653;
-    const DIAMETRE_ORBITES = 360;
+    const DIAMETRE_ORBITES = 2 * (self::ORBITE_RAYON_MINIMUM + (self::MAX_PLANETES - 1) * self::ORBITE_PAS);
+    const DIAMETRE_AFFICHE_MINIMUM = 28;
+    const DIAMETRE_AFFICHE_MAXIMUM = 62;
     const TRAJET_LOCAL_MINIMUM_SECONDES = 20;
     const TRAJET_LOCAL_MAXIMUM_SECONDES = 60;
     const ILLUSTRATION_REJOINT = 'evenement-rejoint';
@@ -516,8 +518,16 @@ class Planete {
         return null;
     }
 
+    public static function cheminTextureDe(int $id): string {
+        return self::DOSSIER_TEXTURES.'/'.($id % self::TEXTURES + 1).'.jpg';
+    }
+
     public function cheminTexture(): string {
-        return self::DOSSIER_TEXTURES.'/'.($this->id % self::TEXTURES + 1).'.jpg';
+        return self::cheminTextureDe($this->id);
+    }
+
+    public static function diametreAffiche(int $slot): int {
+        return (int) round(self::DIAMETRE_AFFICHE_MINIMUM + ($slot - self::$min_slot) * (self::DIAMETRE_AFFICHE_MAXIMUM - self::DIAMETRE_AFFICHE_MINIMUM) / (self::$max_slot - self::$min_slot));
     }
 
     public function estOccupee(): bool {
