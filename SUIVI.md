@@ -10,6 +10,8 @@ Lu (rien codé) : dans la vue système de la carte, chaque planète est aujourd'
 
 Ce que je comprends : dans la vue système, chaque planète s'affiche comme sa sphère texturée qui tourne, la même que sur sa fiche (même texture, même ombrage, même rotation), à la place du disque uni. Les planètes non explorées gardent le voile noir à 75 % par-dessus la sphère (rond, qui épouse la planète). La couleur du camp passe en anneau autour de la sphère. L'étoile au centre et les systèmes de la vue galaxie ne changent pas. Cliquable comme avant.
 
+Précision du 27/11 : « les planetes ne doivent pas toucher l'etoile putain , et baisse l'opacité de 5% ». Donc : jamais de contact entre une planète et l'étoile (première orbite écartée : rayon 100 contre 24 aujourd'hui, pas de 30 contre 14, pour une sphère de 44 px et une étoile de 56 px) ; et le voile des planètes non explorées passe de 75 % à 70 % d'opacité (je lis « 5 points », pas « 5 % de 75 »).
+
 ### 2. Étoile centrale en couleurs d'étoiles réelles (27/11)
 
 Ta phrase : « l'etoile ( centrale ) tu la met dans des couleurs d'etoiles réelle par random, mais une etoil gris jamais vue de am vie ».
@@ -26,9 +28,9 @@ Ce que je comprends : une nouvelle proposition de l'affichage de la vue système
 
 ## Questions en suspens
 
-1. Taille : une sphère lisible demande environ 24 à 44 px à l'écran, alors que les orbites sont aujourd'hui espacées de 14 unités. Pour qu'elles ne se chevauchent pas, j'écarte les orbites et j'agrandis la zone affichée (positions de planètes recalculées, durées locales toujours entre 20 et 60 s). Je recommande cela, avec la sphère de 32 px au zoom de départ.
+1. Taille : sphère de 44 px, première orbite à 100 unités de l'étoile et pas de 30 (maquette), donc positions de planètes recalculées par une migration ; les durées locales restent entre 20 et 60 s en adaptant le diamètre de référence. Je recommande cela.
 2. Couleur du camp : anneau fin autour de la sphère, à la place du disque coloré. Je recommande cela.
-3. Le voile à 75 % couvre toute la sphère (la texture reste devinée en transparence). Je recommande cela.
+3. Voile à 70 % d'opacité (75 % − 5 points) sur toute la sphère, texture devinée en transparence. Je recommande cela. Ou tu voulais 5 % relatifs, soit environ 71 % ?
 
 4. Le hasard : couleur fixe par système (calculée à partir de son numéro, donc la même à chaque affichage et pour tous les joueurs, sans nouvelle colonne), pas retirée à chaque chargement. Je recommande cela.
 5. Les couleurs, que je ne choisis pas seul : bleue #9BB0FF, blanc-bleu #CAD7FF, blanche #F8F7FF, jaune #FFE9A8, orange #FFB56C, rouge #FF8A5B (teintes de corps noir des classes O/B, A, F, G, K, M), tirées à égalité. Tu valides ces valeurs, ou tu en donnes d'autres ?
