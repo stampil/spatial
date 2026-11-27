@@ -290,6 +290,8 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 
 ## Textures de planètes telluriques : `planete-<n>` (2:1, raccord automatique)
 
+Attention : le 27/11, les 50 fichiers de `img/planete/` ont été mélangés physiquement par type (pour que deux planètes d'un même système n'aient pas le même type). Les numéros de fichiers ne correspondent donc plus aux numéros `planete-<n>` ci-dessous : ces numéros ne servent que de noms de prompts. `tools/generer-terre.py` écrit encore sous les anciens numéros 40 à 45 : ne pas le relancer sur `img/planete/` sans le rediriger vers un autre dossier.
+
 12 nouvelles textures de surface (27 à 38) : projection plane 2:1 d'un monde rocheux entier, sans sphère ni halo ni étoiles. Sans image de référence (ça consomme des jetons) : coller seulement le prompt. La colonne « Référence » ne sert qu'en cas de rendu raté. Le script `tools/detourer-magenta.py` raccorde le bord gauche au bord droit (fondu) pour que le défilement n'ait aucune couture, puis range le résultat dans `img/planete/<n>.jpg`.
 
 Début de chaque prompt (bloc TEXTURE) : `Flat equirectangular surface texture map of an entire rocky planet, exact 2:1 aspect ratio, seen straight on as a flat rectangular map with no sphere, no curvature, no atmosphere glow, no stars, no clouds shadow, no text, no labels, no grid lines. Flat, realistic global satellite-map look with fine surface detail, like a real planetary mosaic map.`
