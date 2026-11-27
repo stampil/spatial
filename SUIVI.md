@@ -25,7 +25,15 @@ Ce que je comprends :
 - Planète non reconnue : à l'arrivée on voit seulement les infos visibles, et si des vaisseaux défenseurs sont présents, le combat part tout seul, sans choix, en embuscade (rapport « Combat spatial » avec le bouton Résoudre).
 - Tuto : l'arrivée de la première flotte sur la planète découverte déclenche le combat automatiquement ; le texte et la flèche de l'étape 8 ne parlent plus d'« attaquer » mais disent que le combat se lance à l'arrivée, puis pointent « Débarquer » quand la défense est tombée.
 
+### 3. Icônes embarquer et débarquer plus lisibles (27/11)
+
+Ta phrase : « l'iconne pour faire embarquer ou desembarquer est trop petite donc on voit aps ce qu sa fait, lasisse la taille mais rajoute un gros + en bas a droite dans l'icone et un gros moins pour le desembarquement ».
+
+Ce que je comprends : on garde la taille actuelle des boutons ; les icônes « embarquer » reçoivent un gros « + » blanc en bas à droite, dans le bouton, et les icônes « débarquer » un gros « − ». Partout où elles servent : liste des vaisseaux (bouton d'ouverture du panneau, bouton de validation, bouton débarquer), fiche du perso (monter dans un transport, descendre du transport).
+
 ## Questions en suspens
+
+0. Go pour le « + » sur embarquer et le « − » sur débarquer, dans le bouton ?
 
 1. Les planètes du système sont des nœuds cliquables ; avec un ordre en cours, un toucher choisit la destination ; sans ordre, un toucher ouvre la feuille d'infos visibles. Je recommande cela.
 2. Le combat automatique à l'arrivée engage-t-il aussi le bouclier et le canon de la planète (défense complète), ou seulement les vaisseaux comme aujourd'hui, le bouton « Attaquer » restant pour la défense planétaire ? Je recommande la défense complète dans l'arrivée : plus de choix à faire pour le combat spatial, comme tu le demandes, et plus de bouton « Attaquer ».
