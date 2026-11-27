@@ -2,9 +2,11 @@
 
 ## À faire
 
-1. Textures de planètes : « fait générer d'autres prompt de texture planete, c une tache infini c moi qui metrai pause », puis « donne les 1 par 1 ».
-   Compris : tâche continue, un seul prompt à la fois, donné dans la conversation, prêt à coller dans Gemini (bloc TEXTURE + description, dans un seul bloc de code). Je donne d'abord ceux déjà écrits dans tools/prompts-images.md (planete-51 à 62), puis j'en invente de nouveaux un par un (ajoutés au fichier). Les prompts s’enchaînent sans attente : les déjà écrits d’un coup, un par un, puis un planning récurrent (toutes les minutes) en invente et donne un nouveau, jusqu'à ce que tu dises « pause ». Les ajouts sont amendés dans un seul commit local, sans push ni publication.
-   Dernier prompt donné : planete-64.
+1. Textures de planètes : « fait générer d'autres prompt de texture planete, c une tache infini c moi qui metrai pause », « donne les 1 par 1 », puis « k récupere a chaque "k" les texture et integre les direct ».
+   Compris : tâche continue.
+   a. Un prompt prêt à coller est donné toutes les minutes (planning), à partir de tools/prompts-images.md. Dernier prompt donné : planete-64. Ces ajouts ne sont plus commités à part : ils partent avec le commit d'intégration suivant.
+   b. À chaque « k » de l'utilisateur : je prends dans ~/Téléchargements les images plus récentes que la dernière intégrée, je regarde chacune (rendu 2:1, planète plate, bon type de monde), je la copie dans img/texture/<n>.jpg avec le numéro suivant, je la raccorde (tools/raccorder-planete.py, 1440 × 720, raccord vérifié), j'ajuste Planete::TEXTURES, puis commit, push et publication (autorisation permanente).
+   Textures intégrées : 51 = planete-51 (soufre, Gemini_Generated_Image_xknaojxknaojxkna.jpeg), 52 = planete-52 (champignons bioluminescents, Gemini_Generated_Image_6ermab6ermab6erm.jpeg). Dernière image intégrée : celle du 27/11 à 16:36.
 
 ## Questions en suspens
 
