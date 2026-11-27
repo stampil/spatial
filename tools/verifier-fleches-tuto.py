@@ -13,8 +13,8 @@ import urllib.request
 PAGES_SIMPLES = ('tableauBord', 'carte', 'listePlanete', 'listeVaisseau', 'listePerso')
 CLES_DESSINEES_PAR_SCRIPT = ('systeme-',)
 ETAPE_MINIMUM = 0
-ETAPE_MAXIMUM = 17
-ETAPE_APRES_TUTO = 18
+ETAPE_MAXIMUM = 20
+ETAPE_APRES_TUTO = 21
 CHAMP_MENU = 'data-tuto-menu'
 CHAMP_CIBLE = 'data-tuto-cible'
 

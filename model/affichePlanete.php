@@ -32,7 +32,7 @@ $defenseurs = Combat::defenseurs($p);
     <?php if($p->peutEtreRenommee($Joueur)){ ?>
     <div data-bloc>
         <div class="actions-icones">
-            <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer la planète', false, 'md3-button--tonal') ?>
+            <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer la planète', false, 'md3-button--tonal', ' data-tuto="'.Tuto::CLE_RENOMMER.'"') ?>
         </div>
         <div class="panneau-action" data-panneau="renommer" hidden>
             <form class="systeme-details__corps" method="POST" action="?p=renommerPlanete">
@@ -40,7 +40,7 @@ $defenseurs = Combat::defenseurs($p);
                 <?= csrfField() ?>
                 <div class="ligne-jeu">
                     <input type="text" class="md3-text" name="nom" maxlength="<?= Planete::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($p->nom) ?>" required aria-label="Nom de la planète" />
-                    <?= Vue::boutonIcone('valider', 'Renommer la planète', false, 'md3-button--tonal') ?>
+                    <?= Vue::boutonIcone('valider', 'Renommer la planète', false, 'md3-button--tonal', ' data-tuto="'.Tuto::CLE_RENOMMER_VALIDER.'"') ?>
                 </div>
             </form>
         </div>

@@ -229,6 +229,9 @@ class Combat {
 
         $force = Vaisseau::CATALOGUE[Vaisseau::TROUPE]['force'];
         $attaque = self::alea($troupes * $force);
+        if($joueur->enTuto()){
+            $attaque = max($attaque, $planete->troupes * $force + 1);
+        }
         $conquete = false;
         if($attaque > $planete->troupes * $force){
             $survivants = max(1, $troupes - $planete->troupes);

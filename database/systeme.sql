@@ -320,7 +320,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('025_positions_planetes'),
 ('026_planete_nom_origine'),
 ('027_orbites_ecartees'),
-('028_credits_reste');
+('028_credits_reste'),
+('029_tuto_fin_etapes_ajoutees');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

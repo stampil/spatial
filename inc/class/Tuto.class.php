@@ -18,11 +18,17 @@ class Tuto {
     const ETAPE_DEMOLITION = 15;
     const ETAPE_MENACE = 16;
     const ETAPE_RESTRICTOR = 17;
+    const ETAPE_CONQUETE = 18;
+    const ETAPE_NOMMER = 19;
+    const ETAPE_FERMES = 20;
     const ETAPES_A_VALIDER = array(self::ETAPE_BONUS, self::ETAPE_DEMOLITION);
     const PRIME_HEROS = 350;
     const PRIME_CREDITS = 800;
     const PRIME_ASSASSIN = 400;
     const PRIME_RESTRICTOR = 1000;
+    const PRIME_MARGE_POURCENT = 20;
+    const CLE_RENOMMER = 'renommer-planete';
+    const CLE_RENOMMER_VALIDER = 'renommer-planete-valider';
     const FLOTTE_REDUITE = 2;
     const GOUVERNEUR_ETOILES = 1;
     const ORBITE_CHASSEURS = 1;
@@ -48,6 +54,9 @@ class Tuto {
         }
         if($joueur->etape_tuto === self::ETAPE_RESTRICTOR && $joueur->enTuto()){
             self::garnirPlaneteDeux($joueur);
+        }
+        if($joueur->etape_tuto === self::ETAPE_CONQUETE && $joueur->enTuto()){
+            self::envoyerRenfort($joueur);
         }
         while($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && self::objectifAtteint($joueur)){
             self::passerALEtapeSuivante($joueur);
@@ -162,6 +171,14 @@ class Tuto {
                 return array(self::niveau('listeVaisseau', 'combattre laisser'));
             case self::ETAPE_RESTRICTOR:
                 return self::routeDeRestrictor($joueur, $mere);
+            case self::ETAPE_CONQUETE:
+                return self::routeDeConquete($joueur, $mere);
+            case self::ETAPE_NOMMER:
+                $renommable = self::planeteRenommable($joueur, $mere);
+                return $renommable === null ? array() : self::routeVersPlanete($renommable, self::CLE_RENOMMER_VALIDER.' '.self::CLE_RENOMMER);
+            case self::ETAPE_FERMES:
+                $aGarnir = self::planeteSansFermes($joueur);
+                return $aGarnir === null ? array() : self::routeVersPlanete($aGarnir, self::CLE_CONSTRUIRE.Batiment::FERME);
         }
         return array(self::niveau($page, self::CLE_COMPRENDRE));
     }
@@ -228,12 +245,109 @@ class Tuto {
         }
         $deux = self::planeteDeux($joueur);
         if(!self::restrictorSur($joueur, $deux)){
-            return self::routeVersLaCarte(array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte '.self::CLE_VOYAGER_FLOTTE)), $deux);
+            return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RESTRICTOR)), $deux);
         }
         if(self::chasseursSurRestrictor($joueur) < Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]){
             return array(self::niveau('listeVaisseau', 'embarquer-'.Vaisseau::RESTRICTOR.' embarquer-valider-'.Vaisseau::RESTRICTOR.'-'.Vaisseau::CHASSEUR));
         }
-        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER_FLOTTE)), self::planeteTrois($joueur));
+        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RESTRICTOR)), self::planeteTrois($joueur));
+    }
+
+    private static function primeDe(int $cout): int {
+        return intdiv($cout * (Planete::PERCENT + self::PRIME_MARGE_POURCENT) + Planete::PERCENT - 1, Planete::PERCENT);
+    }
+
+    private static function planetesDuSecteur(Joueur $joueur): array {
+        $planetes = array();
+        foreach(array(self::planeteCible($joueur), self::planeteDeux($joueur), self::planeteTrois($joueur)) as $planete){
+            if($planete !== null){
+                $planetes[$planete->id] = $planete;
+            }
+        }
+        return array_values($planetes);
+    }
+
+    private static function vider(Joueur $joueur, array $planetes): void {
+        foreach($planetes as $planete){
+            $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET id_camp=?, gouverneur=0, pnj_endurance=NULL, flotte_ia=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, bouclier=0, canon=0, troupes=0, defense_maj=? WHERE id=?";
+            MyPDO::getInstance()->query($query,Camp::PIRATES,Tools::now(),$planete->id);
+        }
+    }
+
+    private static function bargeSur(Joueur $joueur, Planete $planete): ?object {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND type=? AND id_planete=? AND arrivee IS NULL AND id_flotte IS NULL ORDER BY id LIMIT 1";
+        return MyPDO::getInstance()->query($query,$joueur->id,Vaisseau::BARGE,$planete->id)[0] ?? null;
+    }
+
+    private static function routeDeConquete(Joueur $joueur, Planete $mere): array {
+        $deux = self::planeteDeux($joueur);
+        $trois = self::planeteTrois($joueur);
+        $cible = $deux->gouverneur === $joueur->id ? $trois : $deux;
+        $depart = $cible->id === $deux->id ? $mere : $deux;
+        if(self::bargeSur($joueur, $cible) !== null){
+            return array(self::niveau('carte', self::CLE_FICHE.' systeme-'.$cible->id_systeme.' '.self::CLE_PLANETE.$cible->id), self::niveau('affichePlanete', 'debarquement'));
+        }
+        $barge = self::bargeSur($joueur, $depart);
+        if($barge === null){
+            return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::BARGE);
+        }
+        if(Vaisseau::troupesEnBarge($depart->id, $joueur->id) < 1){
+            if((Vaisseau::stockLibre($depart->id, $joueur->id)[Vaisseau::TROUPE] ?? 0) > 0){
+                return array(self::niveau('listeVaisseau', 'embarquer-valider-'.Vaisseau::BARGE.'-'.Vaisseau::TROUPE.' embarquer-'.Vaisseau::BARGE));
+            }
+            return $depart->id === $mere->id ? self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::TROUPE) : array();
+        }
+        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::BARGE)), $cible);
+    }
+
+    private static function envoyerRenfort(Joueur $joueur): void {
+        $deux = self::planeteDeux($joueur);
+        if($deux->gouverneur !== $joueur->id || self::planeteTrois($joueur)->gouverneur === $joueur->id || self::bargeSur($joueur, $deux) === null){
+            return;
+        }
+        if(Vaisseau::troupesEnBarge($deux->id, $joueur->id) + (Vaisseau::stockLibre($deux->id, $joueur->id)[Vaisseau::TROUPE] ?? 0) > 0){
+            return;
+        }
+        MyPDO::getInstance()->query("INSERT INTO " . MyPDO::DB_FLAG . "vaisseau (id_joueur,id_planete,type,creato) VALUES (?,?,?,?)",$joueur->id,$deux->id,Vaisseau::TROUPE,Tools::now());
+        Tools::addMessage('Tutoriel : un renfort de troupes vous attend sur '.$deux->getNom().'.');
+    }
+
+    private static function planeteRenommable(Joueur $joueur, Planete $mere): ?Planete {
+        foreach(array_merge(array(self::planeteDeux($joueur), self::planeteTrois($joueur), self::planeteCible($joueur)), array($mere)) as $planete){
+            if($planete !== null && $planete->peutEtreRenommee($joueur)){
+                return $planete;
+            }
+        }
+        return null;
+    }
+
+    private static function fermesManquantes(Joueur $joueur): int {
+        $manquantes = 0;
+        foreach(self::planetesDuSecteur($joueur) as $planete){
+            $manquantes += $planete->slot - $planete->nombre(Batiment::FERME);
+        }
+        return $manquantes;
+    }
+
+    private static function planeteSansFermes(Joueur $joueur): ?Planete {
+        foreach(self::planetesDuSecteur($joueur) as $planete){
+            if($planete->gouverneur !== $joueur->id || $planete->nombre(Batiment::FERME) < $planete->slot){
+                return $planete;
+            }
+        }
+        return null;
+    }
+
+    private static function remplacerParDesFermes(Joueur $joueur): void {
+        foreach(self::planetesDuSecteur($joueur) as $planete){
+            foreach(array_keys(Batiment::CATALOGUE) as $batiment){
+                if($batiment === Batiment::FERME || $planete->nombre($batiment) < 1){
+                    continue;
+                }
+                $joueur->crediter($planete->nombre($batiment) * Batiment::remboursement($batiment));
+                MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=0 WHERE id=?",$planete->id);
+            }
+        }
     }
 
     private static function restrictorSur(Joueur $joueur, ?Planete $planete): bool {
@@ -261,7 +375,7 @@ class Tuto {
     }
 
     private static function planeteDeux(Joueur $joueur): ?Planete {
-        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<>? AND gouverneur=0 ORDER BY id LIMIT 1";
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<>? ORDER BY id LIMIT 1";
         $ligne = MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin,self::planeteCible($joueur)->id)[0] ?? null;
         if($ligne === null){
             $idPlanete = Planete::premiereGouvernee($joueur->id);
@@ -272,7 +386,7 @@ class Tuto {
 
     private static function planeteTrois(Joueur $joueur): ?Planete {
         $deux = self::planeteDeux($joueur);
-        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<>? AND id<>? AND gouverneur=0 ORDER BY id LIMIT 1";
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<>? AND id<>? ORDER BY id LIMIT 1";
         $ligne = MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin,self::planeteCible($joueur)->id,$deux === null ? 0 : $deux->id)[0] ?? null;
         return $ligne === null ? $deux : new Planete($ligne->id);
     }
@@ -325,6 +439,18 @@ class Tuto {
             self::lancerFlotteReduite($joueur);
             Tools::addMessage('Tutoriel : prime de '.self::PRIME_RESTRICTOR.' '.__('credit', 'credits', self::PRIME_RESTRICTOR).' pour une usine lourde et un Restrictor.');
         }
+        elseif($etape === self::ETAPE_CONQUETE){
+            $prime = self::primeDe(Vaisseau::CATALOGUE[Vaisseau::BARGE]['prix'] + Vaisseau::CATALOGUE[Vaisseau::TROUPE]['prix']);
+            self::vider($joueur, array(self::planeteDeux($joueur), self::planeteTrois($joueur)));
+            $joueur->crediter($prime);
+            Tools::addMessage('Tutoriel : prime de '.$prime.' '.__('credit', 'credits', $prime).' pour une barge et une troupe d\'assaut.');
+        }
+        elseif($etape === self::ETAPE_FERMES){
+            self::remplacerParDesFermes($joueur);
+            $prime = self::primeDe(self::fermesManquantes($joueur) * Batiment::CATALOGUE[Batiment::FERME]['prix']);
+            $joueur->crediter($prime);
+            Tools::addMessage('Tutoriel : prime de '.$prime.' '.__('credit', 'credits', $prime).' pour construire les fermes.');
+        }
         elseif($etape === self::ETAPE_ANALYSE){
             self::preparerPlaneteDeux($joueur);
             Tools::addMessage('Tutoriel : planète capturée ; la planète voisine vous attend.');
@@ -368,6 +494,12 @@ class Tuto {
                 return self::possedePerso($joueur, Perso::ROLE_HEROS);
             case self::ETAPE_MENACE:
                 return Menace::enCours($joueur->id) === null;
+            case self::ETAPE_CONQUETE:
+                return self::planeteDeux($joueur)->gouverneur === $joueur->id && self::planeteTrois($joueur)->gouverneur === $joueur->id;
+            case self::ETAPE_NOMMER:
+                return (int) $db->query("SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "planete WHERE gouverneur=? AND nom_origine IS NOT NULL",$joueur->id)[0]->nombre > 0;
+            case self::ETAPE_FERMES:
+                return self::planeteSansFermes($joueur) === null;
             case self::ETAPE_RESTRICTOR:
                 return (int) $db->query("SELECT tuto_aneantie FROM " . MyPDO::DB_FLAG . "joueur WHERE id=?",$joueur->id)[0]->tuto_aneantie === 1;
             case self::ETAPE_PREPARATION:
@@ -444,6 +576,12 @@ class Tuto {
                 return 'Répondre à une menace pirate';
             case self::ETAPE_RESTRICTOR:
                 return 'Anéantir une flotte avec un Restrictor';
+            case self::ETAPE_CONQUETE:
+                return 'Prendre les deux planètes restantes';
+            case self::ETAPE_NOMMER:
+                return 'Nommer une planète';
+            case self::ETAPE_FERMES:
+                return 'Des fermes partout';
         }
         return '';
     }
@@ -489,7 +627,15 @@ class Tuto {
             case self::ETAPE_RESTRICTOR:
                 $cible = self::planeteTrois($joueur);
                 $deux = self::planeteDeux($joueur);
-                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue s\'enfuit vers la planète alliée ou neutre la plus proche : le Restrictor l\'en empêche, tant qu\'il vit dans votre flotte. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr) : il embarque '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' '.__('chasseur', 'chasseurs', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]).' et '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES].' '.__('troupe', 'troupes', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES]).' d\'assaut. Menu Flottes : '.self::action('creer_flotte', 'Créer une flotte').' avec lui et '.self::action('voyager', 'Voyager').' sur '.($deux === null ? 'la planète voisine' : $deux->getNom()).', déjà nettoyée, où vos chasseurs vous attendent. Là, '.self::action('embarquer', 'Embarquer').' les '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' chasseurs sur le Restrictor (curseur sur '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].', puis validez), et '.self::action('voyager', 'Voyager').' sur '.($cible === null ? 'la planète pirate' : $cible->getNom()).' : l\'arrivée déclenche le combat tout seul, et pendant le tutoriel vous le gagnez d\'avance.';
+                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue s\'enfuit vers la planète alliée ou neutre la plus proche : le Restrictor l\'en empêche, tant qu\'il vit dans votre flotte. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr) : il embarque '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' '.__('chasseur', 'chasseurs', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]).' et '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES].' '.__('troupe', 'troupes', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES]).' d\'assaut. Menu Flottes : '.self::action('voyager', 'Voyager').' avec lui sur '.($deux === null ? 'la planète voisine' : $deux->getNom()).', déjà nettoyée, où vos chasseurs vous attendent. Là, '.self::action('embarquer', 'Embarquer').' les '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' chasseurs sur le Restrictor (curseur sur '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].', puis validez), et '.self::action('voyager', 'Voyager').' sur '.($cible === null ? 'la planète pirate' : $cible->getNom()).' : l\'arrivée déclenche le combat tout seul, et pendant le tutoriel vous le gagnez d\'avance.';
+            case self::ETAPE_CONQUETE:
+                $deux = self::planeteDeux($joueur);
+                $trois = self::planeteTrois($joueur);
+                return $deux->getNom().' et '.$trois->getNom().' ne sont plus défendues, mais personne ne les gouverne : les Pirates peuvent encore les reprendre. Prenez-les, comme la première. Menu Flottes : produisez une barge et une troupe d\'assaut sur '.$planete->getNom().' (prime comprise), '.self::action('embarquer', 'Embarquer').' la troupe dans la barge, puis '.self::action('voyager', 'Voyager').' sur '.$deux->getNom().' et '.self::action('debarquement', 'Débarquer').'. Une troupe de renfort vous y attend ensuite : embarquez-la, voyagez sur '.$trois->getNom().' et débarquez. Une barge débarque toutes ses troupes sur une seule planète, d\'où le renfort ; pendant le tutoriel, le débarquement est gagné d\'avance.';
+            case self::ETAPE_NOMMER:
+                return 'Vous gouvernez les trois planètes du système voisin. Un gouverneur dont un perso se trouve sur la planète peut la renommer : ouvrez la fiche d\'une planète où l\'un de vos persos est présent (l\'assassin est resté sur '.self::planeteDeux($joueur)->getNom().') et '.self::action('renommer', 'Renommer la planète').'. Si le gouverneur perd la planète, elle reprend son nom d\'origine.';
+            case self::ETAPE_FERMES:
+                return 'Chaque ferme rapporte '.Batiment::FERME_INCOME.' cr/h pour '.Batiment::CATALOGUE[Batiment::FERME]['maintenance'].' cr/h de maintenance. Une prime couvre le coût : sur chacune de vos trois planètes du système voisin (menu Colonies, puis la fiche de la planète), construisez des fermes sur tous les emplacements, rien d\'autre. Les crédits tombent ensuite chaque minute : vous les verrez monter en haut de l\'écran.';
         }
         return '';
     }

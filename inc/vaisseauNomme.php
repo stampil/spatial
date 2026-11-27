@@ -20,7 +20,7 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
         </div>
         <div class="actions-icones hors-creation">
             <?php if($avecVoyage){ ?>
-            <?= Vue::lienIcone('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager') ?>
+            <?= Vue::lienIcone('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager', false, '', ' data-tuto="'.Tuto::CLE_VOYAGER.$vaisseau->type.'"') ?>
             <?php } ?>
             <?php if($peutEmbarquer){ ?>
             <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal md3-button--plus', ' data-tuto="embarquer embarquer-'.$vaisseau->type.'"') ?>

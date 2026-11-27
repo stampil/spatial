@@ -171,7 +171,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('025_positions_planetes'),
 ('026_planete_nom_origine'),
 ('027_orbites_ecartees'),
-('028_credits_reste');
+('028_credits_reste'),
+('029_tuto_fin_etapes_ajoutees');
 
 UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
 
