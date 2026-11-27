@@ -26,7 +26,7 @@ class Planete {
     const CAPTURE_REVOLTE = 50;
     const REVOLTE_ALERTE = 40;
     const SEUIL_INDEPENDANCE = 51;
-    const TEXTURES = 47;
+    const TEXTURES = 48;
     const ILLUSTRATION_REJOINT = 'evenement-rejoint';
     const ILLUSTRATION_REVOLTE = 'evenement-revolte';
     const ILLUSTRATION_CONQUISE = 'evenement-conquise';
