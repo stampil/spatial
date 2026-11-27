@@ -28,7 +28,8 @@ foreach(Flotte::liste($Joueur->id) as $ligne){
 <p><?= Vue::lienIcone('?p=carte&systeme='.$systeme->id, 'carte', 'Voir sur la carte', false, 'md3-button--tonal') ?></p>
 <div class="fiches">
 <?php
-foreach($systeme->planetes as $p){
+foreach($systeme->planetes as $ligne){
+    $p = new Planete($ligne->id);
     $couleurPlanete = $p->id_camp === null ? Camp::SANS_CAMP_COULEUR : (new Camp($p->id_camp))->couleur;
     $releve = Analyse::releve($Joueur, $p);
     $stock = $posees[$p->id] ?? array();

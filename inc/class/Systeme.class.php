@@ -9,7 +9,6 @@ class Systeme {
     const TENTATIVES_PAR_AGRANDISSEMENT = 20;
     const AGRANDISSEMENT = 100;
     const DEGRES_TOUR = 360;
-    const DISTANCE_MEME_SYSTEME = 0;
     const DISTANCE_MINIMUM = 1;
     const REQUETE_SYSTEMES_DES_ANCIENS = "SELECT p.id_systeme FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=p.gouverneur WHERE j.fin_tuto<=?";
 
@@ -178,9 +177,6 @@ class Systeme {
     }
 
     public function distanceA(Systeme $autre): int {
-        if($this->id === $autre->id){
-            return self::DISTANCE_MEME_SYSTEME;
-        }
         return max(self::DISTANCE_MINIMUM, (int) round(hypot($this->x - $autre->x, $this->y - $autre->y)));
     }
 

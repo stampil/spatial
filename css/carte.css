@@ -62,7 +62,12 @@ main.md3-page > .mission {
     stroke-width: 1;
 }
 
-.carte__systeme {
+.carte__monde--cache {
+    display: none;
+}
+
+.carte__systeme,
+.carte__planete {
     cursor: pointer;
     outline: none;
 }
@@ -81,14 +86,27 @@ main.md3-page > .mission {
     vector-effect: non-scaling-stroke;
 }
 
-.carte__systeme--moi .carte__halo {
+.carte__systeme--moi .carte__halo,
+.carte__planete--moi .carte__halo {
     display: inline;
 }
 
 .carte__systeme--choisi .carte__halo,
-.carte__systeme:focus-visible .carte__halo {
+.carte__systeme:focus-visible .carte__halo,
+.carte__planete--choisie .carte__halo,
+.carte__planete:focus-visible .carte__halo {
     display: inline;
     stroke: #FFFFFF;
+}
+
+.carte__orbite {
+    fill: none;
+    stroke: var(--carte-trait);
+    stroke-dasharray: 4 6;
+    stroke-width: 1;
+    opacity: 0.3;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
 }
 
 .carte__zone {
@@ -242,6 +260,11 @@ main.md3-page > .mission {
     border-top: 0;
 }
 
+.carte__actions {
+    display: flex;
+    gap: 8px;
+}
+
 .carte__valeur {
     min-width: 3ch;
     text-align: center;
@@ -252,7 +275,8 @@ main.md3-page > .mission {
     height: 48px;
 }
 
-#carte-base {
+#carte-base,
+#carte-retour {
     font-size: var(--md-sys-typescale-label-large-size);
 }
 

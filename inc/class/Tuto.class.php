@@ -35,6 +35,9 @@ class Tuto {
     const CLE_RECRUTER = 'recruter-';
     const CLE_VOYAGER = 'voyager-';
     const CLE_PLANETE = 'planete-';
+    const CLE_FICHE = 'planete-fiche';
+    const CLE_VOYAGER_ICI = 'voyager-ici';
+    const CLE_VOYAGER_FLOTTE = 'voyager-flotte';
     const CLE_PERSO = 'perso-';
     const CLE_COMPRENDRE = 'comprendre';
 
@@ -132,14 +135,16 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 return array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte'));
             case self::ETAPE_ENVOI:
-                return array(self::niveau('listeVaisseau', self::cleDEnvoi($joueur)));
+                $cle = self::cleDEnvoi($joueur);
+                return self::routeVersLaCarte(array(self::niveau('listeVaisseau', $cle)), $cle === self::CLE_VOYAGER_FLOTTE ? self::planeteCible($joueur) : null);
             case self::ETAPE_ASSAUT:
                 $cible = self::planeteCible($joueur);
-                return array(self::niveau('carte', null), self::niveau('carte', 'systeme-'.$cible->id_systeme), self::niveau('afficheSysteme', self::CLE_PLANETE.$cible->id), self::niveau('affichePlanete', 'attaque_flotte debarquement'));
+                return array(self::niveau('carte', self::CLE_FICHE.' systeme-'.$cible->id_systeme.' '.self::CLE_PLANETE.$cible->id), self::niveau('affichePlanete', 'debarquement'));
             case self::ETAPE_ANALYSE:
-                return array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RECONNAISSANCE));
+                return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RECONNAISSANCE)), self::planeteDeux($joueur));
             case self::ETAPE_ORBITE:
-                return array(self::niveau('listeVaisseau', self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) > 0 ? 'decharger' : self::CLE_VOYAGER.Vaisseau::CHASSEUR));
+                $chasseursEmbarques = self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) > 0;
+                return self::routeVersLaCarte(array(self::niveau('listeVaisseau', $chasseursEmbarques ? 'decharger' : self::CLE_VOYAGER.Vaisseau::CHASSEUR)), $chasseursEmbarques ? null : self::planeteCible($joueur));
             case self::ETAPE_ASSASSIN:
                 return self::routeDAssassin($joueur, $mere);
             case self::ETAPE_SABOTAGE:
@@ -152,6 +157,13 @@ class Tuto {
                 return self::routeDeRestrictor($joueur, $mere);
         }
         return array(self::niveau($page, self::CLE_COMPRENDRE));
+    }
+
+    private static function routeVersLaCarte(array $route, ?Planete $cible): array {
+        if($cible !== null){
+            array_push($route, self::niveau('carte', self::CLE_VOYAGER_ICI.' '.self::CLE_PLANETE.$cible->id.' systeme-'.$cible->id_systeme));
+        }
+        return $route;
     }
 
     private static function cleDePreparation(Joueur $joueur, Planete $mere): string {
@@ -179,7 +191,7 @@ class Tuto {
         }
         $assassin = MyPDO::getInstance()->query("SELECT embarque, arrivee, sur_planete FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND role=? AND fin_mort IS NULL ORDER BY id LIMIT 1",$joueur->id,Perso::ROLE_ASSASSIN)[0];
         if((int) $assassin->embarque === 1){
-            return array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::TRANSPORT_PERSO));
+            return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::TRANSPORT_PERSO)), self::planeteDeux($joueur));
         }
         $versLaFiche = array(self::niveau('listePerso', self::CLE_PERSO.Perso::ROLE_ASSASSIN));
         if($assassin->arrivee !== null){
@@ -197,7 +209,7 @@ class Tuto {
         if(self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) < self::CHASSEURS_REQUIS){
             return 'embarquer-valider-fregate-'.Vaisseau::CHASSEUR.' embarquer-fregate';
         }
-        return 'voyager-flotte';
+        return self::CLE_VOYAGER_FLOTTE;
     }
 
     private static function routeDeRestrictor(Joueur $joueur, Planete $mere): array {
@@ -207,7 +219,7 @@ class Tuto {
         if(self::nombreDeVaisseaux($joueur, Vaisseau::RESTRICTOR, false) < 1){
             return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::RESTRICTOR);
         }
-        return array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte voyager-flotte'));
+        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte '.self::CLE_VOYAGER_FLOTTE)), self::planeteDeux($joueur));
     }
 
     private static function planeteDeux(Joueur $joueur): ?Planete {
@@ -409,9 +421,9 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 return 'Une flotte regroupe vos vaisseaux moyens et lourds (frégate, barge, capital). Allez dans le menu Flottes : sur l\'encart de '.$planete->getNom().', '.self::action('creer_flotte', 'Créer une flotte').' (en haut à droite) vous laisse cocher la frégate et la barge, puis '.self::action('valider', 'Enregistrer').'.';
             case self::ETAPE_ENVOI:
-                return 'Dans le menu Flottes, ouvrez '.self::action('embarquer', 'Embarquer').' sur la barge de votre flotte : réglez le curseur sur '.self::TROUPES_REQUISES.' '.__('troupe', 'troupes', self::TROUPES_REQUISES).' et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Ensuite '.self::action('voyager', 'Voyager').' sur votre flotte : touchez le système voisin et '.self::action('voyager', 'Voyager ici').' sur '.self::planeteCible($joueur)->getNom().'.';
+                return 'Dans le menu Flottes, ouvrez '.self::action('embarquer', 'Embarquer').' sur la barge de votre flotte : réglez le curseur sur '.self::TROUPES_REQUISES.' '.__('troupe', 'troupes', self::TROUPES_REQUISES).' et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Ensuite '.self::action('voyager', 'Voyager').' sur votre flotte : touchez le système voisin, puis la planète '.self::planeteCible($joueur)->getNom().', et '.self::action('voyager', 'Voyager ici').'. À l\'arrivée, la défense de la planète engage votre flotte automatiquement : le combat spatial n\'est plus un choix.';
             case self::ETAPE_ASSAUT:
-                return 'Votre flotte est arrivée. Ouvrez la fiche de '.self::planeteCible($joueur)->getNom().' : '.self::action('attaque_flotte', 'Attaquer').' avec votre flotte pour détruire sa défense (les chasseurs embarqués sur la frégate combattent avec elle, pas besoin de les sortir), puis '.self::action('debarquement', 'Débarquer').' les troupes de vos barges. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
+                return 'Votre flotte est arrivée et a combattu la défense de '.self::planeteCible($joueur)->getNom().' toute seule (les chasseurs embarqués sur la frégate combattent avec elle). Une fois la défense détruite, ouvrez la fiche de la planète ('.self::action('info', 'Fiche').' sur la carte) et '.self::action('debarquement', 'Débarquer').' les troupes de vos barges. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
             case self::ETAPE_ANALYSE:
                 $deux = self::planeteDeux($joueur);
                 return 'Planète capturée et tenue. Inutile de faire de la diplomatie ni de la rallier à votre cause : tant que votre garnison y reste, ses bâtiments produisent, avec un léger malus de temps ('.Planete::MALUS_OCCUPATION_POURCENT.' %). Si la garnison disparaît ou est détruite, la planète redevient neutre, élit un gouverneur une fois sur deux et reconstruit ses défenses. Place à la planète voisine '.($deux === null ? '' : $deux->getNom()).' : elle a un gouverneur. Envoyez-y votre vaisseau de reconnaissance (menu Flottes, '.self::action('reconnaitre', 'Reconnaître').') : une reconnaissance ne déclenche aucun combat (un joueur adverse peut pourtant l\'attaquer) et, à l\'arrivée, elle analyse la planète : garnison, vaisseaux en orbite, bâtiments et gouverneur, qui restaient inconnus.';

@@ -123,6 +123,8 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `nb_canon_orbital` int(11) NOT NULL DEFAULT '0',
   `pnj_endurance` tinyint(1) DEFAULT NULL,
   `occupee` tinyint(1) NOT NULL DEFAULT '0',
+  `x` int(11) NOT NULL DEFAULT '0',
+  `y` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 
@@ -312,7 +314,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('021_flotte_ia'),
 ('022_tuto_restrictor'),
 ('023_gouverneurs_structures_analyse'),
-('024_perso_demi_etoiles');
+('024_perso_demi_etoiles'),
+('025_positions_planetes');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

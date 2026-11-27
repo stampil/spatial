@@ -20,7 +20,9 @@ ALTER TABLE `planete`
   ADD COLUMN `nb_bouclier_planetaire` int(11) NOT NULL DEFAULT '0' AFTER `flotte_ia`,
   ADD COLUMN `nb_canon_orbital` int(11) NOT NULL DEFAULT '0' AFTER `nb_bouclier_planetaire`,
   ADD COLUMN `pnj_endurance` tinyint(1) DEFAULT NULL AFTER `nb_canon_orbital`,
-  ADD COLUMN `occupee` tinyint(1) NOT NULL DEFAULT '0' AFTER `pnj_endurance`;
+  ADD COLUMN `occupee` tinyint(1) NOT NULL DEFAULT '0' AFTER `pnj_endurance`,
+  ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `occupee`,
+  ADD COLUMN `y` int(11) NOT NULL DEFAULT '0' AFTER `x`;
 
 ALTER TABLE `systeme`
   ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `visible`,
@@ -163,9 +165,14 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('021_flotte_ia'),
 ('022_tuto_restrictor'),
 ('023_gouverneurs_structures_analyse'),
-('024_perso_demi_etoiles');
+('024_perso_demi_etoiles'),
+('025_positions_planetes');
 
 UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
+
+ALTER TABLE `planete` ADD INDEX `tmp_positions_systeme` (`id_systeme`);
+UPDATE `planete` p JOIN (SELECT a.`id`, (SELECT COUNT(*) FROM `planete` b WHERE b.`id_systeme` = a.`id_systeme` AND b.`id` < a.`id`) AS `rang` FROM `planete` a) r ON r.`id` = p.`id` SET p.`x` = ROUND((24 + r.`rang` * 14) * COS(r.`rang` * 2.399963229728653 + p.`id_systeme`)), p.`y` = ROUND((24 + r.`rang` * 14) * SIN(r.`rang` * 2.399963229728653 + p.`id_systeme`));
+ALTER TABLE `planete` DROP INDEX `tmp_positions_systeme`;
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

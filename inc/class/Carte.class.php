@@ -2,6 +2,10 @@
 
 class Carte {
 
+    const STATUT_MIEN = 'Votre colonie';
+    const STATUT_LIBRE = 'Libre';
+    const STATUT_OCCUPE = 'Occupée';
+
     public static function donnees(Joueur $joueur): array {
         $camps = array();
         foreach(Camp::liste() as $camp){
@@ -78,7 +82,15 @@ class Carte {
             if((int) $planete->gouverneur === $joueur->id){
                 $moi = true;
             }
-            array_push($planetes, array('id' => (int) $planete->id, 'nom' => $planete->nom));
+            array_push($planetes, array(
+                'id' => (int) $planete->id,
+                'nom' => $planete->nom,
+                'x' => $planete->x,
+                'y' => $planete->y,
+                'couleur' => $planete->id_camp === null ? Camp::SANS_CAMP_COULEUR : $camps[$planete->id_camp]->couleur,
+                'statut' => $planete->gouverneur === $joueur->id ? self::STATUT_MIEN : ($planete->gouverneur === 0 ? self::STATUT_LIBRE : self::STATUT_OCCUPE),
+                'moi' => $planete->gouverneur === $joueur->id,
+            ));
         }
         return array(
             'id' => $systeme->id,
@@ -96,13 +108,30 @@ class Carte {
         $reduction = $depart->reductionTrajet($joueur);
         $secondes = array();
         foreach($destinations as $destination){
-            $duree = 0;
-            foreach($types as $type){
-                $duree = max($duree, Vaisseau::dureeEntre($joueur, $type, $depart->systeme->distanceA($destination), $reduction));
+            if($destination->id !== $depart->id_systeme){
+                $secondes[$destination->id] = self::dureeMaximale($joueur, $types, $depart->systeme->distanceA($destination) * Vaisseau::TRAJET_SECONDES_PAR_UNITE, $reduction);
             }
-            $secondes[$destination->id] = $duree;
         }
         return $secondes;
+    }
+
+    private static function secondesLocales(Joueur $joueur, Planete $depart, array $types): array {
+        $reduction = $depart->reductionTrajet($joueur);
+        $secondes = array();
+        foreach($depart->systeme->planetes as $destination){
+            if($destination->id !== $depart->id){
+                $secondes[$destination->id] = self::dureeMaximale($joueur, $types, Planete::secondesEntre($depart->x, $depart->y, $destination->x, $destination->y), $reduction);
+            }
+        }
+        return $secondes;
+    }
+
+    private static function dureeMaximale(Joueur $joueur, array $types, int $baseSecondes, int $reduction): int {
+        $duree = 0;
+        foreach($types as $type){
+            $duree = max($duree, Vaisseau::dureeEntre($joueur, $type, $baseSecondes, $reduction));
+        }
+        return $duree;
     }
 
     private static function stocks(Joueur $joueur, array $systemes, array $destinations): array {
@@ -120,6 +149,7 @@ class Carte {
                     'nombre' => $nombre,
                     'combat' => in_array($type, Combat::ESCADRE, true),
                     'secondes' => self::secondes($joueur, $planete, array($type), $destinations),
+                    'secondesLocales' => self::secondesLocales($joueur, $planete, array($type)),
                 ));
             }
             array_push($stocks, array('planete' => $planete->id, 'systeme' => $planete->id_systeme, 'nom' => $planete->nom, 'vaisseaux' => $vaisseaux));
@@ -150,6 +180,7 @@ class Carte {
                 'systeme' => $planete->id_systeme,
                 'composition' => $composition,
                 'secondes' => self::secondes($joueur, $planete, array_keys($flotte->composition()), $destinations),
+                'secondesLocales' => self::secondesLocales($joueur, $planete, array_keys($flotte->composition())),
             ));
         }
         return $flottes;

@@ -154,20 +154,11 @@ class Combat {
         if($planete->gouverneur === $joueur->id){
             return;
         }
-        $defenseurs = self::defenseurs($planete);
-        $nombres = Vaisseau::escadre($planete->id, $joueur->id);
-        if(array_sum($defenseurs) === 0 || array_sum($nombres) === 0){
+        $defenseActive = $planete->bouclier + $planete->canon > 0 || array_sum(self::defenseurs($planete)) > 0;
+        if(!$defenseActive || array_sum(Vaisseau::combattants($planete->id, $joueur->id, null)) === 0){
             return;
         }
-        $bataille = self::bataillePlanete($joueur, $planete, $nombres, $defenseurs, 'Combat spatial sur '.$planete->nom);
-        Vaisseau::detruire($planete->id, $joueur->id, $bataille['pertes'][self::ATTAQUANT]);
-        if($bataille['fuite'][self::ATTAQUANT]){
-            Vaisseau::fuirTous($joueur, $planete, $planete->refugePour($joueur));
-        }
-        if($bataille['vainqueur'] === self::ATTAQUANT){
-            $joueur->crediter($bataille['epaves']);
-        }
-        Tools::addMessage($bataille['bilan']);
+        self::attaquer($joueur, $planete);
     }
 
     public static function defenseurs(Planete $planete): array {

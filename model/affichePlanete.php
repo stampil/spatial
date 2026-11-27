@@ -75,45 +75,16 @@ $analyse = $proprietaire ? null : Analyse::derniere($Joueur->id, $p->id);
 </section>
 <?php
 if($p->gouverneur !== $Joueur->id){
-    $escadre = array_sum(Vaisseau::combattants($p->id, $Joueur->id, null));
-    $troupes = Vaisseau::troupesEnBarge($p->id, $Joueur->id);
     $defenseActive = $defense > 0 || array_sum($defenseurs) > 0;
-    $flottesPresentes = array();
-    foreach(Flotte::liste($Joueur->id) as $ligne){
-        $flotte = new Flotte($ligne->id);
-        $engages = array_sum(Vaisseau::combattants($p->id, $Joueur->id, $flotte->id));
-        if($flotte->planeteAuRepos() === $p->id && $defenseActive && $engages > 0){
-            array_push($flottesPresentes, array('flotte' => $flotte, 'engages' => $engages));
-        }
-    }
-    $attaque = $escadre > 0 && $defenseActive;
+    $troupes = Vaisseau::troupesEnBarge($p->id, $Joueur->id);
     $debarquement = $troupes > 0 && !$defenseActive;
 ?>
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html('canon') ?>Opérations</h2>
-    <?php if(!$attaque && count($flottesPresentes) === 0 && !$debarquement){ ?>
-    <p class="md3-secondary">Aucune opération possible : envoyez des vaisseaux sur cette planète depuis la carte.</p>
+    <?php if(!$debarquement){ ?>
+    <p class="md3-secondary"><?= $defenseActive ? 'Le combat se lance tout seul quand une flotte arrive : envoyez des vaisseaux de combat sur cette planète depuis la carte, puis débarquez les troupes une fois la défense tombée.' : 'Aucune opération possible : envoyez des vaisseaux sur cette planète depuis la carte.' ?></p>
     <?php } ?>
     <div class="md3-actions">
-    <?php if($attaque){ ?>
-        <form class="action" method="POST" action="?p=combattre">
-            <input type="hidden" name="planete" value="<?= $p->id ?>" />
-            <input type="hidden" name="action" value="attaquer" />
-            <?= csrfField() ?>
-            <?= Vue::boutonIcone('attaque', 'Attaquer') ?>
-            <span class="md3-secondary"><?= $escadre ?> <?= __('vaisseau', 'vaisseaux', $escadre) ?></span>
-        </form>
-    <?php } ?>
-    <?php foreach($flottesPresentes as $presente){ ?>
-        <form class="action" method="POST" action="?p=combattre">
-            <input type="hidden" name="planete" value="<?= $p->id ?>" />
-            <input type="hidden" name="flotte" value="<?= $presente['flotte']->id ?>" />
-            <input type="hidden" name="action" value="attaquer" />
-            <?= csrfField() ?>
-            <?= Vue::boutonIcone('attaque_flotte', 'Attaquer avec la flotte', false, 'md3-button--tonal', ' data-tuto="attaque_flotte"') ?>
-            <span class="md3-secondary"><?= htmlspecialchars($presente['flotte']->nom) ?> · <?= $presente['engages'] ?> <?= __('vaisseau', 'vaisseaux', $presente['engages']) ?></span>
-        </form>
-    <?php } ?>
     <?php if($debarquement){ ?>
         <form class="action" method="POST" action="?p=combattre">
             <input type="hidden" name="planete" value="<?= $p->id ?>" />

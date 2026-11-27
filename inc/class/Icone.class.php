@@ -42,7 +42,6 @@ class Icone {
         'saboter' => '<path d="M4 20l8-8"/><path d="M14 4l6 6-3 1-2 4-3-3 4-2z"/><path d="M3 6l3 3M6 3l3 3"/>',
         'restrictor' => '<circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/>',
         'attaque' => '<path d="M5 19l9-9"/><path d="M14 4l6 6-4 1-3-3z"/><path d="M8 14l-3 5"/>',
-        'attaque_flotte' => '<path d="M4 18l5-5 5 5M4 11l5-5 5 5"/><path d="M16 6l4 4-4 4"/>',
         'debarquement' => '<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>',
         'voyager' => '<path d="M5 19L19 5M9 5h10v10"/>',
         'chercher' => '<circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/>',

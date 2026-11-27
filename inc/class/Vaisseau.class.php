@@ -2,7 +2,6 @@
 
 class Vaisseau {
 
-    const TRAJET_MEME_SYSTEME_SECONDES = 60;
     const TRAJET_SECONDES_PAR_UNITE = 1;
     const PERCENT = 100;
     const ILLUSTRATION_DECOUVERTE = 'evenement-decouverte';
@@ -161,16 +160,19 @@ class Vaisseau {
         return MyPDO::getInstance()->query($query,$joueurId);
     }
 
-    public static function dureeTrajet(Joueur $joueur, string $type, Planete $depart, Planete $destination): int {
-        return self::dureeEntre($joueur, $type, $depart->systeme->distanceA($destination->systeme), $depart->reductionTrajet($joueur));
+    public static function secondesDeBase(Planete $depart, Planete $destination): int {
+        if($depart->id_systeme === $destination->id_systeme){
+            return $depart->secondesVers($destination);
+        }
+        return $depart->systeme->distanceA($destination->systeme) * self::TRAJET_SECONDES_PAR_UNITE;
     }
 
-    public static function dureeEntre(Joueur $joueur, string $type, int $distance, int $reductionPourcent): int {
-        $base = $distance * self::TRAJET_SECONDES_PAR_UNITE;
-        if($distance === Systeme::DISTANCE_MEME_SYSTEME){
-            $base = self::TRAJET_MEME_SYSTEME_SECONDES;
-        }
-        return $joueur->dureeEffective(intdiv($base * self::CATALOGUE[$type]['vitesse'] * (self::PERCENT - $reductionPourcent), self::PERCENT * self::PERCENT));
+    public static function dureeTrajet(Joueur $joueur, string $type, Planete $depart, Planete $destination): int {
+        return self::dureeEntre($joueur, $type, self::secondesDeBase($depart, $destination), $depart->reductionTrajet($joueur));
+    }
+
+    public static function dureeEntre(Joueur $joueur, string $type, int $baseSecondes, int $reductionPourcent): int {
+        return $joueur->dureeEffective(intdiv($baseSecondes * self::CATALOGUE[$type]['vitesse'] * (self::PERCENT - $reductionPourcent), self::PERCENT * self::PERCENT));
     }
 
     public static function dureeExpedition(Joueur $joueur): int {

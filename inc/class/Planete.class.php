@@ -28,6 +28,12 @@ class Planete {
     const SEUIL_INDEPENDANCE = 51;
     const TEXTURES = 50;
     const DOSSIER_TEXTURES = 'img/texture';
+    const ORBITE_RAYON_MINIMUM = 24;
+    const ORBITE_PAS = 14;
+    const ORBITE_ANGLE_RADIANS = 2.399963229728653;
+    const DIAMETRE_ORBITES = 360;
+    const TRAJET_LOCAL_MINIMUM_SECONDES = 20;
+    const TRAJET_LOCAL_MAXIMUM_SECONDES = 60;
     const ILLUSTRATION_REJOINT = 'evenement-rejoint';
     const ILLUSTRATION_REVOLTE = 'evenement-revolte';
     const ILLUSTRATION_CONQUISE = 'evenement-conquise';
@@ -46,6 +52,8 @@ class Planete {
     public string $nom;
     public int $slot;
     public int $perc_revolte;
+    public int $x;
+    public int $y;
     public int $gouverneur;
     public int $id_systeme;
     public int $nb_usine_vaiss_leger;
@@ -131,7 +139,12 @@ class Planete {
             $pnj = random_int(1, self::GOUVERNEUR_ETOILES_MAX);
         }
         MyPDO::getInstance()->query($query, $nom_planete,rand(0,self::INITIAL_REVOLTE_MAX),$slot,$gouverneur,$Systeme->id,$id_camp,$bouclier,$canon,$troupes,$flotteIa,0,0,0,0,0,$structures,$structures,$pnj,$bonus);
-        return MyPDO::getInstance()->lastInsertId();
+        $idPlanete = MyPDO::getInstance()->lastInsertId();
+        $rang = (int) MyPDO::getInstance()->query("SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<?",$Systeme->id,$idPlanete)[0]->nombre;
+        $rayon = self::ORBITE_RAYON_MINIMUM + $rang * self::ORBITE_PAS;
+        $angle = $rang * self::ORBITE_ANGLE_RADIANS + $Systeme->id;
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "planete SET x=?, y=? WHERE id=?",(int) round($rayon * cos($angle)),(int) round($rayon * sin($angle)),$idPlanete);
+        return $idPlanete;
     }
 
     public function bouclierMax(): int{
@@ -295,6 +308,8 @@ class Planete {
         $this->slot = $ret[0]->slot;
         $this->gouverneur = $ret[0]->gouverneur;
         $this->id_systeme = $ret[0]->id_systeme;
+        $this->x = (int) $ret[0]->x;
+        $this->y = (int) $ret[0]->y;
         $this->nb_usine_vaiss_leger = $ret[0]->nb_usine_vaiss_leger;
         $this->nb_usine_vaiss_moyen = $ret[0]->nb_usine_vaiss_moyen;
         $this->nb_usine_vaiss_lourd = $ret[0]->nb_usine_vaiss_lourd;
@@ -467,6 +482,15 @@ class Planete {
     public function apaiser(int $points): void {
         $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET perc_revolte=GREATEST(perc_revolte-?,0) WHERE id=?";
         $this->bdd->query($query,$points,$this->id);
+    }
+
+    public function secondesVers(Planete $autre): int {
+        return self::secondesEntre($this->x, $this->y, $autre->x, $autre->y);
+    }
+
+    public static function secondesEntre(int $x, int $y, int $autreX, int $autreY): int {
+        $distance = min(self::DIAMETRE_ORBITES, hypot($x - $autreX, $y - $autreY));
+        return self::TRAJET_LOCAL_MINIMUM_SECONDES + (int) round($distance * (self::TRAJET_LOCAL_MAXIMUM_SECONDES - self::TRAJET_LOCAL_MINIMUM_SECONDES) / self::DIAMETRE_ORBITES);
     }
 
     public function cheminTexture(): string {

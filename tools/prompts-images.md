@@ -235,7 +235,6 @@ Minimalist duotone glyph icon, like a symbol from a duotone icon font: exactly t
 | `icone-chercher` | `A white magnifying glass whose lens is a thick ring containing a small dark grey ringed planet and two tiny dark grey stars around it, the short handle in dark grey at the lower right.` |
 | `icone-reconnaitre` | `A small white scout spaceship seen from above with a dark grey radar scanning beam fanning out in a wide triangle in front of it, with two curved scan arcs cut out of the beam.` |
 | `icone-attaque` | `A white missile with a pointed nose flying to the right, with three short dark grey flame streaks behind it, about to hit a large jagged star-shaped dark grey explosion burst on the right.` |
-| `icone-attaque_flotte` | `Two white missiles with pointed noses flying side by side to the right, one above the other, both aimed at one shared large jagged star-shaped dark grey explosion burst on the right.` |
 | `icone-debarquement` | `A dark grey landing craft seen from the side hovering above a flat ground line, with a small white soldier figure and a bold white arrow descending from its belly toward the ground line.` |
 | `icone-combattre` | `Two crossed futuristic blaster pistols forming an X, chunky rounded sci-fi design with a thick barrel, a glowing energy cell and a short grip, one pistol in white and one in dark grey, muzzles at the top.` |
 | `icone-laisser` | `An open white hand held palm up with fingers slightly spread, a single dark grey coin falling away from it with a short dotted trail above the coin.` |

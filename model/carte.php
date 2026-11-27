@@ -2,6 +2,7 @@
     <?= Vue::fond('carte') ?>
     <svg class="carte__svg" role="group" aria-label="Carte galactique"></svg>
     <div class="carte__commandes">
+        <button type="button" class="carte__commande" id="carte-retour" hidden>Galaxie</button>
         <button type="button" class="carte__commande" id="carte-zoom-avant" aria-label="Zoom avant">+</button>
         <button type="button" class="carte__commande" id="carte-zoom-arriere" aria-label="Zoom arrière">&minus;</button>
         <button type="button" class="carte__commande" id="carte-base">Base</button>
@@ -9,7 +10,7 @@
     <button type="button" class="carte__trajets" id="carte-trajets" hidden></button>
     <div class="carte__bandeau" id="carte-bandeau" hidden role="status">
         <span class="carte__bandeau-texte" id="carte-bandeau-texte"></span>
-        <span class="carte__bandeau-suite" id="carte-bandeau-suite">: choisir le système</span>
+        <span class="carte__bandeau-suite" id="carte-bandeau-suite">: choisir la destination</span>
         <span aria-hidden="true">·</span>
         <?= Vue::commandeIcone('fermer', 'Annuler', 'md3-button--tonal', ' id="carte-annuler"') ?>
     </div>
@@ -24,6 +25,7 @@
         </header>
         <div class="carte__feuille-corps" id="carte-feuille-corps"></div>
     </aside>
+    <template id="carte-modele-fiche"><?= Vue::lienIcone('#', 'info', 'Fiche de la planète', false, '', ' data-tuto="planete-fiche"') ?></template>
     <template id="carte-modele-voyager"><?= Vue::commandeIcone('voyager', 'Voyager ici') ?></template>
 </div>
 <?php
