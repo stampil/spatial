@@ -62,6 +62,10 @@ class Tuto {
         if($joueur->etape_tuto >= self::ETAPE_ANALYSE && $deux !== null && $destination->id === $deux->id){
             return null;
         }
+        $trois = self::planeteTrois($joueur);
+        if($joueur->etape_tuto >= self::ETAPE_RESTRICTOR && $trois !== null && $destination->id === $trois->id){
+            return null;
+        }
         return 'Ce secteur est guidé par le tutoriel : terminez-le avant d\'explorer ses autres planètes.';
     }
 
@@ -219,7 +223,7 @@ class Tuto {
         if(self::nombreDeVaisseaux($joueur, Vaisseau::RESTRICTOR, false) < 1){
             return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::RESTRICTOR);
         }
-        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte '.self::CLE_VOYAGER_FLOTTE)), self::planeteDeux($joueur));
+        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte '.self::CLE_VOYAGER_FLOTTE)), self::planeteTrois($joueur));
     }
 
     private static function planeteDeux(Joueur $joueur): ?Planete {
@@ -230,6 +234,13 @@ class Tuto {
             $ligne = $idPlanete === null ? null : Ia::sourceLaPlusProche($joueur, new Planete($idPlanete), array(Camp::PIRATES));
         }
         return $ligne === null ? null : new Planete($ligne->id);
+    }
+
+    private static function planeteTrois(Joueur $joueur): ?Planete {
+        $deux = self::planeteDeux($joueur);
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme=? AND id<>? AND id<>? AND gouverneur=0 ORDER BY id LIMIT 1";
+        $ligne = MyPDO::getInstance()->query($query,$joueur->id_systeme_voisin,self::planeteCible($joueur)->id,$deux === null ? 0 : $deux->id)[0] ?? null;
+        return $ligne === null ? $deux : new Planete($ligne->id);
     }
 
     private static function preparerPlaneteDeux(Joueur $joueur): void {
@@ -243,11 +254,11 @@ class Tuto {
     }
 
     private static function lancerFlotteReduite(Joueur $joueur): void {
-        $cible = self::planeteDeux($joueur);
+        $cible = self::planeteTrois($joueur);
         if($cible === null){
             return;
         }
-        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "planete SET flotte_ia=?, defense_maj=COALESCE(defense_maj, ?) WHERE id=?",self::FLOTTE_REDUITE,Tools::now(),$cible->id);
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "planete SET id_camp=?, gouverneur=0, pnj_endurance=NULL, flotte_ia=?, nb_bouclier_planetaire=0, nb_canon_orbital=0, bouclier=0, canon=0, troupes=0, defense_maj=COALESCE(defense_maj, ?) WHERE id=?",Camp::PIRATES,self::FLOTTE_REDUITE,Tools::now(),$cible->id);
         Decouverte::ajouter($joueur->id, $cible->id_systeme);
     }
 
@@ -442,7 +453,7 @@ class Tuto {
             case self::ETAPE_MENACE:
                 return 'Une flotte pirate menace '.$planete->getNom().'. Allez dans le menu Flottes : '.self::action('combattre', 'Combattre').' l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; '.self::action('laisser', 'Laisser').' laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour continuer.';
             case self::ETAPE_RESTRICTOR:
-                $cible = self::planeteDeux($joueur);
+                $cible = self::planeteTrois($joueur);
                 return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue qui a perdu l\'essentiel de ses vaisseaux s\'enfuit vers la planète alliée ou neutre la plus proche. Le Restrictor l\'en empêche : tant qu\'il vit dans votre flotte, l\'ennemi ne peut pas fuir. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr), regroupez-le avec votre frégate dans une flotte (embarquez-y vos chasseurs : ils protègent vos grands vaisseaux, car les chasseurs ennemis frappent doublement les capitaux), puis voyagez vers cette planète : l\'arrivée déclenche le combat, '.self::action('resoudre', 'Résoudre').' le joue.';
         }
         return '';

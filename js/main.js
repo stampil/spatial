@@ -76,6 +76,7 @@ $(function(){
     var MESSAGE_PAGE_NON_RAFRAICHIE_APRES = ') : rechargement…';
     var MILLISECONDES = 1000;
     var SECONDES_MINUTE = 60;
+    var MINUTES_HEURE = 60;
     var SECONDES_HEURE = 3600;
     var POURCENT = 100;
     var SELECTEURS_REMPLACES = ['main.md3-page', '.hud'];
@@ -274,6 +275,36 @@ $(function(){
         return (valeur < 10 ? '0' : '') + valeur;
     }
 
+    function formaterNombre(valeur) {
+        return (valeur < 0 ? '-' : '') + String(Math.abs(valeur)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function avancerCredits() {
+        $('.hud__element[data-credits]').each(function() {
+            var element = $(this);
+            if (!element.data('prochain')) {
+                element.data('prochain', Date.now() + Number(element.data('dans')) * MILLISECONDES);
+            }
+            var prochain = element.data('prochain');
+            if (Date.now() < prochain) {
+                return;
+            }
+            var credits = Number(element.data('credits'));
+            var reste = Number(element.data('reste'));
+            var revenu = Number(element.data('revenu'));
+            while (Date.now() >= prochain) {
+                var total = revenu + reste;
+                var gain = Math.trunc(total / MINUTES_HEURE);
+                reste = total - gain * MINUTES_HEURE;
+                credits = Math.max(credits + gain, 0);
+                prochain += SECONDES_MINUTE * MILLISECONDES;
+            }
+            element.data({prochain: prochain, credits: credits, reste: reste});
+            element.find('.hud__valeur').text(formaterNombre(credits));
+            element.find('.hud__nom').text(credits > 1 ? element.data('plusieurs') : element.data('un'));
+        });
+    }
+
     function formaterDuree(secondes) {
         var heures = Math.floor(secondes / SECONDES_HEURE);
         var minutes = Math.floor((secondes % SECONDES_HEURE) / SECONDES_MINUTE);
@@ -295,6 +326,7 @@ $(function(){
                 rafraichir();
             }
         });
+        avancerCredits();
     }, MILLISECONDES);
 
     initialiserPage();

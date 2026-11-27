@@ -36,7 +36,8 @@ ALTER TABLE `joueur`
   ADD COLUMN `fin_tuto` datetime DEFAULT NULL AFTER `id_systeme_voisin`,
   ADD COLUMN `raid_maj` datetime DEFAULT NULL AFTER `fin_tuto`,
   ADD COLUMN `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0' AFTER `raid_maj`,
-  ADD COLUMN `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0' AFTER `aide_icones_masquee`;
+  ADD COLUMN `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0' AFTER `aide_icones_masquee`,
+  ADD COLUMN `credits_reste` int(11) NOT NULL DEFAULT '0' AFTER `tuto_aneantie`;
 
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -169,7 +170,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('024_perso_demi_etoiles'),
 ('025_positions_planetes'),
 ('026_planete_nom_origine'),
-('027_orbites_ecartees');
+('027_orbites_ecartees'),
+('028_credits_reste');
 
 UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
 

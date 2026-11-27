@@ -2,6 +2,9 @@
 
 class Joueur {
 
+    const SECONDES_PAR_MINUTE = 60;
+    const MINUTES_PAR_HEURE = 60;
+
     private MyPDO $bdd;
     private string $mdp;
     
@@ -11,6 +14,7 @@ class Joueur {
     public string $nom;
     public int $credits;
     public ?string $credits_maj;
+    public int $credits_reste;
     public int $etape_tuto;
     public int $id_camp;
     public ?int $id_systeme_voisin;
@@ -55,7 +59,7 @@ class Joueur {
     }
 
     public static function repartirDeZero(): void{
-        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=?, etape_tuto=0, id_systeme_voisin=NULL, fin_tuto=NULL, raid_maj=NULL, credits_maj=NULL",self::$credits_depart);
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=?, etape_tuto=0, id_systeme_voisin=NULL, fin_tuto=NULL, raid_maj=NULL, credits_maj=NULL, credits_reste=0",self::$credits_depart);
         foreach(self::liste() as $ligne){
             self::demarrer(new Joueur($ligne->id));
         }
@@ -122,6 +126,7 @@ class Joueur {
 
         $this->credits = $ret[0]->credits;
         $this->credits_maj = $ret[0]->credits_maj;
+        $this->credits_reste = $ret[0]->credits_reste;
         $this->mdp = $ret[0]->mdp;
         $this->etape_tuto= $ret[0]->etape_tuto;
         $this->id_camp = $ret[0]->id_camp;
@@ -189,22 +194,31 @@ class Joueur {
     public function updateCredits(): void {
         if($this->credits_maj === null){
             $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits_maj=? WHERE id=? AND credits_maj IS NULL";
-            $this->bdd->query($query,Tools::now(),$this->id);
+            $maintenant = Tools::now();
+            $this->bdd->query($query,$maintenant,$this->id);
+            $this->credits_maj = $maintenant;
             return;
         }
         $depuis = strtotime($this->credits_maj);
-        $heures = intdiv(time() - $depuis, Planete::SECONDS_PER_HOUR);
-        if($heures < 1){
+        $minutes = intdiv(time() - $depuis, self::SECONDES_PAR_MINUTE);
+        if($minutes < 1){
             return;
         }
-        $gain = $heures * $this->revenuNet();
-        $nouvelleMaj = Tools::formatDate($depuis + $heures * Planete::SECONDS_PER_HOUR);
-        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=GREATEST(credits+?,0), credits_maj=? WHERE id=? AND credits_maj=?";
-        $this->bdd->query($query,$gain,$nouvelleMaj,$this->id,$this->credits_maj);
+        $total = $minutes * $this->revenuNet() + $this->credits_reste;
+        $gain = intdiv($total, self::MINUTES_PAR_HEURE);
+        $reste = $total - $gain * self::MINUTES_PAR_HEURE;
+        $nouvelleMaj = Tools::formatDate($depuis + $minutes * self::SECONDES_PAR_MINUTE);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=GREATEST(credits+?,0), credits_reste=?, credits_maj=? WHERE id=? AND credits_maj=?";
+        $this->bdd->query($query,$gain,$reste,$nouvelleMaj,$this->id,$this->credits_maj);
         if($this->bdd->lastRowCount === 1){
             $this->credits = max($this->credits + $gain, 0);
+            $this->credits_reste = $reste;
             $this->credits_maj = $nouvelleMaj;
         }
+    }
+
+    public function secondesAvantCredits(): int {
+        return self::SECONDES_PAR_MINUTE - (time() - strtotime($this->credits_maj)) % self::SECONDES_PAR_MINUTE;
     }
 
     public function resolveEvents(): void {

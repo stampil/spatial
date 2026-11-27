@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `raid_maj` datetime DEFAULT NULL,
   `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0',
   `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0',
+  `credits_reste` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
@@ -318,7 +319,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('024_perso_demi_etoiles'),
 ('025_positions_planetes'),
 ('026_planete_nom_origine'),
-('027_orbites_ecartees');
+('027_orbites_ecartees'),
+('028_credits_reste');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 
