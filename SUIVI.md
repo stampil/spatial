@@ -21,8 +21,19 @@ Mauvais menu ou rien :
 
 Ce que je comprends : je fais disparaître la flèche dès le clic sur la cible, elle suit ensuite la suite de l'action (panneau ouvert, bouton de validation, mode création), elle ne saute plus quand la cible est cachée, elle retombe sur l'entrée de menu quand la cible n'est pas sur la page, les sous-pages comptent comme leur menu parent, et chaque étape est vérifiée par un script qui parcourt les 16 étapes sur toutes les pages et contrôle que la flèche existe et vise le bon élément ou le bon menu.
 
+### 2. Carte : vue des planètes d'un système, avec positions et temps de trajet (27/11)
+
+Ta phrase : « dans la vue carte, quand on clique sur un systeme, tu reprend la vue de la carte mais au lieu d'afficher les galaxie tu affiche les planetes du systeme, les positions x,y sont donc noté et depende aussi du temps pour ls rejoindre. revoi tes calcul mais passer d'une planete a une autre dans le mme systeme doit tjrs etre moins long que passer d'un systeme a un autre ».
+
+Lu (rien codé) : aujourd'hui, toucher un système sur la carte ouvre une page de fiche de système (\`afficheSysteme\`), pas la carte. Les systèmes ont des coordonnées x,y (1328 systèmes, de −1652 à 2608 et de −1540 à 2525) ; les planètes n'en ont pas. La durée d'un trajet (\`Vaisseau::dureeEntre\`) est : distance entre systèmes × 1 s, et fixe à 60 s dans un même système, quelle que soit la paire de planètes. La distance minimale entre deux systèmes est 80 ; l'ordre « même système plus court » tient donc aujourd'hui (60 < 80), mais par hasard : 60 est une constante sans lien avec la géométrie.
+
+Ce que je comprends :
+- Toucher un système sur la carte rouvre la même carte (même zoom animé, mêmes ordres de déplacement) mais avec les planètes du système à la place des systèmes : chaque planète a une position x,y dans son système, affichée comme un nœud.
+- La durée entre deux planètes d'un même système dépend de leur distance dans le système, avec un plancher et un plafond choisis pour qu'elle reste toujours strictement inférieure au plus court trajet entre deux systèmes (80 s de base), quelle que soit la réduction, la vitesse du vaisseau ou la division des durées du tuto, qui s'appliquent pareil aux deux.
+- Un bouton pour revenir à la vue des systèmes.
+
 ## Questions en suspens
 
-1. Flèche retirée dès le clic, puis réaffichée sur la cible suivante si l'étape n'est pas finie. Je recommande cela.
-2. Je corrige aussi l'étape 8 (carte, fiche de système, fiche de la planète pirate) et l'étape 7 (la bonne barge ou frégate). Je recommande oui.
-3. Je livre le script de contrôle des 16 étapes et je te donne son tableau de résultats. Je recommande oui.
+1. Positions : je les enregistre en colonnes (position x,y de chaque planète dans son système), remplies une fois par une migration à partir d'une disposition en orbites régulière et stable, plutôt que recalculées à chaque affichage. Je recommande cela.
+2. Durées : de 20 s (planètes voisines) à 60 s (planètes opposées) dans un système, contre 80 s au minimum entre systèmes ; un contrôle automatique vérifie l'ordre pour tous les systèmes. Je recommande ces bornes.
+3. La page de fiche de système actuelle reste accessible depuis la feuille d'un système sur la carte (nom, camp, planètes). Je recommande de la garder.

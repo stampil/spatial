@@ -86,12 +86,13 @@ class Tuto {
         if(count($route) === 0){
             return '';
         }
+        $attributs = ' data-tuto-menu="'.$route[0]['page'].'"';
         foreach(array_reverse($route) as $niveau){
             if($niveau['page'] === $page){
-                return $niveau['cle'] === null ? '' : ' data-tuto-cible="'.$niveau['cle'].'"';
+                return $attributs.($niveau['cle'] === null ? '' : ' data-tuto-cible="'.$niveau['cle'].'"');
             }
         }
-        return ' data-tuto-menu="'.$route[0]['page'].'"';
+        return $attributs;
     }
 
     private static function niveau(string $page, ?string $cle): array {
@@ -131,10 +132,10 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 return array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte'));
             case self::ETAPE_ENVOI:
-                $pret = self::nombreDeVaisseaux($joueur, Vaisseau::TROUPE, true) >= self::TROUPES_REQUISES && self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) >= self::CHASSEURS_REQUIS;
-                return array(self::niveau('listeVaisseau', $pret ? 'voyager-flotte' : 'embarquer'));
+                return array(self::niveau('listeVaisseau', self::cleDEnvoi($joueur)));
             case self::ETAPE_ASSAUT:
-                return array(self::niveau('carte', null), self::niveau('affichePlanete', 'attaque_flotte debarquement'));
+                $cible = self::planeteCible($joueur);
+                return array(self::niveau('carte', null), self::niveau('carte', 'systeme-'.$cible->id_systeme), self::niveau('afficheSysteme', self::CLE_PLANETE.$cible->id), self::niveau('affichePlanete', 'attaque_flotte debarquement'));
             case self::ETAPE_ANALYSE:
                 return array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RECONNAISSANCE));
             case self::ETAPE_ORBITE:
@@ -176,7 +177,27 @@ class Tuto {
         if(self::nombreDeVaisseaux($joueur, Vaisseau::TRANSPORT_PERSO, false) < 1){
             return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::TRANSPORT_PERSO);
         }
-        return array(self::niveau('listePerso', self::CLE_PERSO.Perso::ROLE_ASSASSIN), self::niveau('affichePerso', 'assassin embarquer'), self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::TRANSPORT_PERSO));
+        $assassin = MyPDO::getInstance()->query("SELECT embarque, arrivee, sur_planete FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND role=? AND fin_mort IS NULL ORDER BY id LIMIT 1",$joueur->id,Perso::ROLE_ASSASSIN)[0];
+        if((int) $assassin->embarque === 1){
+            return array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::TRANSPORT_PERSO));
+        }
+        $versLaFiche = array(self::niveau('listePerso', self::CLE_PERSO.Perso::ROLE_ASSASSIN));
+        if($assassin->arrivee !== null){
+            return $versLaFiche;
+        }
+        $deux = self::planeteDeux($joueur);
+        $surPlaceDeux = $deux !== null && (int) $assassin->sur_planete === $deux->id;
+        return array_merge($versLaFiche, array(self::niveau('affichePerso', $surPlaceDeux ? 'assassin' : 'embarquer')));
+    }
+
+    private static function cleDEnvoi(Joueur $joueur): string {
+        if(self::nombreDeVaisseaux($joueur, Vaisseau::TROUPE, true) < self::TROUPES_REQUISES){
+            return 'embarquer-valider-'.Vaisseau::BARGE.'-'.Vaisseau::TROUPE.' embarquer-'.Vaisseau::BARGE;
+        }
+        if(self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) < self::CHASSEURS_REQUIS){
+            return 'embarquer-valider-fregate-'.Vaisseau::CHASSEUR.' embarquer-fregate';
+        }
+        return 'voyager-flotte';
     }
 
     private static function routeDeRestrictor(Joueur $joueur, Planete $mere): array {
