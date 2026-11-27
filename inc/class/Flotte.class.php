@@ -133,6 +133,25 @@ class Flotte {
         return null;
     }
 
+    public function recomposer(array $vaisseauxIds): ?string {
+        $planeteId = $this->planeteAuRepos();
+        if($planeteId === null){
+            return 'Cette flotte n\'est pas au repos : recomposez-la une fois arrivée.';
+        }
+        $marquesIds = implode(',', array_fill(0, count($vaisseauxIds), '?'));
+        $types = Vaisseau::typesDeFlotte();
+        $marquesTypes = implode(',', array_fill(0, count($types), '?'));
+        $conditions = "WHERE id IN ($marquesIds) AND id_joueur=? AND id_planete=? AND arrivee IS NULL AND (id_flotte IS NULL OR id_flotte=?) AND type IN ($marquesTypes)";
+        $parametres = array_merge($vaisseauxIds, array($this->id_joueur, $planeteId, $this->id), $types);
+        $eligibles = (int) $this->bdd->query("SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau " . $conditions,...$parametres)[0]->nombre;
+        if($eligibles !== count($vaisseauxIds)){
+            return 'La situation a changé sur cette planète : recommencez.';
+        }
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=NULL WHERE id_flotte=? AND id NOT IN ($marquesIds)",$this->id,...$vaisseauxIds);
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=? " . $conditions,$this->id,...$parametres);
+        return null;
+    }
+
     public function dissoudre(): void {
         $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_flotte=NULL WHERE id_flotte=?",$this->id);
         $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "flotte WHERE id=?",$this->id);

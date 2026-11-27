@@ -34,6 +34,7 @@ if($menace !== null){
 </section>
 <?php } ?>
 <?php
+$nommes = Vaisseau::nommesAuRepos($Joueur->id);
 foreach($flottes as $ligne){
     $flotte = new Flotte($ligne->id);
     $auRepos = $flotte->planeteAuRepos();
@@ -48,12 +49,39 @@ foreach($flottes as $ligne){
         <div class="actions-icones actions-icones--flotte">
             <?= Vue::lienIcone('?p=carte&ordre='.$planete->id.'&flotte='.$flotte->id, 'voyager', 'Voyager', true, '', ' data-tuto="voyager-flotte"') ?>
             <?= Vue::lienIcone('?p=carte&systeme='.$planete->id_systeme, 'carte', 'Carte', true, 'md3-button--tonal') ?>
+            <?= Vue::basculeIcone('composer', 'ajouter', 'Modifier la flotte', true, 'md3-button--tonal') ?>
             <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer la flotte', true, 'md3-button--tonal') ?>
             <form method="POST" action="?p=gererFlotte">
                 <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
                 <input type="hidden" name="action" value="dissoudre" />
                 <?= csrfField() ?>
                 <?= Vue::boutonIcone('dissoudre', 'Dissoudre la flotte', true, 'md3-button--tonal') ?>
+            </form>
+        </div>
+        <div class="panneau-action" data-panneau="composer" hidden>
+            <form class="systeme-details__corps" method="POST" action="?p=recomposerFlotte">
+                <input type="hidden" name="flotte" value="<?= $flotte->id ?>" />
+                <?= csrfField() ?>
+                <?php
+                $candidats = array();
+                foreach($flotte->vaisseaux() as $membre){
+                    array_push($candidats, array('vaisseau' => $membre, 'membre' => true));
+                }
+                foreach($nommes[$planete->id] ?? array() as $isole){
+                    if(in_array($isole->type, Vaisseau::typesDeFlotte(), true)){
+                        array_push($candidats, array('vaisseau' => $isole, 'membre' => false));
+                    }
+                }
+                foreach($candidats as $candidat){
+                ?>
+                <label class="ligne-jeu">
+                    <span class="ligne-jeu__info"><?= Vue::visuelVaisseau($candidat['vaisseau']->type, $Joueur->id_camp) ?><?= htmlspecialchars($candidat['vaisseau']->nom) ?></span>
+                    <input type="checkbox" name="vaisseau[]" value="<?= $candidat['vaisseau']->id ?>"<?= $candidat['membre'] ? ' checked' : '' ?> />
+                </label>
+                <?php } ?>
+                <div class="ligne-jeu">
+                    <?= Vue::boutonIcone('valider', 'Valider la flotte', false, 'md3-button--tonal') ?>
+                </div>
             </form>
         </div>
         <div class="panneau-action" data-panneau="renommer" hidden>
@@ -81,7 +109,6 @@ foreach($flottes as $ligne){
 <?php } ?>
 
 <?php
-$nommes = Vaisseau::nommesAuRepos($Joueur->id);
 foreach(array_keys($posees) as $planeteId){
     $planete = new Planete($planeteId);
     $types = $posees[$planeteId];
