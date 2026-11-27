@@ -2,13 +2,13 @@
     <summary><?= Icone::html('mission') ?>Mission <?= $Joueur->etape_tuto - Tuto::ETAPE_USINE + 1 ?>/<?= Joueur::TUTO_END_STEP - Tuto::ETAPE_USINE ?> : <?= htmlspecialchars(Tuto::titre($Joueur)) ?></summary>
     <p class="mission__texte"><?= Tuto::texte($Joueur) ?></p>
     <?php if(Tuto::explicationEnAttente($Joueur)){ ?>
-    <form method="POST" action="?p=tutoExplicationLue">
+    <form class="mission__actions" method="POST" action="?p=tutoExplicationLue">
         <?= csrfField() ?>
         <input type="submit" class="md3-button" value="OK" />
     </form>
     <?php } ?>
     <?php if(in_array($Joueur->etape_tuto, Tuto::ETAPES_A_VALIDER, true)){ ?>
-    <form method="POST" action="?p=tutoSuivant">
+    <form class="mission__actions" method="POST" action="?p=tutoSuivant">
         <?= csrfField() ?>
         <input type="submit" class="md3-button" value="J'ai compris" data-tuto="<?= Tuto::CLE_COMPRENDRE ?>" />
     </form>

@@ -94,6 +94,13 @@
     padding: 0 16px 16px;
 }
 
+.mission__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0 16px 16px;
+}
+
 .mission__fermer {
     position: absolute;
     top: 0;
