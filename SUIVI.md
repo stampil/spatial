@@ -30,7 +30,7 @@ Ce que je comprends : une nouvelle proposition de l'affichage de la vue système
 
 Ta phrase : « joue un peu sur la taille de la planete, elle doivent pas avoir toute la meme taille, sa sera sauve dans sa db planete la taille, généré la premiere fois ».
 
-Ce que je comprends : chaque planète a sa propre taille, tirée au hasard une seule fois à sa création et enregistrée dans une colonne de la table planète (migration : les planètes existantes en reçoivent une aussi). La vue système l'utilise pour le diamètre de la sphère (28 à 62 px sur la maquette, contre 44 px unique avant) ; la taille ne change plus ensuite. Purement visuelle : aucun effet sur le jeu.
+Ce que je comprends : chaque planète a sa propre taille, tirée au hasard une seule fois à sa création et enregistrée en base ; la vue système en tire le diamètre de la sphère. Précision du 27/11 : « la taille influera directement sur la capacité a recevoir des structure construite ». Donc la taille détermine le nombre d'emplacements de structures de la planète (aujourd'hui `slot`, de 1 à 16, tiré au hasard à la création et déjà enregistré ; les planètes de départ ont 8). Plus la planète est grande, plus elle a d'emplacements.
 
 ## Questions en suspens
 
@@ -42,8 +42,8 @@ Ce que je comprends : chaque planète a sa propre taille, tirée au hasard une s
 5. Les couleurs, que je ne choisis pas seul : bleue #9BB0FF, blanc-bleu #CAD7FF, blanche #F8F7FF, jaune #FFE9A8, orange #FFB56C, rouge #FF8A5B (teintes de corps noir des classes O/B, A, F, G, K, M), tirées à égalité. Tu valides ces valeurs, ou tu en donnes d'autres ?
 6. Les systèmes de la vue galaxie gardent la couleur de leur camp (le gris « sans camp » y reste) ; seule l'étoile centrale de la vue système change. Je recommande cela.
 
-7. Taille : plage de 28 à 62 px sur la carte (rapport 1 à 2,2), tirage uniforme dans cette plage, uniquement visuelle (pas liée aux emplacements ni aux bâtiments). Je recommande cela.
-8. La fiche de la planète (grande sphère de 160 px) et les petites sphères des listes reflètent aussi cette taille, ou seulement la carte ? Je recommande seulement la carte : les fiches gardent une taille fixe pour rester lisibles.
+7. Où vit la valeur enregistrée : l'emplacement `slot` existe déjà, est déjà tiré au hasard une seule fois et enregistré. Je recommande de le garder comme valeur d'origine (aucune nouvelle colonne, aucune planète existante qui change de capacité) et d'en déduire la taille : 1 emplacement = 28 px, 16 = 62 px, progression linéaire (maquette). Inconvénient : toutes les planètes de départ (8 emplacements) ont la même taille. L'autre solution est une colonne `taille` tirée au hasard dont dériverait le nombre d'emplacements, mais cela redistribue les emplacements des planètes existantes. Laquelle ?
+8. La fiche de la planète (grande sphère de 160 px) et les petites sphères des listes reflètent aussi la taille, ou seulement la carte ? Je recommande seulement la carte : les fiches gardent une taille fixe pour rester lisibles.
 9. La première orbite reste calculée pour la plus grande planète possible, afin que même une sphère de 62 px ne touche pas l'étoile. Je recommande cela.
 
 À ne coder qu'à ton « go ».
