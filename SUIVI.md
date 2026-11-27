@@ -26,6 +26,12 @@ Ta phrase : « refait une prop. ».
 
 Ce que je comprends : une nouvelle proposition de l'affichage de la vue système (sphères texturées qui tournent, étoile colorée, première planète explorée, les autres voilées), montrée en maquette animée avec les vraies textures et le vrai CSS de rotation, pour que tu la valides avant tout code. Maquette : http://127.0.0.1:19931/index.html (les 6 couleurs d'étoile se choisissent en cliquant). Si tu voulais refaire autre chose, dis-le.
 
+### 4. Taille variable des planètes, enregistrée en base (27/11)
+
+Ta phrase : « joue un peu sur la taille de la planete, elle doivent pas avoir toute la meme taille, sa sera sauve dans sa db planete la taille, généré la premiere fois ».
+
+Ce que je comprends : chaque planète a sa propre taille, tirée au hasard une seule fois à sa création et enregistrée dans une colonne de la table planète (migration : les planètes existantes en reçoivent une aussi). La vue système l'utilise pour le diamètre de la sphère (28 à 62 px sur la maquette, contre 44 px unique avant) ; la taille ne change plus ensuite. Purement visuelle : aucun effet sur le jeu.
+
 ## Questions en suspens
 
 1. Taille : sphère de 44 px, première orbite à 100 unités de l'étoile et pas de 30 (maquette), donc positions de planètes recalculées par une migration ; les durées locales restent entre 20 et 60 s en adaptant le diamètre de référence. Je recommande cela.
@@ -35,5 +41,9 @@ Ce que je comprends : une nouvelle proposition de l'affichage de la vue système
 4. Le hasard : couleur fixe par système (calculée à partir de son numéro, donc la même à chaque affichage et pour tous les joueurs, sans nouvelle colonne), pas retirée à chaque chargement. Je recommande cela.
 5. Les couleurs, que je ne choisis pas seul : bleue #9BB0FF, blanc-bleu #CAD7FF, blanche #F8F7FF, jaune #FFE9A8, orange #FFB56C, rouge #FF8A5B (teintes de corps noir des classes O/B, A, F, G, K, M), tirées à égalité. Tu valides ces valeurs, ou tu en donnes d'autres ?
 6. Les systèmes de la vue galaxie gardent la couleur de leur camp (le gris « sans camp » y reste) ; seule l'étoile centrale de la vue système change. Je recommande cela.
+
+7. Taille : plage de 28 à 62 px sur la carte (rapport 1 à 2,2), tirage uniforme dans cette plage, uniquement visuelle (pas liée aux emplacements ni aux bâtiments). Je recommande cela.
+8. La fiche de la planète (grande sphère de 160 px) et les petites sphères des listes reflètent aussi cette taille, ou seulement la carte ? Je recommande seulement la carte : les fiches gardent une taille fixe pour rester lisibles.
+9. La première orbite reste calculée pour la plus grande planète possible, afin que même une sphère de 62 px ne touche pas l'étoile. Je recommande cela.
 
 À ne coder qu'à ton « go ».
