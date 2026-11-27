@@ -21,6 +21,7 @@ class Joueur {
     public ?string $fin_tuto;
     public ?string $raid_maj;
     public bool $aide_icones_masquee;
+    public bool $tuto_transit_lu;
 
     public string $IPs;
     
@@ -59,7 +60,7 @@ class Joueur {
     }
 
     public static function repartirDeZero(): void{
-        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=?, etape_tuto=0, id_systeme_voisin=NULL, fin_tuto=NULL, raid_maj=NULL, credits_maj=NULL, credits_reste=0",self::$credits_depart);
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=?, etape_tuto=0, id_systeme_voisin=NULL, fin_tuto=NULL, raid_maj=NULL, credits_maj=NULL, credits_reste=0, tuto_transit_lu=0",self::$credits_depart);
         foreach(self::liste() as $ligne){
             self::demarrer(new Joueur($ligne->id));
         }
@@ -134,6 +135,7 @@ class Joueur {
         $this->fin_tuto = $ret[0]->fin_tuto;
         $this->raid_maj = $ret[0]->raid_maj;
         $this->aide_icones_masquee = (bool) $ret[0]->aide_icones_masquee;
+        $this->tuto_transit_lu = (bool) $ret[0]->tuto_transit_lu;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 

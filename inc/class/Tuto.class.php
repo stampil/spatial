@@ -46,6 +46,7 @@ class Tuto {
     const CLE_VOYAGER_FLOTTE = 'voyager-flotte';
     const CLE_PERSO = 'perso-';
     const CLE_COMPRENDRE = 'comprendre';
+    const CLE_EN_ROUTE = 'en-route';
 
     public static function avancer(Joueur $joueur): void {
         if($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && $joueur->id_systeme_voisin === null){
@@ -122,6 +123,15 @@ class Tuto {
         return array(self::niveau('listePlanete', self::CLE_PLANETE.$mere->id), self::niveau('affichePlanete', $cle));
     }
 
+    private static function explorationEnCours(Joueur $joueur): bool {
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND exploration=1 AND arrivee IS NOT NULL";
+        return (int) MyPDO::getInstance()->query($query,$joueur->id)[0]->nombre > 0;
+    }
+
+    public static function transitAExpliquer(Joueur $joueur): bool {
+        return $joueur->enTuto() && $joueur->etape_tuto === self::ETAPE_EXPLORATION && !$joueur->tuto_transit_lu && self::explorationEnCours($joueur);
+    }
+
     private static function routeDeProduction(Planete $mere, string $type): array {
         if(self::nombreEnProduction($mere, $type) > 0){
             return array();
@@ -166,6 +176,9 @@ class Tuto {
             case self::ETAPE_RECONNAISSANCE:
                 return self::routeDeProduction($mere, Vaisseau::RECONNAISSANCE);
             case self::ETAPE_EXPLORATION:
+                if(self::explorationEnCours($joueur)){
+                    return $joueur->tuto_transit_lu ? array() : array(self::niveau($page, self::CLE_EN_ROUTE));
+                }
                 return array(self::niveau('listeVaisseau', 'chercher'));
             case self::ETAPE_PREPARATION:
                 $cle = self::cleDePreparation($joueur, $mere);
@@ -627,6 +640,9 @@ class Tuto {
             case self::ETAPE_RECONNAISSANCE:
                 return 'Sur la fiche de '.$planete->getNom().', l\'usine de vaisseaux légers peut produire un vaisseau de reconnaissance. Lancez sa production : pendant le tutoriel, les durées sont divisées par '.Joueur::TUTO_DIVISEUR_DUREES.'.';
             case self::ETAPE_EXPLORATION:
+                if(self::explorationEnCours($joueur)){
+                    return 'Votre vaisseau de reconnaissance est parti dans l\'inconnu : il est en transit. Le compteur « en route » en haut de l\'écran, à côté de la fusée, compte les déplacements de vaisseaux en cours. Quand le vaisseau reviendra avec ce qu\'il a trouvé, le tutoriel continuera.';
+                }
                 return 'Un système voisin, encore inconnu, existe près du vôtre. Allez dans le menu Flottes : sur '.$planete->getNom().', '.self::action('chercher', 'Chercher').' envoie votre vaisseau de reconnaissance chercher un système dans l\'inconnu, et il revient avec ce qu\'il a trouvé. Pendant le tutoriel il réussit à coup sûr ; plus tard il peut ne rien trouver, voire ne pas revenir.';
             case self::ETAPE_PREPARATION:
                 return 'Le système voisin est découvert : sa planète '.self::planeteCible($joueur)->getNom().' est aux mains des Pirates. Préparez l\'assaut sur la fiche de '.$planete->getNom().' : construisez une usine de vaisseaux moyens et une académie, puis produisez '.self::FREGATES_REQUISES.' '.__('fregate', 'fregates', self::FREGATES_REQUISES).', '.self::BARGES_REQUISES.' '.__('barge', 'barges', self::BARGES_REQUISES).', '.self::TROUPES_REQUISES.' '.__('troupe', 'troupes', self::TROUPES_REQUISES).' d\'assaut et '.self::CHASSEURS_REQUIS.' '.__('chasseur', 'chasseurs', self::CHASSEURS_REQUIS).' (réglez le curseur avant '.self::action('produire', 'Produire').' : les unités sortent une par une). La frégate détruit la défense avec les chasseurs qu\'elle embarque ('.Vaisseau::CATALOGUE['fregate']['chasseurs'].' au plus) ; seule la barge débarque les troupes, et seules les troupes embarquées dans une barge débarquent ('.Vaisseau::CATALOGUE['barge']['troupes'].' au plus). Vous les embarquerez vous-même.';
