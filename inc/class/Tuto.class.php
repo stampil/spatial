@@ -184,7 +184,7 @@ class Tuto {
         $mere = new Planete($idPlanete);
         switch($joueur->etape_tuto){
             case self::ETAPE_USINE:
-                return self::routeVersPlanete($mere, self::CLE_CONSTRUIRE.Batiment::USINE_LEGERE);
+                return $mere->nombreEnConstruction(Batiment::USINE_LEGERE) > 0 ? array() : self::routeVersPlanete($mere, self::CLE_CONSTRUIRE.Batiment::USINE_LEGERE);
             case self::ETAPE_RECONNAISSANCE:
                 return self::routeDeProduction($mere, Vaisseau::RECONNAISSANCE);
             case self::ETAPE_EXPLORATION:
@@ -227,7 +227,7 @@ class Tuto {
                 $renommable = self::planeteRenommable($joueur, $mere);
                 return $renommable === null ? array() : self::routeVersPlanete($renommable, self::CLE_RENOMMER_VALIDER.' '.self::CLE_RENOMMER);
             case self::ETAPE_FERMES:
-                $aGarnir = self::planeteSansFermes($joueur);
+                $aGarnir = self::planeteAGarnir($joueur);
                 return $aGarnir === null ? array() : self::routeVersPlanete($aGarnir, self::CLE_CONSTRUIRE.Batiment::FERME);
         }
         return array(self::niveau($page, self::CLE_COMPRENDRE));
@@ -241,11 +241,13 @@ class Tuto {
     }
 
     private static function cleDePreparation(Joueur $joueur, Planete $mere): ?string {
-        if($mere->nombre(Batiment::USINE_MOYENNE) < 1){
-            return self::CLE_CONSTRUIRE.Batiment::USINE_MOYENNE;
+        foreach(array(Batiment::USINE_MOYENNE, Batiment::ACADEMIE) as $batiment){
+            if($mere->nombre($batiment) + $mere->nombreEnConstruction($batiment) < 1){
+                return self::CLE_CONSTRUIRE.$batiment;
+            }
         }
-        if($mere->nombre(Batiment::ACADEMIE) < 1){
-            return self::CLE_CONSTRUIRE.Batiment::ACADEMIE;
+        if($mere->nombre(Batiment::USINE_MOYENNE) < 1 || $mere->nombre(Batiment::ACADEMIE) < 1){
+            return null;
         }
         $stock = Vaisseau::stock($mere->id, $joueur->id);
         foreach(self::requis() as $type => $minimum){
@@ -288,7 +290,7 @@ class Tuto {
 
     private static function routeDeRestrictor(Joueur $joueur, Planete $mere): array {
         if($mere->nombre(Batiment::USINE_LOURDE) < 1){
-            return self::routeVersPlanete($mere, self::CLE_CONSTRUIRE.Batiment::USINE_LOURDE);
+            return $mere->nombreEnConstruction(Batiment::USINE_LOURDE) > 0 ? array() : self::routeVersPlanete($mere, self::CLE_CONSTRUIRE.Batiment::USINE_LOURDE);
         }
         if(self::nombreDeVaisseaux($joueur, Vaisseau::RESTRICTOR, false) < 1){
             return self::routeDeProduction($mere, Vaisseau::RESTRICTOR);
@@ -384,6 +386,15 @@ class Tuto {
             $manquantes += $planete->slot - $planete->nombre(Batiment::FERME);
         }
         return $manquantes;
+    }
+
+    private static function planeteAGarnir(Joueur $joueur): ?Planete {
+        foreach(self::planetesDuSecteur($joueur) as $planete){
+            if($planete->gouverneur !== $joueur->id || $planete->emplacementsLibres() > 0){
+                return $planete;
+            }
+        }
+        return null;
     }
 
     private static function planeteSansFermes(Joueur $joueur): ?Planete {
@@ -651,7 +662,7 @@ class Tuto {
         $planete = new Planete($idPlanete);
         switch($joueur->etape_tuto){
             case self::ETAPE_USINE:
-                return 'Votre planète '.$planete->getNom().' peut accueillir des bâtiments. Allez dans le menu Colonies, ouvrez sa fiche et construisez une usine de vaisseaux légers.';
+                return 'Votre planète '.$planete->getNom().' peut accueillir des bâtiments. Allez dans le menu Colonies, ouvrez sa fiche et construisez une usine de vaisseaux légers (curseur sur 1, puis Construire). Une construction prend un peu de temps : pendant le tutoriel, les durées sont divisées par '.Joueur::TUTO_DIVISEUR_DUREES.'.';
             case self::ETAPE_RECONNAISSANCE:
                 return 'Sur la fiche de '.$planete->getNom().', l\'usine de vaisseaux légers peut produire un vaisseau de reconnaissance. Lancez sa production : pendant le tutoriel, les durées sont divisées par '.Joueur::TUTO_DIVISEUR_DUREES.'.';
             case self::ETAPE_EXPLORATION:
@@ -698,7 +709,7 @@ class Tuto {
             case self::ETAPE_NOMMER:
                 return 'Vous gouvernez les trois planètes du système voisin. Un gouverneur dont un perso se trouve sur la planète peut la renommer : ouvrez la fiche d\'une planète où l\'un de vos persos est présent (l\'assassin est resté sur '.self::planeteDeux($joueur)->getNom().') et '.self::action('renommer', 'Renommer la planète').'. Si le gouverneur perd la planète, elle reprend son nom d\'origine.';
             case self::ETAPE_FERMES:
-                return 'Chaque ferme rapporte '.Batiment::FERME_INCOME.' cr/h pour '.Batiment::CATALOGUE[Batiment::FERME]['maintenance'].' cr/h de maintenance. Une prime couvre le coût : sur chacune de vos trois planètes du système voisin (menu Colonies, puis la fiche de la planète), construisez des fermes sur tous les emplacements, rien d\'autre. '.self::phraseRevenuParMinute($joueur);
+                return 'Chaque ferme rapporte '.Batiment::FERME_INCOME.' cr/h pour '.Batiment::CATALOGUE[Batiment::FERME]['maintenance'].' cr/h de maintenance. Une prime couvre le coût : sur chacune de vos trois planètes du système voisin (menu Colonies, puis la fiche de la planète), construisez des fermes sur tous les emplacements (curseur au maximum, puis Construire), rien d\'autre ; elles arrivent après leur durée de construction. '.self::phraseRevenuParMinute($joueur);
         }
         return '';
     }

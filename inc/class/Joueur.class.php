@@ -229,6 +229,7 @@ class Joueur {
         foreach(Planete::listeGouvernees($this->id) as $ligne){
             (new Planete($ligne->id))->updateRevolte();
         }
+        Planete::resoudreConstructions($this);
         Vaisseau::resolveProduction($this);
         Vaisseau::resolveArrivees($this);
         Vaisseau::resoudreExpeditions($this);

@@ -190,6 +190,17 @@ INSERT INTO `systeme` (`id`, `nom`, `visible`, `creato`) VALUES
 (8, 'Ksi-4361', 0, '2022-12-19 09:58:42'),
 (9, 'Nu-2343', 0, '2022-12-19 10:02:32'),
 (10, 'Sigma-9547', 0, '2022-12-19 10:21:18');
+CREATE TABLE IF NOT EXISTS `construction` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `batiment` varchar(32) NOT NULL,
+  `fin` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_joueur` int(11) NOT NULL,
@@ -324,7 +335,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('028_credits_reste'),
 ('029_tuto_fin_etapes_ajoutees'),
 ('030_tuto_transit_lu'),
-('031_tuto_explication_lue');
+('031_tuto_explication_lue'),
+('032_constructions');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

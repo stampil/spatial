@@ -40,6 +40,17 @@ ALTER TABLE `joueur`
   ADD COLUMN `credits_reste` int(11) NOT NULL DEFAULT '0' AFTER `tuto_aneantie`,
   ADD COLUMN `tuto_explication_lue` int(11) NOT NULL DEFAULT '0' AFTER `credits_reste`;
 
+CREATE TABLE IF NOT EXISTS `construction` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `batiment` varchar(32) NOT NULL,
+  `fin` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_joueur` int(11) NOT NULL,
@@ -175,7 +186,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('028_credits_reste'),
 ('029_tuto_fin_etapes_ajoutees'),
 ('030_tuto_transit_lu'),
-('031_tuto_explication_lue');
+('031_tuto_explication_lue'),
+('032_constructions');
 
 UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
 

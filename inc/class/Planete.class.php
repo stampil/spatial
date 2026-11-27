@@ -408,27 +408,80 @@ class Planete {
         return $revenu;
     }
 
-    public function construire(Joueur $joueur, string $batiment): ?string {
+    public function nombreEnConstruction(?string $batiment = null): int {
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "construction WHERE id_planete=?";
+        $parametres = array($this->id);
+        if($batiment !== null){
+            $query .= " AND batiment=?";
+            array_push($parametres, $batiment);
+        }
+        return (int) $this->bdd->query($query,...$parametres)[0]->nombre;
+    }
+
+    public function constructionsEnCours(): array {
+        $query = "SELECT batiment, COUNT(*) AS restants, MAX(fin) AS fin FROM " . MyPDO::DB_FLAG . "construction WHERE id_planete=? GROUP BY batiment ORDER BY MAX(fin)";
+        return $this->bdd->query($query,$this->id);
+    }
+
+    public function emplacementsLibres(): int {
+        return $this->slot - $this->batimentsTotal() - $this->nombreEnConstruction();
+    }
+
+    public function construire(Joueur $joueur, string $batiment, int $nombre): ?string {
         if(!isset(Batiment::CATALOGUE[$batiment])){
             return 'Bâtiment inconnu.';
         }
         if($this->gouverneur !== $joueur->id){
             return 'Vous ne gouvernez pas cette planète.';
         }
+        if($nombre < 1){
+            return 'Choisissez au moins un bâtiment.';
+        }
         if($joueur->revenuNet() < 0){
             return 'Votre revenu est négatif : plus de construction possible.';
         }
-        $total = implode('+', array_keys(Batiment::CATALOGUE));
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment+1 WHERE id=? AND gouverneur=? AND ($total)<slot";
-        $this->bdd->query($query,$this->id,$joueur->id);
-        if($this->bdd->lastRowCount !== 1){
-            return "Il n'y a plus d'emplacement libre sur cette planète.";
+        if($nombre > $this->emplacementsLibres()){
+            return "Il n'y a pas assez d'emplacements libres sur cette planète.";
         }
-        if(!$joueur->payer(Batiment::CATALOGUE[$batiment]['prix'])){
-            $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment-1 WHERE id=?",$this->id);
+        $cout = $nombre * Batiment::CATALOGUE[$batiment]['prix'];
+        if(!$joueur->payer($cout)){
             return 'Crédits insuffisants.';
         }
+        $fin = Tools::formatDate(time() + $this->dureeProduction($joueur, Batiment::CATALOGUE[$batiment]['duree']));
+        $total = implode('+', array_keys(Batiment::CATALOGUE));
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "construction (id_joueur,id_planete,batiment,fin) SELECT ?,id,?,? FROM " . MyPDO::DB_FLAG . "planete WHERE id=? AND gouverneur=? AND ($total)+(SELECT COUNT(*) FROM " . MyPDO::DB_FLAG . "construction WHERE id_planete=?)<slot";
+        $lancees = array();
+        for($i = 0; $i < $nombre; $i++){
+            $this->bdd->query($query,$joueur->id,$batiment,$fin,$this->id,$joueur->id,$this->id);
+            if($this->bdd->lastRowCount !== 1){
+                if(count($lancees) > 0){
+                    $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "construction WHERE id IN (" . implode(',', array_fill(0, count($lancees), '?')) . ")",...$lancees);
+                }
+                $joueur->crediter($cout);
+                return "Il n'y a plus d'emplacement libre sur cette planète.";
+            }
+            array_push($lancees, (int) $this->bdd->lastInsertId());
+        }
         return null;
+    }
+
+    public static function resoudreConstructions(Joueur $joueur): void {
+        $db = MyPDO::getInstance();
+        $terminees = array();
+        foreach($db->query("SELECT * FROM " . MyPDO::DB_FLAG . "construction WHERE id_joueur=? AND fin<=?",$joueur->id,Tools::now()) as $ligne){
+            $db->query("DELETE FROM " . MyPDO::DB_FLAG . "construction WHERE id=?",$ligne->id);
+            if($db->lastRowCount !== 1){
+                continue;
+            }
+            $db->query("UPDATE " . MyPDO::DB_FLAG . "planete SET $ligne->batiment=$ligne->batiment+1 WHERE id=? AND gouverneur=?",$ligne->id_planete,$joueur->id);
+            $terminees[$ligne->id_planete][$ligne->batiment] = ($terminees[$ligne->id_planete][$ligne->batiment] ?? 0) + 1;
+        }
+        foreach($terminees as $planeteId => $batiments){
+            $planete = new Planete($planeteId);
+            foreach($batiments as $batiment => $nombre){
+                Tools::addMessage($nombre.' × '.Batiment::CATALOGUE[$batiment]['nom'].' : construction terminée sur '.$planete->nom.'.');
+            }
+        }
     }
 
     public function demolir(Joueur $joueur, string $batiment): ?string {
@@ -481,6 +534,7 @@ class Planete {
             return false;
         }
         $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "construction WHERE id_planete=?",$this->id);
         return true;
     }
 
@@ -546,6 +600,7 @@ class Planete {
         }
         $this->bdd->query($query,rand(0,self::INITIAL_REVOLTE_MAX),Tools::now(),$pnj,$this->id);
         $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "production WHERE id_planete=?",$this->id);
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "construction WHERE id_planete=?",$this->id);
     }
 
     public function dureeProduction(Joueur $joueur, int $duree): int {

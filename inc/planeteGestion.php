@@ -1,7 +1,8 @@
 <?php
 $stock = Vaisseau::stock($planete->id, $Joueur->id);
 $file = Vaisseau::enFile($planete->id);
-$libres = $planete->slot - $planete->batimentsTotal();
+$libres = $planete->emplacementsLibres();
+$constructions = $planete->constructionsEnCours();
 ?>
 <section class="panneau">
     <h2 class="panneau__titre"><?= Icone::html('emplacements') ?>Emplacements <?= $planete->batimentsTotal() ?> / <?= $planete->slot ?></h2>
@@ -9,10 +10,16 @@ $libres = $planete->slot - $planete->batimentsTotal();
         <?php foreach(Batiment::CATALOGUE as $batiment => $infos){ for($i = 0; $i < $planete->nombre($batiment); $i++){ ?>
         <a class="emplacement" href="#bat-<?= $batiment ?>"><?= Icone::html($infos['icone']) ?><?= $infos['court'] ?></a>
         <?php } } ?>
+        <?php foreach($constructions as $construction){ for($i = 0; $i < $construction->restants; $i++){ ?>
+        <a class="emplacement" href="#bat-<?= $construction->batiment ?>"><?= Icone::html(Batiment::CATALOGUE[$construction->batiment]['icone']) ?><?= Batiment::CATALOGUE[$construction->batiment]['court'] ?> (chantier)</a>
+        <?php } } ?>
         <?php for($i = 0; $i < $libres; $i++){ ?>
         <a class="emplacement emplacement--vide" href="#construire"><?= Icone::html('ajouter') ?>Libre</a>
         <?php } ?>
     </div>
+    <?php foreach($constructions as $construction){ ?>
+    <?= Vue::progression(Batiment::CATALOGUE[$construction->batiment]['nom'].' · '.$construction->restants.' '.__('restant', 'restants', $construction->restants), strtotime($construction->fin) - time(), $planete->dureeProduction($Joueur, Batiment::CATALOGUE[$construction->batiment]['duree']), Batiment::CATALOGUE[$construction->batiment]['icone']) ?>
+    <?php } ?>
     <p class="md3-secondary">Revenu net de la planète : <?= sprintf('%+d', $planete->revenuNet()) ?> cr/h</p>
 </section>
 
@@ -31,16 +38,18 @@ $libres = $planete->slot - $planete->batimentsTotal();
             </dialog>
             <div>
                 <strong><?= $infos['nom'] ?></strong> × <?= $planete->nombre($batiment) ?><br>
-                <span class="md3-secondary"><?= $infos['prix'] ?> cr · maintenance <?= $infos['maintenance'] ?> cr/h</span>
+                <span class="md3-secondary"><?= $infos['prix'] ?> cr · <?= gmdate('i:s', $planete->dureeProduction($Joueur, $infos['duree'])) ?> · maintenance <?= $infos['maintenance'] ?> cr/h</span>
             </div>
         </div>
         <div class="md3-actions">
-            <form method="POST" action="?p=gererBatiment">
+            <form class="action" method="POST" action="?p=gererBatiment">
                 <input type="hidden" name="planete" value="<?= $planete->id ?>" />
                 <input type="hidden" name="batiment" value="<?= $batiment ?>" />
                 <input type="hidden" name="operation" value="<?= Planete::OPERATION_CONSTRUIRE ?>" />
                 <?= csrfField() ?>
-                <?= Vue::boutonIcone('construire', 'Construire', false, '', ($planete->batimentsTotal() < $planete->slot ? '' : ' disabled').' data-tuto="'.Tuto::CLE_CONSTRUIRE.$batiment.'"') ?>
+                <?php $maximum = min($libres, intdiv($Joueur->credits, $infos['prix'])); ?>
+                <?= Vue::curseur('nombre', min(1, $maximum), $maximum, min(1, $maximum), 'Nombre à construire : '.$infos['nom']) ?>
+                <?= Vue::boutonIcone('construire', 'Construire', false, '', ($maximum === 0 ? ' disabled' : '').' data-tuto="'.Tuto::CLE_CONSTRUIRE.$batiment.'"') ?>
             </form>
             <form class="action" method="POST" action="?p=gererBatiment">
                 <input type="hidden" name="planete" value="<?= $planete->id ?>" />
