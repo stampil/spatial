@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Usage: generer-terre.py [output folder] [world numbers...].
-Generates the earth-like planet textures (img/planete/40.jpg to 45.jpg) from invented continents: 3D noise sampled on a sphere, so the map wraps horizontally with no seam and never copies the real Earth. Water, sand, forest, desert, mountains and snow follow altitude, latitude and moisture."""
+Generates the earth-like planet textures (img/texture/40.jpg to 45.jpg) from invented continents: 3D noise sampled on a sphere, so the map wraps horizontally with no seam and never copies the real Earth. Water, sand, forest, desert, mountains and snow follow altitude, latitude and moisture."""
 import os
 import sys
 
@@ -201,7 +201,7 @@ def rapport_couture(image):
 
 
 if __name__ == '__main__':
-    destination = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'img', 'planete')
+    destination = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'img', 'texture')
     os.makedirs(destination, exist_ok=True)
     numeros = [int(numero) for numero in sys.argv[2:]]
     for parametres in MONDES:

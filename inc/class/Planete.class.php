@@ -27,6 +27,7 @@ class Planete {
     const REVOLTE_ALERTE = 40;
     const SEUIL_INDEPENDANCE = 51;
     const TEXTURES = 50;
+    const DOSSIER_TEXTURES = 'img/texture';
     const ILLUSTRATION_REJOINT = 'evenement-rejoint';
     const ILLUSTRATION_REVOLTE = 'evenement-revolte';
     const ILLUSTRATION_CONQUISE = 'evenement-conquise';
@@ -468,8 +469,8 @@ class Planete {
         $this->bdd->query($query,$points,$this->id);
     }
 
-    public function numeroTexture(): int {
-        return $this->id % self::TEXTURES + 1;
+    public function cheminTexture(): string {
+        return self::DOSSIER_TEXTURES.'/'.($this->id % self::TEXTURES + 1).'.jpg';
     }
 
     public function estOccupee(): bool {

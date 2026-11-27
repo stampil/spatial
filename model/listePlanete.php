@@ -17,7 +17,7 @@ foreach($gouvernees as $ligne){
 ?>
     <section class="panneau" style="--accent:<?= htmlspecialchars($couleur) ?>">
         <div class="fiche__tete">
-            <div class="avatar avatar--planete" style="background-image:url(img/planete/<?= $p->numeroTexture() ?>.jpg)"></div>
+            <div class="avatar avatar--planete" style="background-image:url(<?= $p->cheminTexture() ?>)"></div>
             <div>
                 <h2 class="fiche__nom"><a href="?p=affichePlanete&id_planete=<?= $p->id ?>" data-tuto="<?= Tuto::CLE_PLANETE.$p->id ?>"><?= htmlspecialchars($p->nom) ?></a></h2>
                 <p class="md3-secondary">Système <?= $p->systeme->getNom() ?></p>

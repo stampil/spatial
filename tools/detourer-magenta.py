@@ -99,7 +99,7 @@ def traiter(chemin, nom, destination):
         if rapport > raccord.SEUIL_COUTURE:
             print('  ignoré %s : la couture reste visible (rapport %.2f)' % (nom, rapport))
             return False
-        sortie = os.path.join(destination, 'planete', cle + '.jpg')
+        sortie = os.path.join(destination, 'texture', cle + '.jpg')
         os.makedirs(os.path.dirname(sortie), exist_ok=True)
         image.save(sortie, quality=raccord.QUALITE_JPEG)
         print('  %s -> %s (couture %.2f)' % (nom, sortie, rapport))
