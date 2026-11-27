@@ -253,6 +253,13 @@ class Tuto {
         return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RESTRICTOR)), self::planeteTrois($joueur));
     }
 
+    private static function phraseRevenuParMinute(Joueur $joueur): string {
+        $revenu = $joueur->revenuNet();
+        $parMinute = intdiv($revenu, Joueur::MINUTES_PAR_HEURE);
+        $gain = $parMinute > 0 ? 'environ '.$parMinute.' '.__('credit', 'credits', $parMinute).' chaque minute' : 'une fraction de crédit chaque minute, qui s\'accumule jusqu\'à faire un crédit entier';
+        return 'Le revenu affiché en haut de l\'écran est un montant par heure ('.sprintf('%+d', $revenu).' cr/h), mais vous en gagnez l\'équivalent chaque minute : '.$gain.'.';
+    }
+
     private static function primeDe(int $cout): int {
         return intdiv($cout * (Planete::PERCENT + self::PRIME_MARGE_POURCENT) + Planete::PERCENT - 1, Planete::PERCENT);
     }
@@ -461,7 +468,7 @@ class Tuto {
         }
         elseif($etape === Joueur::TUTO_END_STEP){
             MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET fin_tuto=? WHERE id=?",Tools::now(),$joueur->id);
-            Tools::addMessage('Tutoriel terminé : vous avez appris toutes les mécaniques du jeu.');
+            Tools::addMessage('Tutoriel terminé : vous avez appris toutes les mécaniques du jeu. '.strip_tags(self::phraseRevenuParMinute($joueur)));
         }
         else{
             Tools::addMessage('Tutoriel : étape réussie.');
@@ -635,7 +642,7 @@ class Tuto {
             case self::ETAPE_NOMMER:
                 return 'Vous gouvernez les trois planètes du système voisin. Un gouverneur dont un perso se trouve sur la planète peut la renommer : ouvrez la fiche d\'une planète où l\'un de vos persos est présent (l\'assassin est resté sur '.self::planeteDeux($joueur)->getNom().') et '.self::action('renommer', 'Renommer la planète').'. Si le gouverneur perd la planète, elle reprend son nom d\'origine.';
             case self::ETAPE_FERMES:
-                return 'Chaque ferme rapporte '.Batiment::FERME_INCOME.' cr/h pour '.Batiment::CATALOGUE[Batiment::FERME]['maintenance'].' cr/h de maintenance. Une prime couvre le coût : sur chacune de vos trois planètes du système voisin (menu Colonies, puis la fiche de la planète), construisez des fermes sur tous les emplacements, rien d\'autre. Les crédits tombent ensuite chaque minute : vous les verrez monter en haut de l\'écran.';
+                return 'Chaque ferme rapporte '.Batiment::FERME_INCOME.' cr/h pour '.Batiment::CATALOGUE[Batiment::FERME]['maintenance'].' cr/h de maintenance. Une prime couvre le coût : sur chacune de vos trois planètes du système voisin (menu Colonies, puis la fiche de la planète), construisez des fermes sur tous les emplacements, rien d\'autre. '.self::phraseRevenuParMinute($joueur);
         }
         return '';
     }
