@@ -26,7 +26,7 @@ class Planete {
     const CAPTURE_REVOLTE = 50;
     const REVOLTE_ALERTE = 40;
     const SEUIL_INDEPENDANCE = 51;
-    const TEXTURES = 57;
+    const TEXTURES = 58;
     const NOM_LONGUEUR_MAX = 32;
     const DOSSIER_TEXTURES = 'img/texture';
     const ORBITE_RAYON_MINIMUM = 100;
