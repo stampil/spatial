@@ -44,6 +44,7 @@
     const RAYON_PLANETE_MONDE = 5;
     const RAYON_PLANETE_ECRAN_MIN = 7;
     const RAYON_TOUCHER_PLANETE = 14;
+    const VOILE_DEBORD = 1;
     const TOUCHE_ENTREE = 'Enter';
     const TOUCHE_ESPACE = ' ';
     const TOUCHE_ECHAP = 'Escape';
@@ -490,15 +491,20 @@
         });
         const halo = creerSvg('circle', {'class': 'carte__halo', cx: planete.x, cy: planete.y});
         const disque = creerSvg('circle', {'class': 'carte__disque', cx: planete.x, cy: planete.y, fill: planete.couleur});
+        const voile = creerSvg('circle', {'class': 'carte__voile', cx: planete.x, cy: planete.y});
         const zone = creerSvg('circle', {'class': 'carte__zone', cx: planete.x, cy: planete.y});
         const nom = creerSvg('text', {'class': 'carte__nom', x: planete.x, 'text-anchor': 'middle'});
         nom.textContent = planete.nom;
         groupe.appendChild(halo);
         groupe.appendChild(disque);
+        groupe.appendChild(voile);
         groupe.appendChild(nom);
         groupe.appendChild(zone);
         if (planete.moi) {
             groupe.classList.add('carte__planete--moi');
+        }
+        if (!planete.exploree) {
+            groupe.classList.add('carte__planete--inexploree');
         }
         groupe.addEventListener('keydown', (evenement) => {
             if (evenement.key === TOUCHE_ENTREE || evenement.key === TOUCHE_ESPACE) {
@@ -512,6 +518,7 @@
             const rayon = Math.max(RAYON_PLANETE_ECRAN_MIN / echelle, RAYON_PLANETE_MONDE);
             halo.setAttribute('r', rayon + ECART_HALO / echelle);
             disque.setAttribute('r', rayon);
+            voile.setAttribute('r', rayon + VOILE_DEBORD / echelle);
             zone.setAttribute('r', Math.max(rayon, RAYON_TOUCHER_PLANETE / echelle));
             nom.setAttribute('y', planete.y + rayon + DECALAGE_NOM / echelle);
             nom.setAttribute('font-size', TAILLE_POLICE_NOM / echelle);

@@ -28,6 +28,14 @@ class Analyse {
         return $analyse;
     }
 
+    public static function planetesAnalysees(int $joueurId): array {
+        $analysees = array();
+        foreach(MyPDO::getInstance()->query("SELECT id_planete FROM " . MyPDO::DB_FLAG . "analyse_planete WHERE id_joueur=?",$joueurId) as $ligne){
+            $analysees[$ligne->id_planete] = true;
+        }
+        return $analysees;
+    }
+
     public static function releve(Joueur $joueur, Planete $planete): ?array {
         if($planete->gouverneur === $joueur->id){
             return array('troupes' => $planete->troupes, 'bouclier' => $planete->bouclier, 'canon' => $planete->canon);

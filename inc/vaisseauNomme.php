@@ -23,13 +23,13 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
             <?= Vue::lienIcone('?p=carte&ordre='.$vaisseau->id_planete.'&vaisseau='.$vaisseau->id, 'voyager', 'Voyager') ?>
             <?php } ?>
             <?php if($peutEmbarquer){ ?>
-            <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal', ' data-tuto="embarquer embarquer-'.$vaisseau->type.'"') ?>
+            <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal md3-button--plus', ' data-tuto="embarquer embarquer-'.$vaisseau->type.'"') ?>
             <?php } ?>
             <?php if(array_sum($embarques) > 0){ ?>
             <form method="POST" action="?p=debarquer">
                 <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
                 <?= csrfField() ?>
-                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal', ' data-tuto="decharger"') ?>
+                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal md3-button--moins', ' data-tuto="decharger"') ?>
             </form>
             <?php } ?>
             <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer', false, 'md3-button--tonal') ?>
@@ -46,7 +46,7 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
                 <div class="ligne-jeu">
                     <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
                     <?= Vue::curseur('nombre', min(1, $place), $place, min(1, $place), 'Nombre à embarquer sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
-                    <?= Vue::boutonIcone('embarquer', 'Embarquer', false, 'md3-button--tonal', ($place === 0 ? ' disabled' : '').' data-tuto="embarquer-valider embarquer-valider-'.$vaisseau->type.'-'.$typeEmbarque.'"') ?>
+                    <?= Vue::boutonIcone('embarquer', 'Embarquer', false, 'md3-button--tonal md3-button--plus', ($place === 0 ? ' disabled' : '').' data-tuto="embarquer-valider embarquer-valider-'.$vaisseau->type.'-'.$typeEmbarque.'"') ?>
                 </div>
             </form>
             <?php } ?>

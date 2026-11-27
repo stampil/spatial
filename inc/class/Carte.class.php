@@ -16,6 +16,7 @@ class Carte {
             $systemes[$systeme->id] = $systeme;
         }
 
+        $analysees = Analyse::planetesAnalysees($joueur->id);
         $enRoute = self::enRoute($joueur, $systemes);
         $donnees = array(
             'maintenant' => time(),
@@ -27,7 +28,7 @@ class Carte {
             'enRouteLibelle' => count($enRoute).' '.__('deplacement','deplacements',count($enRoute)),
         );
         foreach($systemes as $systeme){
-            array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps));
+            array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps, $analysees));
         }
         return $donnees;
     }
@@ -74,7 +75,7 @@ class Carte {
         return $planete === null ? null : $planete->id_systeme;
     }
 
-    private static function systeme(Joueur $joueur, Systeme $systeme, array $camps): array {
+    private static function systeme(Joueur $joueur, Systeme $systeme, array $camps, array $analysees): array {
         $idCamp = $systeme->getIdCamp();
         $planetes = array();
         $moi = false;
@@ -90,6 +91,7 @@ class Carte {
                 'couleur' => $planete->id_camp === null ? Camp::SANS_CAMP_COULEUR : $camps[$planete->id_camp]->couleur,
                 'statut' => $planete->gouverneur === $joueur->id ? self::STATUT_MIEN : ($planete->gouverneur === 0 ? self::STATUT_LIBRE : self::STATUT_OCCUPE),
                 'moi' => $planete->gouverneur === $joueur->id,
+                'exploree' => $planete->gouverneur === $joueur->id || isset($analysees[$planete->id]),
             ));
         }
         return array(

@@ -171,7 +171,7 @@ Aucune action possible sur <?= $planete->getNom() ?>.
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="embarquer" />
     <?= csrfField() ?>
-    <?= Vue::boutonIcone('embarquer', 'Monter dans un transport', false, 'md3-button--tonal', ' data-tuto="embarquer"') ?>
+    <?= Vue::boutonIcone('embarquer', 'Monter dans un transport', false, 'md3-button--tonal md3-button--plus', ' data-tuto="embarquer"') ?>
     <span class="md3-secondary">sur <?= $planete->getNom() ?></span>
 </form>
 <?php
@@ -183,7 +183,7 @@ elseif($o->embarque){
     <input type="hidden" name="perso" value="<?= $o->id ?>" />
     <input type="hidden" name="action" value="descendre" />
     <?= csrfField() ?>
-    <?= Vue::boutonIcone('decharger', 'Descendre du transport', false, 'md3-button--tonal') ?>
+    <?= Vue::boutonIcone('decharger', 'Descendre du transport', false, 'md3-button--tonal md3-button--moins') ?>
 </form>
 <?php
 }

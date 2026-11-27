@@ -99,6 +99,21 @@ main.md3-page > .mission {
     stroke: #FFFFFF;
 }
 
+.carte__voile {
+    display: none;
+    fill: #000000;
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+.carte__planete--inexploree .carte__voile {
+    display: inline;
+}
+
+.carte__planete--inexploree .carte__nom {
+    opacity: 0.25;
+}
+
 .carte__orbite {
     fill: none;
     stroke: var(--carte-trait);

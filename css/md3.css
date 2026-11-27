@@ -257,6 +257,28 @@ body {
     padding: 0;
 }
 
+.md3-button--plus,
+.md3-button--moins {
+    position: relative;
+}
+
+.md3-button--plus::after,
+.md3-button--moins::after {
+    content: '+';
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    color: white;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.md3-button--moins::after {
+    content: '\2212';
+}
+
 .md3-button--icone-flotte {
     --coupe: 12px;
     width: 56px;
