@@ -80,46 +80,6 @@ class Vaisseau {
         return $stock;
     }
 
-    private static function conditionCombattants(?int $flotteId): array {
-        if($flotteId === null){
-            return array("id_flotte IS NULL AND id_hote IS NULL", array());
-        }
-        return array("(id_flotte=? OR id_hote IN (SELECT h.id FROM " . MyPDO::DB_FLAG . "vaisseau h WHERE h.id_flotte=?))", array($flotteId, $flotteId));
-    }
-
-    public static function combattants(int $planeteId, int $joueurId, ?int $flotteId): array {
-        list($condition, $parametresCondition) = self::conditionCombattants($flotteId);
-        $marques = implode(',', array_fill(0, count(Combat::ESCADRE), '?'));
-        $query = "SELECT type, COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND arrivee IS NULL AND type IN ($marques) AND " . $condition . " GROUP BY type";
-        $parametres = array_merge(array($joueurId, $planeteId), Combat::ESCADRE, $parametresCondition);
-        $nombres = array_fill_keys(Combat::ESCADRE, 0);
-        foreach(MyPDO::getInstance()->query($query,...$parametres) as $ligne){
-            $nombres[$ligne->type] = (int) $ligne->nombre;
-        }
-        return $nombres;
-    }
-
-    public static function retirerCombattants(int $planeteId, int $joueurId, ?int $flotteId, array $pertes): void {
-        list($condition, $parametresCondition) = self::conditionCombattants($flotteId);
-        $db = MyPDO::getInstance();
-        foreach($pertes as $type => $nombre){
-            if($nombre < 1){
-                continue;
-            }
-            $query = "SELECT id FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND " . $condition . " ORDER BY id LIMIT " . $nombre;
-            $parametres = array_merge(array($joueurId, $planeteId, $type), $parametresCondition);
-            $ids = array();
-            foreach($db->query($query,...$parametres) as $ligne){
-                array_push($ids, (int) $ligne->id);
-            }
-            if(count($ids) > 0){
-                $db->query("DELETE FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id IN (" . implode(',', array_fill(0, count($ids), '?')) . ")",...$ids);
-            }
-        }
-        Flotte::dissoudreVides($joueurId);
-        self::libererOrphelins();
-    }
-
     public static function escadre(int $planeteId, int $joueurId): array {
         $nombres = array_fill_keys(Combat::ESCADRE, 0);
         $marques = implode(',', array_fill(0, count(Combat::ESCADRE), '?'));

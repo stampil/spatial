@@ -18,18 +18,14 @@ class Combat {
     const DEFENSEUR = 'defenseur';
     const ADVERSAIRE = array(self::ATTAQUANT => self::DEFENSEUR, self::DEFENSEUR => self::ATTAQUANT);
 
-    public static function attaquer(Joueur $joueur, Planete $planete, ?Flotte $flotte = null): ?string {
-        if($flotte !== null && $flotte->id_joueur !== $joueur->id){
-            return 'Cette flotte ne vous appartient pas.';
-        }
+    public static function attaquer(Joueur $joueur, Planete $planete): ?string {
         if($planete->gouverneur === $joueur->id){
             return 'Vous gouvernez déjà cette planète.';
         }
         if(!$planete->systeme->estConnuDe($joueur->id)){
             return 'Cette planète est inconnue.';
         }
-        $flotteId = $flotte === null ? null : $flotte->id;
-        $nombres = Vaisseau::combattants($planete->id, $joueur->id, $flotteId);
+        $nombres = Vaisseau::escadre($planete->id, $joueur->id);
         if(array_sum($nombres) === 0){
             return 'Aucun vaisseau de combat engagé sur cette planète.';
         }
@@ -46,9 +42,9 @@ class Combat {
             $bataille = self::bataillePlanete($joueur, $planete, $nombres, $defenseurs, 'Flotte défenseuse sur '.$planete->nom);
             $pertesBataille = $bataille['pertes'][self::ATTAQUANT];
             if($bataille['vainqueur'] !== self::ATTAQUANT){
-                Vaisseau::retirerCombattants($planete->id, $joueur->id, $flotteId, $pertesBataille);
+                Vaisseau::detruire($planete->id, $joueur->id, $pertesBataille);
                 if($bataille['fuite'][self::ATTAQUANT]){
-                    Vaisseau::fuir($joueur, $planete, $planete->refugePour($joueur), $flotteId);
+                    Vaisseau::fuirTous($joueur, $planete, $planete->refugePour($joueur));
                 }
                 Tools::addMessage($bataille['bilan']);
                 return null;
@@ -59,19 +55,20 @@ class Combat {
                 $nombres[$type] -= $pertesBataille[$type];
             }
         }
+        $scripte = $joueur->enTuto() && $planete->id_systeme === $joueur->id_systeme_voisin;
         $etapes = array();
-        $degats = self::puissance($nombres['chasseur'], 'chasseur', $bonusHeros, $resistance);
+        $degats = self::garantirDegats(self::puissance($nombres['chasseur'], 'chasseur', $bonusHeros, $resistance), $nombres['chasseur'], $scripte, $planete);
         list($canon, $bouclier) = self::infliger($degats, $planete->canon, $planete->bouclier);
         self::noterEtape($etapes, $nombres['chasseur'], 'chasseur', $degats, $bouclier, $canon);
         $bonus = $canon === 0 ? self::BONUS_PHASE_POURCENT : 0;
-        $degats = self::puissance($nombres['fregate'], 'fregate', $bonus + $bonusHeros, $resistance);
+        $degats = self::garantirDegats(self::puissance($nombres['fregate'], 'fregate', $bonus + $bonusHeros, $resistance), $nombres['fregate'], $scripte, $planete);
         list($bouclier, $canon) = self::infliger($degats, $bouclier, $canon);
         self::noterEtape($etapes, $nombres['fregate'], 'fregate', $degats, $bouclier, $canon);
         $bonus = $bouclier === 0 ? self::BONUS_PHASE_POURCENT : 0;
-        $degats = self::puissance($nombres['capital'], 'capital', $bonus + $bonusHeros, $resistance);
+        $degats = self::garantirDegats(self::puissance($nombres['capital'], 'capital', $bonus + $bonusHeros, $resistance), $nombres['capital'], $scripte, $planete);
         list($canon, $bouclier) = self::infliger($degats, $canon, $bouclier);
         self::noterEtape($etapes, $nombres['capital'], 'capital', $degats, $bouclier, $canon);
-        $degats = self::puissance($nombres[Vaisseau::RESTRICTOR], Vaisseau::RESTRICTOR, $bonusHeros, $resistance);
+        $degats = self::garantirDegats(self::puissance($nombres[Vaisseau::RESTRICTOR], Vaisseau::RESTRICTOR, $bonusHeros, $resistance), $nombres[Vaisseau::RESTRICTOR], $scripte, $planete);
         list($bouclier, $canon) = self::infliger($degats, $bouclier, $canon);
         self::noterEtape($etapes, $nombres[Vaisseau::RESTRICTOR], Vaisseau::RESTRICTOR, $degats, $bouclier, $canon);
 
@@ -83,7 +80,7 @@ class Combat {
         }
 
         $pertes = $pertesBataille;
-        foreach(self::pertes($nombres, $planete->canon) as $type => $perdus){
+        foreach(($scripte ? array() : self::pertes($nombres, $planete->canon)) as $type => $perdus){
             $pertes[$type] += $perdus;
         }
         $rapport = array();
@@ -92,7 +89,7 @@ class Combat {
                 array_push($rapport, $perdus.' × '.Vaisseau::CATALOGUE[$type]['nom']);
             }
         }
-        Vaisseau::retirerCombattants($planete->id, $joueur->id, $flotteId, $pertes);
+        Vaisseau::detruire($planete->id, $joueur->id, $pertes);
         $message = $bilanBataille.'Combat sur '.$planete->nom.' : défense restante, bouclier '.$bouclier.' et canon '.$canon.'. Pertes : '.(count($rapport) > 0 ? implode(', ', $rapport) : 'aucune').'.';
         if($resistance > 0){
             $message .= ' Citadelle : défense +'.$resistance.' %.';
@@ -115,9 +112,6 @@ class Combat {
             'etapes' => $etapes,
             'bilan' => $message,
         ));
-        if($flotte !== null && count($flotte->composition()) === 0){
-            $flotte->dissoudre();
-        }
         return null;
     }
 
@@ -155,7 +149,7 @@ class Combat {
             return;
         }
         $defenseActive = $planete->bouclier + $planete->canon > 0 || array_sum(self::defenseurs($planete)) > 0;
-        if(!$defenseActive || array_sum(Vaisseau::combattants($planete->id, $joueur->id, null)) === 0){
+        if(!$defenseActive || array_sum(Vaisseau::escadre($planete->id, $joueur->id)) === 0){
             return;
         }
         self::attaquer($joueur, $planete);
@@ -398,6 +392,13 @@ class Combat {
     public static function infliger(int $degats, int $principal, int $secondaire): array {
         $surplus = max(0, $degats - $principal);
         return array(max(0, $principal - $degats), max(0, $secondaire - $surplus));
+    }
+
+    private static function garantirDegats(int $degats, int $nombre, bool $scripte, Planete $planete): int {
+        if(!$scripte || $nombre === 0){
+            return $degats;
+        }
+        return max($degats, $planete->bouclier + $planete->canon);
     }
 
     private static function puissance(int $nombre, string $type, int $bonusPourcent, int $resistancePourcent): int {
