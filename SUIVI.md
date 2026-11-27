@@ -18,9 +18,15 @@ Lu (rien codé) : l'étoile au centre de la vue système est un disque de la cou
 
 Ce que je comprends : chaque système reçoit une couleur d'étoile tirée au hasard parmi les couleurs d'étoiles réelles (bleue, blanche, jaune, orange, rouge), jamais grise. Elle sert à l'étoile centrale de la vue système.
 
+### 3. Refaire une proposition (27/11)
+
+Ta phrase : « refait une prop. ».
+
+Ce que je comprends : une nouvelle proposition de l'affichage de la vue système (sphères texturées qui tournent, étoile colorée, première planète explorée, les autres voilées), montrée en maquette animée avec les vraies textures et le vrai CSS de rotation, pour que tu la valides avant tout code. Maquette : http://127.0.0.1:19931/index.html (les 6 couleurs d'étoile se choisissent en cliquant). Si tu voulais refaire autre chose, dis-le.
+
 ## Questions en suspens
 
-1. Taille : une sphère lisible demande environ 24 à 40 px à l'écran, alors que les orbites sont aujourd'hui espacées de 14 unités. Pour qu'elles ne se chevauchent pas, j'écarte les orbites et j'agrandis la zone affichée (positions de planètes recalculées, durées locales toujours entre 20 et 60 s). Je recommande cela, avec la sphère de 32 px au zoom de départ.
+1. Taille : une sphère lisible demande environ 24 à 44 px à l'écran, alors que les orbites sont aujourd'hui espacées de 14 unités. Pour qu'elles ne se chevauchent pas, j'écarte les orbites et j'agrandis la zone affichée (positions de planètes recalculées, durées locales toujours entre 20 et 60 s). Je recommande cela, avec la sphère de 32 px au zoom de départ.
 2. Couleur du camp : anneau fin autour de la sphère, à la place du disque coloré. Je recommande cela.
 3. Le voile à 75 % couvre toute la sphère (la texture reste devinée en transparence). Je recommande cela.
 
