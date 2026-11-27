@@ -1,7 +1,7 @@
 <?php
 $infos = Vaisseau::CATALOGUE[$vaisseau->type];
 $embarques = Vaisseau::embarques((int) $vaisseau->id);
-$capacites = array(Vaisseau::TROUPE => Vaisseau::CAPACITE_TROUPES, Vaisseau::CHASSEUR => Vaisseau::CAPACITE_CHASSEURS);
+$capacites = Vaisseau::CAPACITES_EMBARQUABLES;
 $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPACITE_CHASSEURS] > 0;
 ?>
 <div class="vaisseau-nomme" data-bloc>
@@ -26,31 +26,43 @@ $peutEmbarquer = $infos[Vaisseau::CAPACITE_TROUPES] > 0 || $infos[Vaisseau::CAPA
             <?= Vue::basculeIcone('embarquer', 'embarquer', 'Embarquer', false, 'md3-button--tonal md3-button--plus', ' data-tuto="embarquer embarquer-'.$vaisseau->type.'"') ?>
             <?php } ?>
             <?php if(array_sum($embarques) > 0){ ?>
-            <form method="POST" action="?p=debarquer">
-                <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
-                <?= csrfField() ?>
-                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal md3-button--moins', ' data-tuto="decharger"') ?>
-            </form>
+            <?= Vue::basculeIcone('debarquer', 'decharger', 'Débarquer', false, 'md3-button--tonal md3-button--moins', ' data-tuto="decharger"') ?>
             <?php } ?>
             <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer', false, 'md3-button--tonal') ?>
         </div>
     </div>
     <?php if($peutEmbarquer){ ?>
     <div class="panneau-action hors-creation" data-panneau="embarquer" hidden>
-        <div class="systeme-details__corps">
+        <form class="systeme-details__corps" method="POST" action="?p=embarquer">
+            <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
+            <?= csrfField() ?>
             <?php foreach($capacites as $typeEmbarque => $cle){ if($infos[$cle] === 0){ continue; } $place = max(0, min($infos[$cle] - ($embarques[$typeEmbarque] ?? 0), $libres[$typeEmbarque] ?? 0)); ?>
-            <form method="POST" action="?p=embarquer">
-                <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
-                <input type="hidden" name="type" value="<?= $typeEmbarque ?>" />
-                <?= csrfField() ?>
-                <div class="ligne-jeu">
-                    <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
-                    <?= Vue::curseur('nombre', min(1, $place), $place, min(1, $place), 'Nombre à embarquer sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
-                    <?= Vue::boutonIcone('embarquer', 'Embarquer', false, 'md3-button--tonal md3-button--plus', ($place === 0 ? ' disabled' : '').' data-tuto="embarquer-valider embarquer-valider-'.$vaisseau->type.'-'.$typeEmbarque.'"') ?>
-                </div>
-            </form>
+            <div class="ligne-jeu">
+                <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
+                <?= Vue::curseur('nombre['.$typeEmbarque.']', 0, $place, 0, 'Nombre à embarquer sur '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
+            </div>
             <?php } ?>
-        </div>
+            <div class="ligne-jeu">
+                <?= Vue::boutonIcone('embarquer', 'Embarquer', false, 'md3-button--tonal md3-button--plus', ' data-tuto="embarquer-valider embarquer-valider-'.$vaisseau->type.'"') ?>
+            </div>
+        </form>
+    </div>
+    <?php } ?>
+    <?php if(array_sum($embarques) > 0){ ?>
+    <div class="panneau-action hors-creation" data-panneau="debarquer" hidden>
+        <form class="systeme-details__corps" method="POST" action="?p=debarquer">
+            <input type="hidden" name="vaisseau" value="<?= $vaisseau->id ?>" />
+            <?= csrfField() ?>
+            <?php foreach($capacites as $typeEmbarque => $cle){ if($infos[$cle] === 0){ continue; } ?>
+            <div class="ligne-jeu">
+                <span class="ligne-jeu__info"><?= Icone::html(Vaisseau::CATALOGUE[$typeEmbarque]['icone']) ?><?= Vaisseau::CATALOGUE[$typeEmbarque]['nom'] ?></span>
+                <?= Vue::curseur('nombre['.$typeEmbarque.']', 0, $embarques[$typeEmbarque] ?? 0, 0, 'Nombre à débarquer de '.$vaisseau->nom.' : '.Vaisseau::CATALOGUE[$typeEmbarque]['nom']) ?>
+            </div>
+            <?php } ?>
+            <div class="ligne-jeu">
+                <?= Vue::boutonIcone('decharger', 'Débarquer', false, 'md3-button--tonal md3-button--moins', ' data-tuto="debarquer-valider"') ?>
+            </div>
+        </form>
     </div>
     <?php } ?>
     <div class="panneau-action hors-creation" data-panneau="renommer" hidden>

@@ -2,10 +2,12 @@
 if(!Tools::isValidCsrfToken($_POST[CSRF_KEY] ?? null)){
     exit('Jeton invalide');
 }
-$type = giveInputString($_POST, 'type');
-$nombre = (int) giveInputString($_POST, 'nombre');
-$erreur = Vaisseau::embarquer($Joueur, (int) ($_POST['vaisseau'] ?? 0), $type, $nombre);
-Tools::addMessage($erreur ?? 'Embarquement : '.$nombre.' × '.Vaisseau::CATALOGUE[$type]['nom'].'.');
+$nombres = array();
+foreach(array_keys(Vaisseau::CAPACITES_EMBARQUABLES) as $type){
+    $nombres[$type] = (int) ($_POST['nombre'][$type] ?? 0);
+}
+$erreur = Vaisseau::embarquer($Joueur, (int) ($_POST['vaisseau'] ?? 0), $nombres);
+Tools::addMessage($erreur ?? 'Embarquement : '.Vaisseau::resume($nombres).'.');
 
 ?>
 

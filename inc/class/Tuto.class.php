@@ -160,7 +160,7 @@ class Tuto {
                 return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RECONNAISSANCE)), self::planeteDeux($joueur));
             case self::ETAPE_ORBITE:
                 $chasseursEmbarques = self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) > 0;
-                return self::routeVersLaCarte(array(self::niveau('listeVaisseau', $chasseursEmbarques ? 'decharger' : self::CLE_VOYAGER.Vaisseau::CHASSEUR)), $chasseursEmbarques ? null : self::planeteCible($joueur));
+                return self::routeVersLaCarte(array(self::niveau('listeVaisseau', $chasseursEmbarques ? 'debarquer-valider decharger' : self::CLE_VOYAGER.Vaisseau::CHASSEUR)), $chasseursEmbarques ? null : self::planeteCible($joueur));
             case self::ETAPE_ASSASSIN:
                 return self::routeDAssassin($joueur, $mere);
             case self::ETAPE_SABOTAGE:
@@ -228,10 +228,10 @@ class Tuto {
 
     private static function cleDEnvoi(Joueur $joueur): string {
         if(self::nombreDeVaisseaux($joueur, Vaisseau::TROUPE, true) < self::TROUPES_REQUISES){
-            return 'embarquer-valider-'.Vaisseau::BARGE.'-'.Vaisseau::TROUPE.' embarquer-'.Vaisseau::BARGE;
+            return 'embarquer-valider-'.Vaisseau::BARGE.' embarquer-'.Vaisseau::BARGE;
         }
         if(self::nombreDeVaisseaux($joueur, Vaisseau::CHASSEUR, true) < self::CHASSEURS_REQUIS){
-            return 'embarquer-valider-fregate-'.Vaisseau::CHASSEUR.' embarquer-fregate';
+            return 'embarquer-valider-fregate embarquer-fregate';
         }
         return self::CLE_VOYAGER_FLOTTE;
     }
@@ -248,7 +248,7 @@ class Tuto {
             return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RESTRICTOR)), $deux);
         }
         if(self::chasseursSurRestrictor($joueur) < Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]){
-            return array(self::niveau('listeVaisseau', 'embarquer-'.Vaisseau::RESTRICTOR.' embarquer-valider-'.Vaisseau::RESTRICTOR.'-'.Vaisseau::CHASSEUR));
+            return array(self::niveau('listeVaisseau', 'embarquer-valider-'.Vaisseau::RESTRICTOR.' embarquer-'.Vaisseau::RESTRICTOR));
         }
         return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::RESTRICTOR)), self::planeteTrois($joueur));
     }
@@ -300,7 +300,7 @@ class Tuto {
         }
         if(Vaisseau::troupesEnBarge($depart->id, $joueur->id) < 1){
             if((Vaisseau::stockLibre($depart->id, $joueur->id)[Vaisseau::TROUPE] ?? 0) > 0){
-                return array(self::niveau('listeVaisseau', 'embarquer-valider-'.Vaisseau::BARGE.'-'.Vaisseau::TROUPE.' embarquer-'.Vaisseau::BARGE));
+                return array(self::niveau('listeVaisseau', 'embarquer-valider-'.Vaisseau::BARGE.' embarquer-'.Vaisseau::BARGE));
             }
             return $depart->id === $mere->id ? self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::TROUPE) : array();
         }
@@ -611,14 +611,14 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 return 'Une flotte regroupe vos vaisseaux moyens et lourds (frégate, barge, capital). Allez dans le menu Flottes : sur l\'encart de '.$planete->getNom().', '.self::action('creer_flotte', 'Créer une flotte').' (en haut à droite) vous laisse cocher la frégate et la barge, puis '.self::action('valider', 'Enregistrer').'.';
             case self::ETAPE_ENVOI:
-                return 'Dans le menu Flottes, ouvrez '.self::action('embarquer', 'Embarquer').' sur la barge de votre flotte : réglez le curseur sur '.self::TROUPES_REQUISES.' '.__('troupe', 'troupes', self::TROUPES_REQUISES).' et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Ensuite '.self::action('voyager', 'Voyager').' sur votre flotte : touchez le système voisin, puis la planète '.self::planeteCible($joueur)->getNom().', et '.self::action('voyager', 'Voyager ici').'. À l\'arrivée, la défense de la planète engage votre flotte automatiquement : le combat spatial n\'est plus un choix.';
+                return 'Dans le menu Flottes, ouvrez '.self::action('embarquer', 'Embarquer').' sur la barge de votre flotte : réglez le curseur des troupes sur '.self::TROUPES_REQUISES.' '.__('troupe', 'troupes', self::TROUPES_REQUISES).' et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Un seul bouton valide tous les curseurs du panneau, et un curseur laissé à 0 n\'embarque rien. Ensuite '.self::action('voyager', 'Voyager').' sur votre flotte : touchez le système voisin, puis la planète '.self::planeteCible($joueur)->getNom().', et '.self::action('voyager', 'Voyager ici').'. À l\'arrivée, la défense de la planète engage votre flotte automatiquement : le combat spatial n\'est plus un choix.';
             case self::ETAPE_ASSAUT:
                 return 'Votre flotte est arrivée et a combattu la défense de '.self::planeteCible($joueur)->getNom().' toute seule (les chasseurs embarqués sur la frégate combattent avec elle). Une fois la défense détruite, ouvrez la fiche de la planète ('.self::action('info', 'Fiche').' sur la carte) et '.self::action('debarquement', 'Débarquer').' les troupes de vos barges. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';
             case self::ETAPE_ANALYSE:
                 $deux = self::planeteDeux($joueur);
                 return 'Planète capturée et tenue. Inutile de faire de la diplomatie ni de la rallier à votre cause : tant que votre garnison y reste, ses bâtiments produisent, avec un léger malus de temps ('.Planete::MALUS_OCCUPATION_POURCENT.' %). Si la garnison disparaît ou est détruite, la planète redevient neutre, élit un gouverneur une fois sur deux et reconstruit ses défenses. Place à la planète voisine '.($deux === null ? '' : $deux->getNom()).' : elle a un gouverneur. Envoyez-y votre vaisseau de reconnaissance (menu Flottes, '.self::action('reconnaitre', 'Reconnaître').') : une reconnaissance ne déclenche aucun combat (un joueur adverse peut pourtant l\'attaquer) et, à l\'arrivée, elle analyse la planète : garnison, vaisseaux en orbite, bâtiments et gouverneur, qui restaient inconnus.';
             case self::ETAPE_ORBITE:
-                return 'L\'analyse montre un gouverneur, un bouclier planétaire et seulement '.self::ORBITE_CHASSEURS.' chasseur en orbite. Les chasseurs de votre frégate sont à bord : dans le menu Flottes, '.self::action('decharger', 'Débarquer').' les fait descendre de la frégate. Dans un même système, les vaisseaux légers peuvent se déplacer seuls : envoyez uniquement les chasseurs sur la planète voisine ('.self::action('voyager', 'Voyager').'), l\'arrivée déclenche le combat. Une orbite vide réduit fortement les chances que l\'espion se fasse attraper : chaque vaisseau en orbite retire '.Perso::PENALITE_ORBITE_PAR_VAISSEAU_POURCENT.' % à ses chances.';
+                return 'L\'analyse montre un gouverneur, un bouclier planétaire et seulement '.self::ORBITE_CHASSEURS.' chasseur en orbite. Les chasseurs de votre frégate sont à bord : dans le menu Flottes, ouvrez '.self::action('decharger', 'Débarquer').' sur la frégate, poussez le curseur des chasseurs au maximum et validez : ils descendent de la frégate. Dans un même système, les vaisseaux légers peuvent se déplacer seuls : envoyez uniquement les chasseurs sur la planète voisine ('.self::action('voyager', 'Voyager').'), l\'arrivée déclenche le combat. Une orbite vide réduit fortement les chances que l\'espion se fasse attraper : chaque vaisseau en orbite retire '.Perso::PENALITE_ORBITE_PAR_VAISSEAU_POURCENT.' % à ses chances.';
             case self::ETAPE_ASSASSIN:
                 return 'Orbite dégagée. Tant qu\'un gouverneur est en place, on ne peut ni gouverner la planète ni baisser sa révolte : il faut l\'éliminer. Recrutez un assassin à l\'académie de '.$planete->getNom().' ('.Perso::ROLES[Perso::ROLE_ASSASSIN]['prix'].' cr), produisez un transport personnel, faites-y monter l\'assassin (sa fiche, '.self::action('embarquer', 'Monter dans un transport').'), envoyez le transport sur la planète voisine ('.self::action('voyager', 'Voyager').', même système), puis '.self::action('assassin', 'Assassiner').' le gouverneur depuis la fiche de l\'assassin.';
             case self::ETAPE_SABOTAGE:
@@ -634,7 +634,7 @@ class Tuto {
             case self::ETAPE_RESTRICTOR:
                 $cible = self::planeteTrois($joueur);
                 $deux = self::planeteDeux($joueur);
-                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue s\'enfuit vers la planète alliée ou neutre la plus proche : le Restrictor l\'en empêche, tant qu\'il vit dans votre flotte. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr) : il embarque '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' '.__('chasseur', 'chasseurs', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]).' et '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES].' '.__('troupe', 'troupes', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES]).' d\'assaut. Menu Flottes : '.self::action('voyager', 'Voyager').' avec lui sur '.($deux === null ? 'la planète voisine' : $deux->getNom()).', déjà nettoyée, où vos chasseurs vous attendent. Là, '.self::action('embarquer', 'Embarquer').' les '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' chasseurs sur le Restrictor (curseur sur '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].', puis validez), et '.self::action('voyager', 'Voyager').' sur '.($cible === null ? 'la planète pirate' : $cible->getNom()).' : l\'arrivée déclenche le combat tout seul, et pendant le tutoriel vous le gagnez d\'avance.';
+                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue s\'enfuit vers la planète alliée ou neutre la plus proche : le Restrictor l\'en empêche, tant qu\'il vit dans votre flotte. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr) : il embarque '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' '.__('chasseur', 'chasseurs', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]).' et '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES].' '.__('troupe', 'troupes', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES]).' d\'assaut. Menu Flottes : '.self::action('voyager', 'Voyager').' avec lui sur '.($deux === null ? 'la planète voisine' : $deux->getNom()).', déjà nettoyée, où vos chasseurs vous attendent. Là, '.self::action('embarquer', 'Embarquer').' les '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' chasseurs sur le Restrictor (curseur des chasseurs sur '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].', celui des troupes à 0, puis validez), et '.self::action('voyager', 'Voyager').' sur '.($cible === null ? 'la planète pirate' : $cible->getNom()).' : l\'arrivée déclenche le combat tout seul, et pendant le tutoriel vous le gagnez d\'avance.';
             case self::ETAPE_CONQUETE:
                 $deux = self::planeteDeux($joueur);
                 $trois = self::planeteTrois($joueur);

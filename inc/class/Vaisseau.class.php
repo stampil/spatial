@@ -24,6 +24,7 @@ class Vaisseau {
     const CAPACITE_TROUPES = 'troupes';
     const TROUPES_EN_BARGE = " FROM " . MyPDO::DB_FLAG . "vaisseau e JOIN " . MyPDO::DB_FLAG . "vaisseau h ON h.id=e.id_hote WHERE e.id_joueur=? AND e.id_planete=? AND e.type=? AND e.arrivee IS NULL AND h.type=? AND h.arrivee IS NULL";
     const CAPACITE_CHASSEURS = 'chasseurs';
+    const CAPACITES_EMBARQUABLES = array(self::TROUPE => self::CAPACITE_TROUPES, self::CHASSEUR => self::CAPACITE_CHASSEURS);
 
     const CATALOGUE = array(
         'chasseur' => array('icone' => 'chasseur', 'nom' => 'Chasseur', 'usine' => Batiment::USINE_LEGERE, 'prix' => 40, 'duree' => 30, 'vitesse' => 100, 'force' => 5, 'troupes' => 0, 'chasseurs' => 0),
@@ -373,48 +374,85 @@ class Vaisseau {
         return $embarques;
     }
 
-    public static function embarquer(Joueur $joueur, int $hoteId, string $type, int $nombre): ?string {
+    public static function embarquer(Joueur $joueur, int $hoteId, array $nombres): ?string {
         $hote = self::auRepos($joueur, $hoteId);
         if($hote === null || !self::estNomme($hote->type)){
             return 'Ce vaisseau ne peut pas embarquer maintenant.';
         }
-        if($type === self::TROUPE){
-            $cle = self::CAPACITE_TROUPES;
+        $deja = self::embarques($hote->id);
+        $libres = self::stockLibre($hote->id_planete, $joueur->id);
+        $total = 0;
+        foreach(self::CAPACITES_EMBARQUABLES as $type => $cle){
+            $nombre = $nombres[$type];
+            $place = max(0, min(self::CATALOGUE[$hote->type][$cle] - ($deja[$type] ?? 0), $libres[$type] ?? 0));
+            if($nombre < 0 || $nombre > $place){
+                return $hote->nom.' peut embarquer au plus '.$place.' '.self::motEmbarque($type, $place).'.';
+            }
+            $total += $nombre;
         }
-        elseif($type === self::CHASSEUR){
-            $cle = self::CAPACITE_CHASSEURS;
-        }
-        else{
-            return 'Seuls les troupes et les chasseurs s\'embarquent.';
-        }
-        $deja = self::embarques($hote->id)[$type] ?? 0;
-        $libres = self::stockLibre($hote->id_planete, $joueur->id)[$type] ?? 0;
-        $place = max(0, min(self::CATALOGUE[$hote->type][$cle] - $deja, $libres));
-        if($nombre < 1 || $nombre > $place){
-            $mot = $type === self::TROUPE ? __('troupe','troupes',$place) : __('chasseur','chasseurs',$place);
-            return $hote->nom.' peut embarquer au plus '.$place.' '.$mot.'.';
+        if($total === 0){
+            return 'Choisissez au moins un vaisseau à embarquer.';
         }
         $db = MyPDO::getInstance();
-        $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_hote=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL AND id_hote IS NULL ORDER BY id LIMIT " . $nombre;
-        $db->query($query,$hote->id,$joueur->id,$hote->id_planete,$type);
-        $embarques = $db->lastRowCount;
+        foreach(self::CAPACITES_EMBARQUABLES as $type => $cle){
+            $nombre = $nombres[$type];
+            if($nombre === 0){
+                continue;
+            }
+            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_hote=? WHERE id_joueur=? AND id_planete=? AND type=? AND arrivee IS NULL AND id_flotte IS NULL AND id_hote IS NULL ORDER BY id LIMIT " . $nombre;
+            $db->query($query,$hote->id,$joueur->id,$hote->id_planete,$type);
+            if($db->lastRowCount !== $nombre){
+                return 'La situation a changé sur cette planète : recommencez.';
+            }
+        }
         if(self::auRepos($joueur, $hote->id) === null){
             $db->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_hote=NULL WHERE id_hote=? AND arrivee IS NULL",$hote->id);
-            return 'La situation a changé sur cette planète : recommencez.';
-        }
-        if($embarques !== $nombre){
             return 'La situation a changé sur cette planète : recommencez.';
         }
         return null;
     }
 
-    public static function debarquer(Joueur $joueur, int $hoteId): ?string {
+    public static function debarquer(Joueur $joueur, int $hoteId, array $nombres): ?string {
         $hote = self::auRepos($joueur, $hoteId);
         if($hote === null || !self::estNomme($hote->type)){
             return 'Ce vaisseau ne peut pas débarquer maintenant.';
         }
-        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_hote=NULL WHERE id_hote=?",$hote->id);
+        $embarques = self::embarques($hote->id);
+        $total = 0;
+        foreach(self::CAPACITES_EMBARQUABLES as $type => $cle){
+            $nombre = $nombres[$type];
+            $present = $embarques[$type] ?? 0;
+            if($nombre < 0 || $nombre > $present){
+                return $hote->nom.' ne porte que '.$present.' '.self::motEmbarque($type, $present).'.';
+            }
+            $total += $nombre;
+        }
+        if($total === 0){
+            return 'Choisissez au moins un vaisseau à débarquer.';
+        }
+        foreach(self::CAPACITES_EMBARQUABLES as $type => $cle){
+            $nombre = $nombres[$type];
+            if($nombre === 0){
+                continue;
+            }
+            $query = "UPDATE " . MyPDO::DB_FLAG . "vaisseau SET id_hote=NULL WHERE id_hote=? AND type=? ORDER BY id LIMIT " . $nombre;
+            MyPDO::getInstance()->query($query,$hote->id,$type);
+        }
         return null;
+    }
+
+    public static function resume(array $nombres): string {
+        $morceaux = array();
+        foreach($nombres as $type => $nombre){
+            if($nombre > 0){
+                array_push($morceaux, $nombre.' × '.self::CATALOGUE[$type]['nom']);
+            }
+        }
+        return implode(', ', $morceaux);
+    }
+
+    private static function motEmbarque(string $type, int $nombre): string {
+        return $type === self::TROUPE ? __('troupe','troupes',$nombre) : __('chasseur','chasseurs',$nombre);
     }
 
     public static function renommer(Joueur $joueur, int $vaisseauId, string $nom): ?string {
