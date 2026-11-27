@@ -37,26 +37,3 @@ foreach($gouvernees as $ligne){
     </section>
 <?php } ?>
 </div>
-
-<h2>Planètes connues</h2>
-<?php
-$planetesParSysteme = array();
-foreach(Planete::listeVisibles($Joueur->id) as $ligne){
-    $planetesParSysteme[$ligne->id_systeme][] = $ligne;
-}
-foreach(Systeme::listeVisibles($Joueur->id) as $systeme){
-    $nombrePlanetes = count($planetesParSysteme[$systeme->id] ?? array());
-?>
-<details class="systeme-details">
-    <summary><?= Vue::emblemeCamp($systeme->getIdCamp(), 24) ?><?= htmlspecialchars($systeme->nom) ?> <span class="md3-secondary">(<?= $nombrePlanetes ?> <?= __('planete', 'planetes', $nombrePlanetes) ?>)</span></summary>
-    <div class="systeme-details__corps">
-        <?php foreach($planetesParSysteme[$systeme->id] ?? array() as $ligne){ $p = new Planete($ligne->id); ?>
-        <div class="ligne-jeu">
-            <span><?= $p->getNom() ?></span>
-            <span class="md3-secondary"><?= $p->gouverneur === 0 ? 'Libre' : $p->getGouverneurNom() ?></span>
-        </div>
-        <?php } ?>
-        <p><a href="?p=carte&systeme=<?= $systeme->id ?>">Voir sur la carte</a></p>
-    </div>
-</details>
-<?php } ?>

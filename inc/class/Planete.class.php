@@ -94,19 +94,6 @@ class Planete {
     }
     
     
-    public static function listeVisibles(int $joueurId): array{
-        $systemes = array();
-        foreach(Systeme::listeVisibles($joueurId) as $systeme){
-            array_push($systemes, $systeme->id);
-        }
-        if(count($systemes) === 0){
-            return array();
-        }
-        $marques = implode(',', array_fill(0, count($systemes), '?'));
-        $query = "SELECT * FROM " . MyPDO::DB_FLAG . "planete WHERE id_systeme IN ($marques)";
-        return MyPDO::getInstance()->query($query,$systemes);
-    }
-
     public static function listeGouvernees(int $joueurId): array{
         $query = "SELECT id FROM " . MyPDO::DB_FLAG . "planete WHERE gouverneur=?";
         return MyPDO::getInstance()->query($query,$joueurId);
