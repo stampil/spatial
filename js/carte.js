@@ -522,7 +522,6 @@
         const rayon = planete.diametre / 2;
         const groupe = creerSvg('g', {
             'class': 'carte__planete',
-            'data-tuto': 'planete-' + planete.id,
             'data-planete': planete.id,
             role: 'button',
             tabindex: '0',
@@ -531,7 +530,7 @@
         const halo = creerSvg('circle', {'class': 'carte__halo', cx: planete.x, cy: planete.y});
         const anneau = creerSvg('circle', {'class': 'carte__anneau', cx: planete.x, cy: planete.y, stroke: planete.couleur});
         const voile = creerSvg('circle', {'class': 'carte__voile', cx: planete.x, cy: planete.y, r: rayon});
-        const zone = creerSvg('circle', {'class': 'carte__zone', cx: planete.x, cy: planete.y});
+        const zone = creerSvg('circle', {'class': 'carte__zone', 'data-tuto': 'planete-' + planete.id, cx: planete.x, cy: planete.y});
         const nom = creerSvg('text', {'class': 'carte__nom', x: planete.x, 'text-anchor': 'middle'});
         nom.textContent = planete.nom;
         groupe.appendChild(halo);
