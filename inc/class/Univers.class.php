@@ -3,10 +3,10 @@
 class Univers {
 
     const PLAN = array(
-        array('nombre' => 6, 'camps' => array(Camp::EMPIRE)),
+        array('nombre' => 6, 'imperial' => true),
         array('nombre' => 3, 'camps' => array(Camp::PIRATES)),
         array('nombre' => 3, 'camps' => array(Camp::EMPIRE, Camp::PIRATES, null)),
-        array('nombre' => 4, 'camps' => array(null)),
+        array('nombre' => 4, 'camps' => array(Camp::REBELLION)),
     );
 
     const POSITIONS = array(
@@ -15,6 +15,8 @@ class Univers {
         array(260, 330), array(740, 330), array(700, 640),
         array(140, 480), array(480, 780), array(270, 740), array(880, 520),
     );
+
+    const CAMPS_DECOUVERTE = array(Camp::PIRATES, null);
 
     const TUTO_BOUCLIER = 5;
     const TUTO_CANON = 5;
@@ -30,7 +32,7 @@ class Univers {
         $ancre = $depart === null ? null : array($depart->x, $depart->y);
         $Systeme = new Systeme(Systeme::create(false, Systeme::positionLibre($ancre)));
         Planete::fillSystemeIA($Systeme, array(Camp::PIRATES, null), Camp::PIRATES);
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=?, troupes=? WHERE id_systeme=? ORDER BY id LIMIT 1";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET bouclier=?, canon=?, troupes=?, flotte_ia=0, pnj_endurance=NULL, nb_bouclier_planetaire=0, nb_canon_orbital=0 WHERE id_systeme=? ORDER BY id LIMIT 1";
         MyPDO::getInstance()->query($query,self::TUTO_BOUCLIER,self::TUTO_CANON,self::TUTO_TROUPES,$Systeme->id);
         $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET id_systeme_voisin=? WHERE id=?";
         MyPDO::getInstance()->query($query,$Systeme->id,$joueur->id);
@@ -43,7 +45,12 @@ class Univers {
         foreach(self::PLAN as $etape){
             for($i=0; $i<$etape['nombre']; $i++){
                 $Systeme = new Systeme(Systeme::create(true, self::POSITIONS[$numero]));
-                Planete::fillSystemeIA($Systeme, $etape['camps'], null, true);
+                if(isset($etape['imperial'])){
+                    Planete::fillSystemeImperial($Systeme, true);
+                }
+                else{
+                    Planete::fillSystemeIA($Systeme, $etape['camps'], null, true);
+                }
                 array_push($noms, $Systeme->nom);
                 $numero++;
             }

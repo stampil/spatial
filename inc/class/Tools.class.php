@@ -54,6 +54,19 @@ class Tools {
         return $rapports;
     }
     
+    public static function addInfo(string $titre, string $texte, ?string $illustration = null, ?int $idCamp = null): void{
+        $_SESSION[INFOS_KEY][] = array('titre' => $titre, 'texte' => $texte, 'illustration' => $illustration, 'id_camp' => $idCamp);
+        if(!empty($_SESSION['Sid'])){
+            Journal::ajouter((int) $_SESSION['Sid'], $titre.' : '.$texte);
+        }
+    }
+
+    public static function takeInfos(): array{
+        $infos = $_SESSION[INFOS_KEY] ?? array();
+        unset($_SESSION[INFOS_KEY]);
+        return $infos;
+    }
+
     public static function isValidCsrfToken(mixed $token): bool{
         return is_string($token) && hash_equals($_SESSION[CSRF_KEY], $token);
     }

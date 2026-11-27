@@ -2,8 +2,10 @@
 
 class Joueur {
 
+    const SECONDES_PAR_MINUTE = 60;
+    const MINUTES_PAR_HEURE = 60;
+
     private MyPDO $bdd;
-    private string $email;
     private string $mdp;
     
     public string $creato;
@@ -12,15 +14,21 @@ class Joueur {
     public string $nom;
     public int $credits;
     public ?string $credits_maj;
+    public int $credits_reste;
     public int $etape_tuto;
     public int $id_camp;
     public ?int $id_systeme_voisin;
     public ?string $fin_tuto;
+    public ?string $raid_maj;
+    public bool $aide_icones_masquee;
+    public int $tuto_explication_lue;
 
     public string $IPs;
     
-    const TUTO_END_STEP = 8;
+    const TUTO_END_STEP = 21;
     const TUTO_DIVISEUR_DUREES = 5;
+    const JETON_OCTETS = 32;
+    const JETON_DUREE_SECONDES = 90 * 24 * 3600;
     const VISIBILITE_APRES_TUTO_SECONDES = 7 * 24 * 3600;
 
     private static int $credits_depart = 500;
@@ -28,14 +36,20 @@ class Joueur {
 
     
     public static function inscrire(array $infos): ?Joueur{
-        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,email,IPs,mdp,credits,id_camp,creato,lastco) VALUES(?,?,?,?,?,?,now(),now()) ";
-        $ret = MyPDO::getInstance()->query($query,$infos['nom'],$infos['email'],giveIP(), $infos['mdp'],self::$credits_depart,$infos['id_camp']);
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "joueur (nom,IPs,mdp,credits,id_camp,creato,lastco) VALUES(?,?,?,?,?,now(),now()) ";
+        $ret = MyPDO::getInstance()->query($query,$infos['nom'],giveIP(), $infos['mdp'],self::$credits_depart,$infos['id_camp']);
         if($ret === MyPDO::QUERY_FAILED){
             return null;
         }
         // pour chaque joueur crée on crée un systeme qui sera celui de départ ( id_joueur = id_systeme départ)
         $id_joueur =  MyPDO::getInstance()->lastInsertId();
         $joueur = new Joueur($id_joueur);
+        self::demarrer($joueur);
+
+        return $joueur;
+    }
+
+    private static function demarrer(Joueur $joueur): void{
         $id_systeme = Systeme::create();
         $systeme = new Systeme($id_systeme);
         $id_perso = Perso::create($joueur);
@@ -43,21 +57,44 @@ class Joueur {
         Planete::fillSysteme($perso,$systeme);
         Decouverte::ajouter($joueur->id, $id_systeme);
         Univers::creerVoisin($joueur, $systeme);
-        
-        return $joueur;
+    }
+
+    public static function repartirDeZero(): void{
+        MyPDO::getInstance()->query("UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=?, etape_tuto=0, id_systeme_voisin=NULL, fin_tuto=NULL, raid_maj=NULL, credits_maj=NULL, credits_reste=0, tuto_explication_lue=0",self::$credits_depart);
+        foreach(self::liste() as $ligne){
+            self::demarrer(new Joueur($ligne->id));
+        }
     }
     
    
     
     public static function connecter(array $infos): ?object{
-        $query = "select * from " . MyPDO::DB_FLAG . "joueur where email=? ";
-        $ret = MyPDO::getInstance()->query($query,$infos['email']);
+        $query = "select * from " . MyPDO::DB_FLAG . "joueur where nom=? ";
+        $ret = MyPDO::getInstance()->query($query,$infos['nom']);
         if(empty($ret) || $ret === MyPDO::QUERY_FAILED || !password_verify($infos['mdp'], $ret[0]->mdp)){
             return null;
         }
         return $ret[0];
     }
         
+    public function creerJeton(): string{
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "jeton_connexion WHERE creato<=?",Tools::formatDate(time() - self::JETON_DUREE_SECONDES));
+        $jeton = bin2hex(random_bytes(self::JETON_OCTETS));
+        $query = "INSERT INTO " . MyPDO::DB_FLAG . "jeton_connexion (empreinte,id_joueur,creato) VALUES (?,?,?)";
+        $this->bdd->query($query,hash('sha256', $jeton),$this->id,Tools::now());
+        return $jeton;
+    }
+
+    public static function connecterParJeton(string $jeton): ?object{
+        $query = "SELECT j.* FROM " . MyPDO::DB_FLAG . "jeton_connexion t JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=t.id_joueur WHERE t.empreinte=? AND t.creato>?";
+        $ret = MyPDO::getInstance()->query($query,hash('sha256', $jeton),Tools::formatDate(time() - self::JETON_DUREE_SECONDES));
+        return $ret[0] ?? null;
+    }
+
+    public function oublierJetons(): void{
+        $this->bdd->query("DELETE FROM " . MyPDO::DB_FLAG . "jeton_connexion WHERE id_joueur=?",$this->id);
+    }
+
     public static function liste(): array{
         $query = "SELECT *
                 FROM " . MyPDO::DB_FLAG . "joueur ";
@@ -86,16 +123,19 @@ class Joueur {
         
         $this->id = $ret[0]->id;
         $this->nom = $ret[0]->nom;
-        $this->email = $ret[0]->email;
         $this->IPs = $ret[0]->IPs;
 
         $this->credits = $ret[0]->credits;
         $this->credits_maj = $ret[0]->credits_maj;
+        $this->credits_reste = $ret[0]->credits_reste;
         $this->mdp = $ret[0]->mdp;
         $this->etape_tuto= $ret[0]->etape_tuto;
         $this->id_camp = $ret[0]->id_camp;
         $this->id_systeme_voisin = $ret[0]->id_systeme_voisin;
         $this->fin_tuto = $ret[0]->fin_tuto;
+        $this->raid_maj = $ret[0]->raid_maj;
+        $this->aide_icones_masquee = (bool) $ret[0]->aide_icones_masquee;
+        $this->tuto_explication_lue = (int) $ret[0]->tuto_explication_lue;
         $this->creato = $ret[0]->creato;
         $this->lastco = $ret[0]->lastco;
 
@@ -105,7 +145,6 @@ class Joueur {
         $query ="UPDATE " . MyPDO::DB_FLAG . "joueur 
             set
             nom = ?,
-            email =?,
             IPs = ?,
             mdp =?,
             etape_tuto = ?,
@@ -113,7 +152,6 @@ class Joueur {
             WHERE id =?";
         $ret = $this->bdd->query($query,          
                 $this->nom,
-                $this->email,
                 $this->IPs,
                 $this->mdp,
                 $this->etape_tuto,
@@ -158,32 +196,46 @@ class Joueur {
     public function updateCredits(): void {
         if($this->credits_maj === null){
             $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits_maj=? WHERE id=? AND credits_maj IS NULL";
-            $this->bdd->query($query,Tools::now(),$this->id);
+            $maintenant = Tools::now();
+            $this->bdd->query($query,$maintenant,$this->id);
+            $this->credits_maj = $maintenant;
             return;
         }
         $depuis = strtotime($this->credits_maj);
-        $heures = intdiv(time() - $depuis, Planete::SECONDS_PER_HOUR);
-        if($heures < 1){
+        $minutes = intdiv(time() - $depuis, self::SECONDES_PAR_MINUTE);
+        if($minutes < 1){
             return;
         }
-        $gain = $heures * $this->revenuNet();
-        $nouvelleMaj = Tools::formatDate($depuis + $heures * Planete::SECONDS_PER_HOUR);
-        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=GREATEST(credits+?,0), credits_maj=? WHERE id=? AND credits_maj=?";
-        $this->bdd->query($query,$gain,$nouvelleMaj,$this->id,$this->credits_maj);
+        $total = $minutes * $this->revenuNet() + $this->credits_reste;
+        $gain = intdiv($total, self::MINUTES_PAR_HEURE);
+        $reste = $total - $gain * self::MINUTES_PAR_HEURE;
+        $nouvelleMaj = Tools::formatDate($depuis + $minutes * self::SECONDES_PAR_MINUTE);
+        $query = "UPDATE " . MyPDO::DB_FLAG . "joueur SET credits=GREATEST(credits+?,0), credits_reste=?, credits_maj=? WHERE id=? AND credits_maj=?";
+        $this->bdd->query($query,$gain,$reste,$nouvelleMaj,$this->id,$this->credits_maj);
         if($this->bdd->lastRowCount === 1){
             $this->credits = max($this->credits + $gain, 0);
+            $this->credits_reste = $reste;
             $this->credits_maj = $nouvelleMaj;
         }
     }
 
+    public function secondesAvantCredits(): int {
+        return self::SECONDES_PAR_MINUTE - (time() - strtotime($this->credits_maj)) % self::SECONDES_PAR_MINUTE;
+    }
+
     public function resolveEvents(): void {
+        Planete::regenererDefenses();
         $this->updateCredits();
         foreach(Planete::listeGouvernees($this->id) as $ligne){
             (new Planete($ligne->id))->updateRevolte();
         }
+        Planete::resoudreConstructions($this);
         Vaisseau::resolveProduction($this);
         Vaisseau::resolveArrivees($this);
+        Vaisseau::resoudreExpeditions($this);
         Tuto::avancer($this);
+        Menace::expirer($this);
+        Ia::resoudre($this);
         foreach(Perso::liste($this) as $ligne){
             (new Perso($ligne->id))->resolve($this);
         }
@@ -227,7 +279,7 @@ class Joueur {
     }
 
     public function peutCibler(Systeme $systeme): bool {
-        return $systeme->estConnuDe($this->id) || $systeme->id === $this->id_systeme_voisin;
+        return $systeme->estConnuDe($this->id);
     }
 
     public function ouvrirSession(): void {

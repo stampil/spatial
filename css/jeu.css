@@ -67,6 +67,7 @@
 }
 
 .mission {
+    position: relative;
     margin: 0 0 16px;
     border-left: 4px solid var(--md-sys-color-primary);
     border-radius: var(--md-sys-shape-corner-small);
@@ -91,6 +92,29 @@
 .mission__texte {
     margin: 0;
     padding: 0 16px 16px;
+}
+
+.mission__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0 16px 16px;
+}
+
+.mission__fermer {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.mission__croix {
+    width: 48px;
+    height: 48px;
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
 .mission__texte a {
@@ -178,11 +202,92 @@
     color: var(--md-sys-color-on-primary-container);
 }
 
+.avatar:has(.visuel--image) {
+    width: 72px;
+    height: 72px;
+}
+
+.avatar .visuel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: transparent;
+}
+
+.avatar .visuel--image {
+    background-size: 110%;
+}
+
+.visuel {
+    flex: none;
+    width: 72px;
+    height: 72px;
+    border-radius: var(--md-sys-shape-corner-small);
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 6%, transparent);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.banniere {
+    height: 120px;
+    margin: -16px -16px 12px;
+    border-radius: var(--md-sys-shape-corner-medium) var(--md-sys-shape-corner-medium) 0 0;
+    background-position: center;
+    background-size: cover;
+}
+
 .avatar--planete {
-    width: 64px;
-    height: 64px;
-    background-size: 140px;
+    --taille: 64px;
+    width: var(--taille);
+    height: var(--taille);
+    background-repeat: repeat-x;
+    background-size: auto var(--taille);
     box-shadow: inset 10px 0 24px 4px rgb(0, 0, 0), inset -2px 0 4px 1px rgba(255, 255, 255, 0.2);
+    animation: planete-rotation 90s linear infinite;
+}
+
+.avatar--planete-grand {
+    --taille: 160px;
+    box-shadow: inset 24px 0 56px 10px rgb(0, 0, 0), inset -4px 0 10px 2px rgba(255, 255, 255, 0.2), 0 0 32px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+@keyframes planete-rotation {
+    to {
+        background-position-x: calc(var(--taille) * -2);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avatar--planete {
+        animation: none;
+    }
+}
+
+.fiche__tete--hero {
+    flex-direction: column;
+    text-align: center;
+}
+
+.bandeau {
+    height: 140px;
+    margin-bottom: 16px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    background-position: center;
+    background-size: cover;
+}
+
+.faction .banniere {
+    grid-column: 1 / -1;
+}
+
+.composition__element .visuel {
+    width: 40px;
+    height: 40px;
+}
+
+.embleme--image {
+    object-fit: contain;
 }
 
 .embleme {
@@ -232,6 +337,44 @@
     gap: 8px;
     margin: 0 0 8px;
     font-size: var(--md-sys-typescale-body-medium-size);
+}
+
+.etoiles {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-size: var(--md-sys-typescale-body-medium-size);
+}
+
+.etoiles__rangee {
+    display: flex;
+    gap: 4px;
+}
+
+.etoile {
+    flex: none;
+    fill: none;
+    stroke: var(--md-sys-color-outline);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+}
+
+.etoile--pleine {
+    fill: var(--md-sys-color-primary);
+    stroke: var(--md-sys-color-primary);
+}
+
+.etoile__moitie {
+    fill: var(--md-sys-color-primary);
+    stroke: none;
+}
+
+@media (min-width: 600px) {
+    .jauge {
+        max-width: 360px;
+    }
 }
 
 .jauge__nom {
@@ -382,8 +525,23 @@
 }
 
 .accueil {
-    padding: 32px 0;
+    position: relative;
+    overflow: hidden;
+    padding: 32px 16px;
+    border-radius: var(--md-sys-shape-corner-medium);
     text-align: center;
+}
+
+.accueil > * {
+    position: relative;
+}
+
+.fond {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+    opacity: 0.4;
 }
 
 .accueil__logo {
@@ -431,12 +589,13 @@
 
 .factions legend {
     margin-bottom: 8px;
-    color: var(--md-sys-color-on-surface-variant);
-    font-size: var(--md-sys-typescale-label-medium-size);
+    color: var(--md-sys-color-on-surface);
+    font-size: var(--md-sys-typescale-title-medium-size);
     font-weight: 500;
 }
 
 .faction {
+    position: relative;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 4px 16px;
@@ -455,11 +614,32 @@
 
 .faction input {
     position: absolute;
-    opacity: 0;
+    top: 12px;
+    left: 12px;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    border: 3px solid var(--md-sys-color-on-surface);
+    border-radius: 50%;
+    background-color: var(--md-sys-color-surface-container-highest);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
+    appearance: none;
+    cursor: pointer;
+}
+
+.faction input:checked {
+    border-color: var(--accent, var(--md-sys-color-primary));
+    background-image: radial-gradient(circle, var(--accent, var(--md-sys-color-primary)) 0 45%, transparent 50%);
+}
+
+.faction input:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
 }
 
 .faction .embleme {
-    grid-row: span 3;
+    grid-row: span 4;
 }
 
 .faction__nom {
@@ -568,8 +748,372 @@
     .md3-page input[type="submit"] {
         min-height: 48px;
     }
+
+    .md3-button--icone:not(.md3-button--icone-flotte) {
+        width: 48px;
+    }
 }
 
 [id] {
     scroll-margin-top: 64px;
+}
+
+.fil ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+    font-size: var(--md-sys-typescale-label-large-size);
+}
+
+.fil li + li::before {
+    content: "\203A";
+    margin-right: 4px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.fil li[aria-current] {
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.fiche--lien {
+    position: relative;
+}
+
+.fiche--lien .fiche__nom a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+}
+
+.fiche--lien .fiche__actions,
+.fiche--lien .md3-secondary a {
+    position: relative;
+    z-index: 1;
+}
+
+@view-transition {
+    navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+}
+
+.visuel-bouton {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: zoom-in;
+}
+
+.popin {
+    width: min(90vw, 420px);
+    padding: 16px;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+}
+
+.popin::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.popin__image .visuel {
+    display: block;
+    width: 100%;
+    height: 240px;
+}
+
+.popin h3 {
+    margin: 12px 0 8px;
+}
+
+.popin__camp,
+.rapport__camp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.faction__vaisseaux {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+}
+
+.faction__vaisseaux .visuel {
+    width: 120px;
+    height: 120px;
+}
+
+.sante {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    font-size: var(--md-sys-typescale-label-medium-size);
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.sante[hidden] {
+    display: none;
+}
+
+.sante__point {
+    width: 10px;
+    height: 10px;
+    background: var(--md-sys-color-outline);
+}
+
+.sante[data-etat="ok"] .sante__point {
+    background: var(--md-sys-color-primary);
+}
+
+.sante[data-etat="lent"] .sante__point {
+    background: var(--md-sys-color-tertiary);
+}
+
+.sante[data-etat="injoignable"] {
+    color: var(--md-sys-color-error);
+}
+
+.sante[data-etat="injoignable"] .sante__point {
+    background: var(--md-sys-color-error);
+}
+
+.sante-bandeau {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding: 10px 16px;
+    background: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+    font-weight: 500;
+    text-align: center;
+}
+
+.sante-bandeau[hidden] {
+    display: none;
+}
+
+@media (max-width: 599px) {
+    .sante__texte {
+        display: none;
+    }
+}
+
+.bouton--attente {
+    position: relative;
+    color: transparent !important;
+    cursor: progress;
+    pointer-events: none;
+}
+
+.bouton-attente {
+    position: relative;
+    display: inline-flex;
+}
+
+.bouton__spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 3px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: bouton-rotation 0.8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes bouton-rotation {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bouton__spinner {
+        animation: none;
+    }
+}
+
+.action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+}
+
+.action__valeur {
+    min-width: 7ch;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.curseur {
+    display: inline-flex;
+    flex: 1 1 200px;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.curseur__piste {
+    flex: 1 1 120px;
+    min-width: 0;
+    height: 44px;
+    margin: 0;
+    accent-color: var(--md-sys-color-primary);
+}
+
+.curseur__valeur {
+    min-width: 2ch;
+    text-align: right;
+    font-weight: 500;
+}
+
+.curseur__maximum {
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.vaisseau-nomme {
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.vaisseau-nomme .ligne-jeu {
+    border-top: 0;
+}
+
+.tuto-action {
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.actions-icones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions-icones form,
+.md3-actions form {
+    margin: 0;
+}
+
+.actions-icones--flotte {
+    margin: 8px 0;
+    gap: 12px;
+}
+
+.panneau__tete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.panneau__tete .panneau__titre {
+    margin: 0;
+}
+
+.panneau__outils {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.case-flotte {
+    display: none;
+    min-width: 48px;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-flotte-enregistrer],
+[data-flotte-annuler] {
+    display: none;
+}
+
+.flotte-creation [data-flotte-creer],
+.flotte-creation .hors-creation {
+    display: none;
+}
+
+.flotte-creation [data-flotte-enregistrer],
+.flotte-creation [data-flotte-annuler],
+.flotte-creation .case-flotte {
+    display: inline-flex;
+    align-items: center;
+}
+
+.icone--image {
+    display: inline-block;
+    flex: none;
+    background-color: currentColor;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.tuto-fleche {
+    --rotation: 0deg;
+    position: fixed;
+    z-index: 40;
+    width: 56px;
+    height: 72px;
+    background: linear-gradient(180deg, var(--md-sys-color-primary), white);
+    clip-path: polygon(35% 0, 65% 0, 65% 55%, 100% 55%, 50% 100%, 0 55%, 35% 55%);
+    pointer-events: none;
+    animation: tuto-rebond 0.8s ease-in-out infinite alternate;
+}
+
+.tuto-fleche--vers-le-haut {
+    --rotation: 180deg;
+}
+
+@keyframes tuto-rebond {
+    from {
+        transform: rotate(var(--rotation)) translateY(-6px);
+    }
+
+    to {
+        transform: rotate(var(--rotation)) translateY(10px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tuto-fleche {
+        transform: rotate(var(--rotation));
+        animation: none;
+    }
 }

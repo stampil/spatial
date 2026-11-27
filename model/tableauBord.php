@@ -4,6 +4,7 @@ if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
     $Camp = $Joueur->getCamp();
 ?>
 <section class="panneau" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>">
+    <?= Vue::banniereCamp($Camp->id) ?>
     <div class="fiche__tete">
         <?= Vue::emblemeCamp($Camp->id, 48) ?>
         <h2 class="fiche__nom" style="--accent:<?= htmlspecialchars($Camp->couleur) ?>"><?= htmlspecialchars($Camp->nom) ?></h2>
@@ -14,9 +15,9 @@ if($Joueur->etape_tuto >= Tuto::ETAPE_USINE){
 
 <div class="raccourcis">
     <a class="emplacement" href="?p=carte"><?= Icone::html('carte') ?>Carte</a>
-    <a class="emplacement" href="?p=listePlanete"><?= Icone::html('planetes') ?><?= count(Planete::listeGouvernees($Joueur->id)) ?> colonies</a>
+    <a class="emplacement" href="?p=listePlanete"><?= Icone::html('planetes') ?><?= count(Planete::listeGouvernees($Joueur->id)) ?> <?= __('colonie', 'colonies', count(Planete::listeGouvernees($Joueur->id))) ?></a>
     <a class="emplacement" href="?p=listeVaisseau"><?= Icone::html('fusee') ?><?= Vaisseau::nombreDeplacements($Joueur->id) ?> en route</a>
-    <a class="emplacement" href="?p=listePerso"><?= Icone::html('persos') ?><?= count(Perso::liste($Joueur)) ?> persos</a>
+    <a class="emplacement" href="?p=listePerso"><?= Icone::html('persos') ?><?= count(Perso::liste($Joueur)) ?> <?= __('perso', 'persos', count(Perso::liste($Joueur))) ?></a>
 </div>
 
 <section class="panneau">
@@ -37,7 +38,7 @@ else{
 ?>
 <section class="panneau">
     <p>Prenez contact avec votre premier personnage pour commencer la partie.</p>
-    <a class="md3-button" href="?p=listePerso">Voir mes persos</a>
+    <?= Vue::lienIcone('?p=listePerso', 'persos', 'Voir mes persos') ?>
 </section>
 <?php
 }

@@ -31,7 +31,6 @@ DROP TABLE IF EXISTS `joueur`;
 CREATE TABLE IF NOT EXISTS `joueur` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
   `IPs` text NOT NULL,
   `credits` int(11) NOT NULL,
   `mdp` varchar(255) NOT NULL,
@@ -42,8 +41,12 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `id_camp` int(11) NOT NULL,
   `id_systeme_voisin` int(11) DEFAULT NULL,
   `fin_tuto` datetime DEFAULT NULL,
+  `raid_maj` datetime DEFAULT NULL,
+  `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0',
+  `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0',
+  `credits_reste` int(11) NOT NULL DEFAULT '0',
+  `tuto_explication_lue` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
@@ -51,8 +54,8 @@ CREATE TABLE IF NOT EXISTS `joueur` (
 -- Déchargement des données de la table `joueur`
 --
 
-INSERT INTO `joueur` (`id`, `nom`, `email`, `IPs`, `credits`, `mdp`, `etape_tuto`, `creato`, `lastco`, `id_camp`) VALUES
-(3, 'Vartus', 'developpeurntic@gmail.com', '::1', 500, 'gPhvB3xN.mAVULqmxVcgCaqgkR0b7wdU.n1Grn0ekmnx35OJ30IDTnO/eAjAlGYx6/cJ/8avLHGmSIJAeMx.o0', 1, '2022-12-19 10:21:18', '2022-12-19 09:21:23', 2);
+INSERT INTO `joueur` (`id`, `nom`, `IPs`, `credits`, `mdp`, `etape_tuto`, `creato`, `lastco`, `id_camp`) VALUES
+(3, 'Vartus', '::1', 500, 'gPhvB3xN.mAVULqmxVcgCaqgkR0b7wdU.n1Grn0ekmnx35OJ30IDTnO/eAjAlGYx6/cJ/8avLHGmSIJAeMx.o0', 1, '2022-12-19 10:21:18', '2022-12-19 09:21:23', 2);
 
 -- --------------------------------------------------------
 
@@ -87,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `perso` (
 --
 
 INSERT INTO `perso` (`id`, `id_joueur`, `nom`, `PV`, `FO`, `diplomatie`, `sur_planete`, `fin_diplomatie`, `fin_voyage_planetaire`, `creato`) VALUES
-(5, 3, 'Vartus', 1, 5, 4, 36, '2022-12-19 10:34:07', NULL, '2022-12-19 10:21:18');
+(5, 3, 'Vartus', 2, 10, 8, 36, '2022-12-19 10:34:07', NULL, '2022-12-19 10:21:18');
 
 -- --------------------------------------------------------
 
@@ -114,7 +117,17 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `canon` int(11) NOT NULL DEFAULT '0',
   `troupes` int(11) NOT NULL DEFAULT '0',
   `bonus` varchar(16) DEFAULT NULL,
+  `defense_maj` datetime DEFAULT NULL,
+  `detournement_fin` datetime DEFAULT NULL,
   `creato` datetime NOT NULL,
+  `flotte_ia` int(11) NOT NULL DEFAULT '0',
+  `nb_bouclier_planetaire` int(11) NOT NULL DEFAULT '0',
+  `nb_canon_orbital` int(11) NOT NULL DEFAULT '0',
+  `pnj_endurance` tinyint(1) DEFAULT NULL,
+  `occupee` tinyint(1) NOT NULL DEFAULT '0',
+  `x` int(11) NOT NULL DEFAULT '0',
+  `y` int(11) NOT NULL DEFAULT '0',
+  `nom_origine` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 
@@ -177,6 +190,17 @@ INSERT INTO `systeme` (`id`, `nom`, `visible`, `creato`) VALUES
 (8, 'Ksi-4361', 0, '2022-12-19 09:58:42'),
 (9, 'Nu-2343', 0, '2022-12-19 10:02:32'),
 (10, 'Sigma-9547', 0, '2022-12-19 10:21:18');
+CREATE TABLE IF NOT EXISTS `construction` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `batiment` varchar(32) NOT NULL,
+  `fin` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_joueur` (`id_joueur`),
+  KEY `id_planete` (`id_planete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `production` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_joueur` int(11) NOT NULL,
@@ -197,11 +221,16 @@ CREATE TABLE IF NOT EXISTS `vaisseau` (
   `id_destination` bigint(20) UNSIGNED DEFAULT NULL,
   `arrivee` datetime DEFAULT NULL,
   `depart` datetime DEFAULT NULL,
+  `exploration` tinyint(1) NOT NULL DEFAULT '0',
   `id_flotte` bigint(20) UNSIGNED DEFAULT NULL,
+  `numero` int(11) UNSIGNED DEFAULT NULL,
+  `nom` varchar(32) DEFAULT NULL,
+  `id_hote` bigint(20) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`),
   KEY `id_planete` (`id_planete`),
-  KEY `id_flotte` (`id_flotte`)
+  KEY `id_flotte` (`id_flotte`),
+  KEY `id_hote` (`id_hote`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `flotte` (
@@ -209,8 +238,17 @@ CREATE TABLE IF NOT EXISTS `flotte` (
   `id_joueur` int(11) NOT NULL,
   `nom` varchar(64) NOT NULL,
   `creato` datetime NOT NULL,
+  `numero` int(11) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `analyse_planete` (
+  `id_joueur` int(11) NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `donnees` text NOT NULL,
+  `analyse_le` datetime NOT NULL,
+  PRIMARY KEY (`id_joueur`,`id_planete`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `camp` (
@@ -243,6 +281,24 @@ CREATE TABLE IF NOT EXISTS `journal` (
   KEY `id_joueur` (`id_joueur`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `menace` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_joueur` bigint(20) UNSIGNED NOT NULL,
+  `id_planete` bigint(20) UNSIGNED NOT NULL,
+  `id_source` bigint(20) UNSIGNED NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `jeton_connexion` (
+  `empreinte` char(64) NOT NULL,
+  `id_joueur` int(11) NOT NULL,
+  `creato` datetime NOT NULL,
+  PRIMARY KEY (`empreinte`),
+  KEY `id_joueur` (`id_joueur`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(64) NOT NULL,
   PRIMARY KEY (`version`)
@@ -258,7 +314,29 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('007_persos_transport'),
 ('008_roles'),
 ('009_carte'),
-('010_journal');
+('010_journal'),
+('011_defense_pirates_ia'),
+('012_pirates_jouables'),
+('013_sans_email'),
+('014_pirates_ia'),
+('015_menaces_pirates'),
+('016_exploration_risquee'),
+('017_connexion_automatique'),
+('018_vaisseaux_nommes_embarques'),
+('019_aide_icones_masquee'),
+('020_flotte_numero'),
+('021_flotte_ia'),
+('022_tuto_restrictor'),
+('023_gouverneurs_structures_analyse'),
+('024_perso_demi_etoiles'),
+('025_positions_planetes'),
+('026_planete_nom_origine'),
+('027_orbites_ecartees'),
+('028_credits_reste'),
+('029_tuto_fin_etapes_ajoutees'),
+('030_tuto_transit_lu'),
+('031_tuto_explication_lue'),
+('032_constructions');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

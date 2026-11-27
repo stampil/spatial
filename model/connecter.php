@@ -1,21 +1,21 @@
 <?php
 
-$email = giveInputString($_POST, 'email');
+$nom = giveInputString($_POST, 'nom');
 $mdp = giveInputString($_POST, 'mdp');
 
-if($email !== '' && $mdp !== ''){
+if($nom !== '' && $mdp !== ''){
     $info = Joueur::connecter(
         array(
             'mdp' =>$mdp,
-            'email' =>$email,
+            'nom' =>$nom,
         )        
     );  
     
     if($info){
         $Joueur = new Joueur($info->id);
         $Joueur->ouvrirSession();
-
-        header('Location: index.php?p='.HOME_PAGE);
+        $jeton = $Joueur->creerJeton();
+        require 'inc/memoriser.php';
         exit();
     }
     else{

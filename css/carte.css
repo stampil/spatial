@@ -62,7 +62,12 @@ main.md3-page > .mission {
     stroke-width: 1;
 }
 
-.carte__systeme {
+.carte__monde--cache {
+    display: none;
+}
+
+.carte__systeme,
+.carte__planete {
     cursor: pointer;
     outline: none;
 }
@@ -81,19 +86,64 @@ main.md3-page > .mission {
     vector-effect: non-scaling-stroke;
 }
 
-.carte__systeme--moi .carte__halo {
+.carte__systeme--moi .carte__halo,
+.carte__planete--moi .carte__halo {
     display: inline;
 }
 
 .carte__systeme--choisi .carte__halo,
-.carte__systeme:focus-visible .carte__halo {
+.carte__systeme:focus-visible .carte__halo,
+.carte__planete--choisie .carte__halo,
+.carte__planete:focus-visible .carte__halo {
     display: inline;
     stroke: #FFFFFF;
 }
 
-.carte__systeme--inconnu .carte__disque {
+.carte__voile {
+    display: none;
+    fill: #000000;
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.carte__planete--inexploree .carte__voile {
+    display: inline;
+}
+
+.carte__planete--inexploree .carte__nom {
+    opacity: 0.25;
+}
+
+.carte__anneau {
     fill: none;
-    stroke-dasharray: 3 3;
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+}
+
+.carte__rotation {
+    animation: carte-rotation 90s linear infinite;
+}
+
+@keyframes carte-rotation {
+    to {
+        transform: translateX(var(--decalage));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carte__rotation {
+        animation: none;
+    }
+}
+
+.carte__orbite {
+    fill: none;
+    stroke: var(--carte-trait);
+    stroke-dasharray: 4 6;
+    stroke-width: 1;
+    opacity: 0.3;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
 }
 
 .carte__zone {
@@ -148,25 +198,39 @@ main.md3-page > .mission {
     top: 12px;
     left: 12px;
     padding: 0 16px;
-    border-radius: var(--md-sys-shape-corner-small);
+    border-radius: 0;
     background: var(--md-sys-color-secondary-container);
     color: var(--md-sys-color-on-secondary-container);
 }
 
 .carte__bandeau {
     position: absolute;
-    top: 72px;
-    left: 12px;
-    right: 80px;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px 16px;
-    padding: 12px 16px;
-    border-radius: var(--md-sys-shape-corner-medium);
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 16px;
     background: var(--md-sys-color-surface-container-high);
     color: var(--md-sys-color-on-surface);
+}
+
+.carte__bandeau-texte {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.carte__bandeau-suite {
+    flex: none;
+    white-space: nowrap;
+}
+
+.carte__bandeau--erreur .carte__bandeau-texte {
+    white-space: normal;
 }
 
 .carte__feuille {
@@ -228,49 +292,14 @@ main.md3-page > .mission {
     overscroll-behavior: contain;
 }
 
-.carte__titre-section {
-    margin: 16px 0 4px;
-    color: var(--md-sys-color-on-surface-variant);
-    font-size: var(--md-sys-typescale-label-large-size);
-    font-weight: 500;
-}
-
-.carte__bloc {
-    padding: 12px 0;
-    border-top: 1px solid var(--md-sys-color-outline-variant);
-}
-
-.carte__bloc .md3-secondary {
-    margin: 4px 0 0;
-}
-
-.carte__bloc .md3-actions {
-    margin-top: 8px;
-}
-
-.carte__etiquette {
-    margin-top: 8px;
-}
-
 .carte__ligne {
     padding: 4px 0;
     border-top: 0;
 }
 
-.carte__stepper {
+.carte__actions {
     display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.carte__pas {
-    width: 48px;
-    height: 48px;
-    border: 1px solid var(--md-sys-color-outline);
-    background: transparent;
-    color: var(--md-sys-color-on-surface);
-    font-size: 1.25rem;
-    cursor: pointer;
+    gap: 8px;
 }
 
 .carte__valeur {
@@ -283,7 +312,8 @@ main.md3-page > .mission {
     height: 48px;
 }
 
-#carte-base {
+#carte-base,
+#carte-retour {
     font-size: var(--md-sys-typescale-label-large-size);
 }
 
@@ -306,6 +336,6 @@ main.md3-page > .mission {
     }
 
     .carte__bandeau {
-        right: 404px;
+        left: 80px;
     }
 }

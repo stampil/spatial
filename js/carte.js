@@ -33,9 +33,26 @@
     const MILLISECONDES = 1000;
     const SECONDES_MINUTE = 60;
     const SECONDES_HEURE = 3600;
-    const TYPE_TROUPE = 'troupe_assaut';
-    const TYPE_RECONNAISSANCE = 'reconnaissance';
-    const DESTINATION_EXPLORATION = 'explorer';
+    const ADRESSE_FLOTTES = '?p=listeVaisseau';
+    const MESSAGE_ECHEC_ENVOI_AVANT = 'Ordre non confirmé (';
+    const MESSAGE_ECHEC_ENVOI_APRES = ') : vérifiez la page Flottes avant de recommencer.';
+    const ADRESSE_PLANETE = '?p=affichePlanete&id_planete=';
+    const CLE_ETOILE = 'etoile';
+    const CLASSE_CACHEE = 'carte__monde--cache';
+    const ECHELLE_SYSTEME_MAX = 3;
+    const RAYON_LUEUR_ETOILE = 56;
+    const ETOILE_COEUR = 0.15;
+    const ETOILE_DISQUE = 0.5;
+    const RAYON_TOUCHER_PLANETE = 14;
+    const ECART_ANNEAU = 4;
+    const RAPPORT_TEXTURE = 2;
+    const PREFIXE_DECOUPE = 'carte-decoupe-';
+    const DEGRADE_OMBRE = 'carte-ombre';
+    const DEGRADE_ETOILE = 'carte-etoile';
+    const OMBRE_CENTRE_X = 0.68;
+    const OMBRE_RAYON = 0.72;
+    const OMBRE_DEBUT = 0.45;
+    const OMBRE_OPACITE = 0.92;
     const TOUCHE_ENTREE = 'Enter';
     const TOUCHE_ESPACE = ' ';
     const TOUCHE_ECHAP = 'Escape';
@@ -56,29 +73,28 @@
     const feuilleCorps = document.getElementById('carte-feuille-corps');
     const bandeau = document.getElementById('carte-bandeau');
     const bandeauTexte = document.getElementById('carte-bandeau-texte');
-    const boutonExplorer = document.getElementById('carte-explorer');
+    const bandeauSuite = document.getElementById('carte-bandeau-suite');
     const boutonTrajets = document.getElementById('carte-trajets');
+    const boutonRetour = document.getElementById('carte-retour');
 
     const systemes = {};
     const positions = {};
+    const positionsPlanetes = {};
     const noeuds = {};
+    const noeudsPlanetes = {};
     const adaptables = [];
+    const adaptablesPlanetes = [];
     const compteurs = [];
     const marqueurs = [];
     let vue = {x: 0, y: 0, echelle: 1};
+    let vueGalaxie = null;
+    let systemeOuvert = null;
     let ordre = null;
+    let envoiEnCours = false;
 
     DONNEES.systemes.forEach((systeme) => {
         systemes[systeme.id] = systeme;
         positions[systeme.id] = {x: systeme.x, y: systeme.y};
-    });
-    if (DONNEES.voisin) {
-        positions[DONNEES.voisin.id] = {x: DONNEES.voisin.x, y: DONNEES.voisin.y};
-    }
-    DONNEES.stocks.forEach((stock) => {
-        stock.vaisseaux.forEach((vaisseau) => {
-            vaisseau.choix = vaisseau.nombre;
-        });
     });
 
     function maintenant() {
@@ -122,20 +138,34 @@
         return noeud;
     }
 
-    function bouton(texte, classe, action) {
-        const noeud = creer('button', {type: 'button', classe: classe, texte: texte});
-        noeud.addEventListener('click', action);
+    function boutonVoyager(action) {
+        const noeud = document.getElementById('carte-modele-voyager').content.firstElementChild.cloneNode(true);
+        noeud.addEventListener('click', () => action(noeud));
         return noeud;
     }
 
-    function envoyer(adresse, champs) {
+    function envoyer(adresse, champs, declencheur) {
+        if (envoiEnCours) {
+            return;
+        }
+        envoiEnCours = true;
+        window.Occupation.demarrer(declencheur);
         const corps = new URLSearchParams();
         corps.append('csrf_token', JETON);
         Object.keys(champs).forEach((cle) => {
-            corps.append(cle, champs[cle]);
+            [].concat(champs[cle]).forEach((valeur) => {
+                corps.append(cle, valeur);
+            });
         });
-        fetch(adresse, {method: 'POST', body: corps, credentials: 'same-origin'}).then(() => {
-            location.reload();
+        window.Requete.demander(adresse, {method: 'POST', body: corps, credentials: 'same-origin'}).then(() => {
+            location.replace(ADRESSE_FLOTTES);
+        }).catch((erreur) => {
+            envoiEnCours = false;
+            window.Occupation.liberer(declencheur);
+            document.dispatchEvent(new Event('sante-verifier'));
+            bandeauTexte.textContent = MESSAGE_ECHEC_ENVOI_AVANT + erreur.message + MESSAGE_ECHEC_ENVOI_APRES;
+            bandeau.classList.add('carte__bandeau--erreur');
+            bandeauSuite.hidden = true;
         });
     }
 
@@ -158,14 +188,16 @@
         location.reload();
     }
 
-    function adapter(fonction) {
-        adaptables.push(fonction);
+    function adapter(fonction, liste = adaptables) {
+        liste.push(fonction);
         fonction(vue.echelle);
     }
 
     function appliquerVue() {
-        monde.setAttribute('transform', 'translate(' + vue.x + ' ' + vue.y + ') scale(' + vue.echelle + ')');
-        adaptables.forEach((fonction) => {
+        const transformation = 'translate(' + vue.x + ' ' + vue.y + ') scale(' + vue.echelle + ')';
+        monde.setAttribute('transform', transformation);
+        calquePlanetes.setAttribute('transform', transformation);
+        (systemeOuvert === null ? adaptables : adaptablesPlanetes).forEach((fonction) => {
             fonction(vue.echelle);
         });
     }
@@ -175,14 +207,14 @@
         return {largeur: rectangle.width, hauteur: rectangle.height};
     }
 
-    function ajuster(identifiants, echelleMax) {
+    function ajuster(identifiants, echelleMax, table = positions) {
         const dimensions = taille();
         let xMin = Infinity;
         let xMax = -Infinity;
         let yMin = Infinity;
         let yMax = -Infinity;
         identifiants.forEach((identifiant) => {
-            const position = positions[identifiant];
+            const position = table[identifiant];
             xMin = Math.min(xMin, position.x);
             xMax = Math.max(xMax, position.x);
             yMin = Math.min(yMin, position.y);
@@ -233,6 +265,8 @@
     monde.appendChild(calqueSystemes);
     monde.appendChild(calqueMarqueurs);
     svgRacine.appendChild(monde);
+    const calquePlanetes = creerSvg('g', {'class': CLASSE_CACHEE});
+    svgRacine.appendChild(calquePlanetes);
 
     function dessinerEtoiles() {
         const identifiants = Object.keys(positions);
@@ -265,6 +299,7 @@
         const rayon = RAYON_NOEUD + systeme.planetes.length * RAYON_PAR_PLANETE;
         const groupe = creerSvg('g', {
             'class': 'carte__systeme',
+            'data-tuto': 'systeme-' + systeme.id,
             'data-systeme': systeme.id,
             role: 'button',
             tabindex: '0',
@@ -285,7 +320,7 @@
         groupe.addEventListener('keydown', (evenement) => {
             if (evenement.key === TOUCHE_ENTREE || evenement.key === TOUCHE_ESPACE) {
                 evenement.preventDefault();
-                toucherSysteme(systeme.id);
+                ouvrirSysteme(systeme.id);
             }
         });
         calqueSystemes.appendChild(groupe);
@@ -301,41 +336,8 @@
         });
     }
 
-    function dessinerVoisin() {
-        const voisin = DONNEES.voisin;
-        const groupe = creerSvg('g', {
-            'class': 'carte__systeme carte__systeme--inconnu',
-            'data-systeme': voisin.id,
-            role: 'button',
-            tabindex: '0',
-            'aria-label': 'Secteur inconnu'
-        });
-        const disque = creerSvg('circle', {'class': 'carte__disque', cx: voisin.x, cy: voisin.y});
-        const zone = creerSvg('circle', {'class': 'carte__zone', cx: voisin.x, cy: voisin.y});
-        const nom = creerSvg('text', {'class': 'carte__nom', x: voisin.x, 'text-anchor': 'middle'});
-        nom.textContent = 'Secteur inconnu';
-        groupe.appendChild(disque);
-        groupe.appendChild(nom);
-        groupe.appendChild(zone);
-        groupe.addEventListener('keydown', (evenement) => {
-            if (evenement.key === TOUCHE_ENTREE || evenement.key === TOUCHE_ESPACE) {
-                evenement.preventDefault();
-                toucherSysteme(voisin.id);
-            }
-        });
-        calqueSystemes.appendChild(groupe);
-        noeuds[voisin.id] = groupe;
-        adapter((echelle) => {
-            disque.setAttribute('r', RAYON_NOEUD / echelle);
-            zone.setAttribute('r', RAYON_TOUCHER / echelle);
-            nom.setAttribute('y', voisin.y + (RAYON_NOEUD + DECALAGE_NOM) / echelle);
-            nom.setAttribute('font-size', TAILLE_POLICE_NOM / echelle);
-            nom.setAttribute('stroke-width', CONTOUR_NOM / echelle);
-        });
-    }
-
     function dessinerTrajet(trajet) {
-        if (trajet.vers === null || !positions[trajet.de] || !positions[trajet.vers]) {
+        if (trajet.expedition || trajet.vers === null || !positions[trajet.de] || !positions[trajet.vers]) {
             return;
         }
         const depart = positions[trajet.de];
@@ -367,22 +369,8 @@
         });
     }
 
-    function planetesDuSysteme(systemeId) {
-        return systemes[systemeId] ? systemes[systemeId].planetes : [];
-    }
-
     function stockDePlanete(planeteId) {
         return DONNEES.stocks.find((stock) => stock.planete === planeteId) || null;
-    }
-
-    function nombreDe(stock, filtre) {
-        let total = 0;
-        stock.vaisseaux.forEach((vaisseau) => {
-            if (filtre(vaisseau)) {
-                total += vaisseau.nombre;
-            }
-        });
-        return total;
     }
 
     function ouvrirFeuille(titre, sousTitre, couleur) {
@@ -397,6 +385,7 @@
     function fermerFeuille() {
         feuille.hidden = true;
         marquerSelection(ordre ? ordre.systeme : null);
+        marquerPlanete(null);
     }
 
     function marquerSelection(systemeId) {
@@ -405,196 +394,71 @@
         });
     }
 
-    function section(titre) {
-        return creer('h3', {classe: 'carte__titre-section', texte: titre});
+    function marquerPlanete(planeteId) {
+        Object.keys(noeudsPlanetes).forEach((identifiant) => {
+            noeudsPlanetes[identifiant].classList.toggle('carte__planete--choisie', Number(identifiant) === planeteId);
+        });
     }
 
-    function ligneInfo(texte) {
-        return creer('p', {classe: 'md3-secondary', texte: texte});
+    function secondesDeOrdre(durees, destinationId) {
+        let secondes = 0;
+        const vaisseaux = ordre.stock ? ordre.stock.vaisseaux : [];
+        vaisseaux.forEach((vaisseau) => {
+            if (ordre.nombres[vaisseau.type]) {
+                secondes = Math.max(secondes, vaisseau[durees][destinationId]);
+            }
+        });
+        ordre.flottes.forEach((flotte) => {
+            secondes = Math.max(secondes, flotte[durees][destinationId]);
+        });
+        return secondes;
     }
 
-    function etiquette(texte, titre) {
-        const noeud = creer('span', {classe: 'md3-chip carte__etiquette', texte: texte});
-        if (titre) {
-            noeud.setAttribute('title', titre);
+    function confirmerOrdre(planeteId, declencheur) {
+        const champs = {depart: ordre.planete, destination: planeteId, 'flotte[]': ordre.flottes.map((flotte) => flotte.id)};
+        if (ordre.vaisseau) {
+            champs.vaisseau = ordre.vaisseau;
+        } else {
+            Object.keys(ordre.nombres).forEach((type) => {
+                if (ordre.nombres[type] > 0) {
+                    champs['nombre[' + type + ']'] = ordre.nombres[type];
+                }
+            });
         }
+        envoyer('?p=deplacer', champs, declencheur);
+    }
+
+    function lienFiche(planeteId) {
+        const noeud = document.getElementById('carte-modele-fiche').content.firstElementChild.cloneNode(true);
+        noeud.setAttribute('href', ADRESSE_PLANETE + planeteId);
         return noeud;
     }
 
-    function stepper(vaisseau) {
-        const valeur = creer('span', {classe: 'carte__valeur', texte: String(vaisseau.choix), 'aria-live': 'polite'});
-        const changer = (delta) => {
-            vaisseau.choix = Math.min(vaisseau.nombre, Math.max(0, vaisseau.choix + delta));
-            valeur.textContent = String(vaisseau.choix);
-        };
-        const moins = bouton('−', 'carte__pas', () => changer(-1));
-        moins.setAttribute('aria-label', 'Moins de ' + vaisseau.nom);
-        const plus = bouton('+', 'carte__pas', () => changer(1));
-        plus.setAttribute('aria-label', 'Plus de ' + vaisseau.nom);
-        return creer('div', {classe: 'carte__stepper'}, [moins, valeur, plus]);
-    }
-
-    function blocStock(stock) {
-        const bloc = creer('div', {classe: 'carte__bloc'});
-        bloc.appendChild(creer('strong', {texte: stock.nom}));
-        stock.vaisseaux.forEach((vaisseau) => {
-            bloc.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
-                creer('span', {texte: vaisseau.nom + ' × ' + vaisseau.nombre}),
-                stepper(vaisseau)
-            ]));
-        });
-        bloc.appendChild(bouton('Envoyer', 'md3-button', () => {
-            const total = stock.vaisseaux.reduce((somme, vaisseau) => somme + vaisseau.choix, 0);
-            if (total > 0) {
-                commencerOrdre({stock: stock, flotte: null, systeme: stock.systeme});
-            }
-        }));
-        return bloc;
-    }
-
-    function blocFlotte(flotte) {
-        const composition = flotte.composition.map((ligne) => ligne.nombre + ' × ' + ligne.nom).join(', ');
-        const bloc = creer('div', {classe: 'carte__bloc'});
-        bloc.appendChild(creer('strong', {texte: 'Flotte ' + flotte.nom}));
-        bloc.appendChild(ligneInfo(composition));
-        bloc.appendChild(bouton('Envoyer la flotte', 'md3-button', () => {
-            commencerOrdre({stock: null, flotte: flotte, systeme: flotte.systeme});
-        }));
-        return bloc;
-    }
-
-    function actionsPlanete(planete) {
-        const actions = creer('div', {classe: 'md3-actions'});
-        if (planete.moi) {
-            return actions;
+    function ouvrirPlanete(planete, systeme) {
+        marquerPlanete(planete.id);
+        const voyage = ordre !== null && planete.id !== ordre.planete;
+        let sousTitre = planete.statut;
+        const actions = [lienFiche(planete.id)];
+        if (voyage) {
+            const duree = systeme.id === ordre.systeme ? secondesDeOrdre('secondesLocales', planete.id) : secondesDeOrdre('secondes', systeme.id);
+            sousTitre = planete.statut + ' · trajet : ' + formaterDuree(duree);
+            const bouton = boutonVoyager((noeud) => confirmerOrdre(planete.id, noeud));
+            bouton.setAttribute('data-tuto', 'voyager-ici');
+            actions.push(bouton);
         }
-        const stock = stockDePlanete(planete.id);
-        const defense = planete.bouclier + planete.canon;
-        if (stock && defense > 0) {
-            const combattants = nombreDe(stock, (vaisseau) => vaisseau.combat);
-            if (combattants > 0) {
-                actions.appendChild(bouton('Attaquer (' + combattants + ')', 'md3-button', () => {
-                    envoyer('?p=combattre', {planete: planete.id, action: 'attaquer'});
-                }));
-            }
-        }
-        DONNEES.flottes.filter((flotte) => flotte.planete === planete.id && defense > 0).forEach((flotte) => {
-            actions.appendChild(bouton('Attaquer : ' + flotte.nom, 'md3-button md3-button--tonal', () => {
-                envoyer('?p=combattre', {planete: planete.id, action: 'attaquer', flotte: flotte.id});
-            }));
-        });
-        if (stock && defense === 0) {
-            const troupes = nombreDe(stock, (vaisseau) => vaisseau.type === TYPE_TROUPE);
-            if (troupes > 0) {
-                actions.appendChild(bouton('Débarquer (' + troupes + ')', 'md3-button', () => {
-                    envoyer('?p=combattre', {planete: planete.id, action: 'debarquer'});
-                }));
-            }
-        }
-        return actions;
-    }
-
-    function lignePlanete(planete) {
-        const gouverneur = planete.moi ? 'Vous' : (planete.gouverneur || 'Libre');
-        const lien = creer('a', {href: '?p=affichePlanete&id_planete=' + planete.id, texte: planete.nom});
-        const entete = creer('div', {classe: 'carte__planete-nom'}, [
-            creer('span', {classe: 'md3-camp-dot', style: 'background-color:' + planete.couleur}),
-            ' ',
-            lien
-        ]);
-        const bloc = creer('div', {classe: 'carte__bloc'});
-        bloc.appendChild(entete);
-        bloc.appendChild(ligneInfo(planete.camp + ' · ' + gouverneur + ' · ' + planete.slot + ' emplacements · révolte ' + planete.revolte + ' %'));
-        bloc.appendChild(ligneInfo('Défense : bouclier ' + planete.bouclier + ', canon ' + planete.canon + ', garnison ' + planete.troupes));
-        if (planete.bonus) {
-            bloc.appendChild(etiquette('Bonus : ' + planete.bonus.nom, planete.bonus.description));
-            bloc.appendChild(ligneInfo(planete.bonus.description));
-        }
-        bloc.appendChild(actionsPlanete(planete));
-        return bloc;
-    }
-
-    function ouvrirSysteme(systemeId) {
-        const systeme = systemes[systemeId];
-        marquerSelection(systemeId);
-        ouvrirFeuille(systeme.nom, systeme.camp + ' · ' + systeme.planetes.length + ' planètes' + (systeme.moi ? ' · votre système' : ''), systeme.couleur);
-        const stocks = DONNEES.stocks.filter((stock) => stock.systeme === systemeId);
-        const flottes = DONNEES.flottes.filter((flotte) => flotte.systeme === systemeId);
-        if (stocks.length > 0 || flottes.length > 0) {
-            feuilleCorps.appendChild(section('Vos vaisseaux ici'));
-            stocks.forEach((stock) => {
-                feuilleCorps.appendChild(blocStock(stock));
-            });
-            flottes.forEach((flotte) => {
-                feuilleCorps.appendChild(blocFlotte(flotte));
-            });
-        }
-        feuilleCorps.appendChild(section('Planètes'));
-        systeme.planetes.forEach((planete) => {
-            feuilleCorps.appendChild(lignePlanete(planete));
-        });
-    }
-
-    function secondesDeOrdre(systemeId) {
-        if (ordre.flotte) {
-            return ordre.flotte.secondes[systemeId];
-        }
-        let duree = 0;
-        ordre.stock.vaisseaux.forEach((vaisseau) => {
-            if (vaisseau.choix > 0) {
-                duree = Math.max(duree, vaisseau.secondes[systemeId]);
-            }
-        });
-        return duree;
-    }
-
-    function confirmerOrdre(planeteId) {
-        if (ordre.flotte) {
-            envoyer('?p=gererFlotte', {flotte: ordre.flotte.id, action: 'envoyer', destination: planeteId});
-            return;
-        }
-        const champs = {depart: ordre.stock.planete, destination: planeteId};
-        ordre.stock.vaisseaux.forEach((vaisseau) => {
-            if (vaisseau.choix > 0) {
-                champs['nombre[' + vaisseau.type + ']'] = vaisseau.choix;
-            }
-        });
-        envoyer('?p=deplacer', champs);
-    }
-
-    function explorer() {
-        const reconnaissance = ordre.stock.vaisseaux.find((vaisseau) => vaisseau.type === TYPE_RECONNAISSANCE);
-        const champs = {depart: ordre.stock.planete, destination: DESTINATION_EXPLORATION};
-        champs['nombre[' + TYPE_RECONNAISSANCE + ']'] = reconnaissance.choix;
-        envoyer('?p=deplacer', champs);
-    }
-
-    function ouvrirDestination(systemeId) {
-        const duree = secondesDeOrdre(systemeId);
-        marquerSelection(systemeId);
-        if (DONNEES.voisin && systemeId === DONNEES.voisin.id) {
-            ouvrirFeuille('Secteur inconnu', 'Trajet : ' + formaterDuree(duree), null);
-            feuilleCorps.appendChild(ligneInfo('Ce secteur voisin n’est pas encore exploré.'));
-            feuilleCorps.appendChild(bouton('Envoyer ici', 'md3-button', () => confirmerOrdre(DONNEES.voisin.planete)));
-            return;
-        }
-        const systeme = systemes[systemeId];
-        ouvrirFeuille('Envoyer vers ' + systeme.nom, 'Trajet : ' + formaterDuree(duree), systeme.couleur);
-        const origine = ordre.stock ? ordre.stock.planete : ordre.flotte.planete;
-        systeme.planetes.filter((planete) => planete.id !== origine).forEach((planete) => {
-            feuilleCorps.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
-                creer('span', {texte: planete.nom}),
-                bouton('Envoyer ici', 'md3-button', () => confirmerOrdre(planete.id))
-            ]));
-        });
+        ouvrirFeuille(planete.nom, sousTitre, planete.couleur);
+        feuilleCorps.appendChild(creer('div', {classe: 'md3-row carte__ligne'}, [
+            creer('span', {texte: systeme.nom}),
+            creer('span', {classe: 'carte__actions'}, actions)
+        ]));
     }
 
     function commencerOrdre(nouvelOrdre) {
         ordre = nouvelOrdre;
         fermerFeuille();
-        bandeauTexte.textContent = 'Touchez le système de destination.';
-        const reconnaissance = ordre.stock ? ordre.stock.vaisseaux.find((vaisseau) => vaisseau.type === TYPE_RECONNAISSANCE) : null;
-        boutonExplorer.hidden = !(DONNEES.peutExplorer && reconnaissance && reconnaissance.choix > 0);
+        bandeauTexte.textContent = ordre.libelle;
+        bandeauSuite.hidden = false;
+        bandeau.classList.remove('carte__bandeau--erreur');
         bandeau.hidden = false;
     }
 
@@ -604,20 +468,156 @@
         fermerFeuille();
     }
 
-    function ouvrirVoisin() {
-        marquerSelection(DONNEES.voisin.id);
-        ouvrirFeuille('Secteur inconnu', 'Non explor\u00e9', null);
-        feuilleCorps.appendChild(ligneInfo('Envoyez un vaisseau de reconnaissance : \u00e0 son arriv\u00e9e, le syst\u00e8me sera explor\u00e9.'));
+    function reprendreOrdre(demande) {
+        const stock = stockDePlanete(demande.planete);
+        const flottes = DONNEES.flottes.filter((flotte) => flotte.planete === demande.planete && demande.flottes.includes(flotte.id));
+        const nombres = {};
+        let total = flottes.length;
+        if (stock) {
+            stock.vaisseaux.forEach((vaisseau) => {
+                nombres[vaisseau.type] = Math.min(vaisseau.nombre, demande.nombres[vaisseau.type] || 0);
+                total += nombres[vaisseau.type];
+            });
+        }
+        if (total === 0) {
+            return;
+        }
+        const systemeId = stock ? stock.systeme : flottes[0].systeme;
+        centrerSur(systemeId, ECHELLE_BASE);
+        commencerOrdre({planete: demande.planete, systeme: systemeId, stock: stock, nombres: nombres, flottes: flottes, vaisseau: demande.vaisseau, libelle: demande.libelle});
     }
 
-    function toucherSysteme(systemeId) {
-        if (ordre) {
-            ouvrirDestination(systemeId);
-        } else if (systemes[systemeId]) {
-            ouvrirSysteme(systemeId);
-        } else {
-            ouvrirVoisin();
+    function creerDegrade(identifiant, arrets, attributs) {
+        const degrade = creerSvg('radialGradient', Object.assign({id: identifiant}, attributs));
+        arrets.forEach((arret) => {
+            degrade.appendChild(creerSvg('stop', {offset: arret.decalage, 'stop-color': arret.couleur, 'stop-opacity': arret.opacite}));
+        });
+        return degrade;
+    }
+
+    function creerSphere(planete, definitions) {
+        const rayon = planete.diametre / 2;
+        const decoupe = creerSvg('clipPath', {id: PREFIXE_DECOUPE + planete.id});
+        decoupe.appendChild(creerSvg('circle', {cx: planete.x, cy: planete.y, r: rayon}));
+        definitions.appendChild(decoupe);
+        const largeurTexture = planete.diametre * RAPPORT_TEXTURE;
+        const rotation = creerSvg('g', {'class': 'carte__rotation', style: '--decalage:' + (-largeurTexture) + 'px'});
+        [0, largeurTexture].forEach((decalageTexture) => {
+            rotation.appendChild(creerSvg('image', {
+                href: planete.texture,
+                x: planete.x - rayon + decalageTexture,
+                y: planete.y - rayon,
+                width: largeurTexture,
+                height: planete.diametre
+            }));
+        });
+        const sphere = creerSvg('g', {'clip-path': 'url(#' + PREFIXE_DECOUPE + planete.id + ')'});
+        sphere.appendChild(rotation);
+        sphere.appendChild(creerSvg('circle', {cx: planete.x, cy: planete.y, r: rayon, fill: 'url(#' + DEGRADE_OMBRE + ')'}));
+        return sphere;
+    }
+
+    function dessinerPlanete(planete, systeme, definitions) {
+        positionsPlanetes[planete.id] = {x: planete.x, y: planete.y};
+        const rayon = planete.diametre / 2;
+        const groupe = creerSvg('g', {
+            'class': 'carte__planete',
+            'data-planete': planete.id,
+            role: 'button',
+            tabindex: '0',
+            'aria-label': planete.nom + ', ' + planete.statut
+        });
+        const halo = creerSvg('circle', {'class': 'carte__halo', cx: planete.x, cy: planete.y});
+        const anneau = creerSvg('circle', {'class': 'carte__anneau', cx: planete.x, cy: planete.y, stroke: planete.couleur});
+        const voile = creerSvg('circle', {'class': 'carte__voile', cx: planete.x, cy: planete.y, r: rayon});
+        const zone = creerSvg('circle', {'class': 'carte__zone', 'data-tuto': 'planete-' + planete.id, cx: planete.x, cy: planete.y});
+        const nom = creerSvg('text', {'class': 'carte__nom', x: planete.x, 'text-anchor': 'middle'});
+        nom.textContent = planete.nom;
+        groupe.appendChild(halo);
+        groupe.appendChild(anneau);
+        groupe.appendChild(creerSphere(planete, definitions));
+        groupe.appendChild(voile);
+        groupe.appendChild(nom);
+        groupe.appendChild(zone);
+        if (planete.moi) {
+            groupe.classList.add('carte__planete--moi');
         }
+        if (!planete.exploree) {
+            groupe.classList.add('carte__planete--inexploree');
+        }
+        groupe.addEventListener('keydown', (evenement) => {
+            if (evenement.key === TOUCHE_ENTREE || evenement.key === TOUCHE_ESPACE) {
+                evenement.preventDefault();
+                ouvrirPlanete(planete, systeme);
+            }
+        });
+        calquePlanetes.appendChild(groupe);
+        noeudsPlanetes[planete.id] = groupe;
+        adapter((echelle) => {
+            halo.setAttribute('r', rayon + ECART_HALO / echelle);
+            anneau.setAttribute('r', rayon + ECART_ANNEAU / echelle);
+            zone.setAttribute('r', Math.max(rayon, RAYON_TOUCHER_PLANETE / echelle));
+            nom.setAttribute('y', planete.y + rayon + DECALAGE_NOM / echelle);
+            nom.setAttribute('font-size', TAILLE_POLICE_NOM / echelle);
+            nom.setAttribute('stroke-width', CONTOUR_NOM / echelle);
+        }, adaptablesPlanetes);
+    }
+
+    function dessinerSystemeOuvert(systeme) {
+        calquePlanetes.textContent = '';
+        adaptablesPlanetes.length = 0;
+        [positionsPlanetes, noeudsPlanetes].forEach((table) => {
+            Object.keys(table).forEach((cle) => {
+                delete table[cle];
+            });
+        });
+        positionsPlanetes[CLE_ETOILE] = {x: 0, y: 0};
+        const definitions = creerSvg('defs');
+        definitions.appendChild(creerDegrade(DEGRADE_OMBRE, [
+            {decalage: OMBRE_DEBUT, couleur: '#000000', opacite: 0},
+            {decalage: 1, couleur: '#000000', opacite: OMBRE_OPACITE}
+        ], {cx: OMBRE_CENTRE_X, cy: 0.5, r: OMBRE_RAYON}));
+        definitions.appendChild(creerDegrade(DEGRADE_ETOILE, [
+            {decalage: 0, couleur: '#FFFFFF', opacite: 1},
+            {decalage: ETOILE_COEUR, couleur: systeme.etoile, opacite: 1},
+            {decalage: ETOILE_DISQUE, couleur: systeme.etoile, opacite: 1},
+            {decalage: 1, couleur: systeme.etoile, opacite: 0}
+        ], {}));
+        calquePlanetes.appendChild(definitions);
+        systeme.planetes.forEach((planete) => {
+            calquePlanetes.appendChild(creerSvg('circle', {'class': 'carte__orbite', cx: 0, cy: 0, r: Math.hypot(planete.x, planete.y)}));
+        });
+        calquePlanetes.appendChild(creerSvg('circle', {cx: 0, cy: 0, r: RAYON_LUEUR_ETOILE, fill: 'url(#' + DEGRADE_ETOILE + ')'}));
+        systeme.planetes.forEach((planete) => {
+            dessinerPlanete(planete, systeme, definitions);
+        });
+    }
+
+    function ouvrirSysteme(systemeId) {
+        vueGalaxie = {x: vue.x, y: vue.y, echelle: vue.echelle};
+        fermerFeuille();
+        systemeOuvert = systemeId;
+        dessinerSystemeOuvert(systemes[systemeId]);
+        monde.classList.add(CLASSE_CACHEE);
+        calquePlanetes.classList.remove(CLASSE_CACHEE);
+        boutonRetour.hidden = false;
+        boutonRetour.setAttribute('title', systemes[systemeId].nom);
+        ajuster(Object.keys(positionsPlanetes), ECHELLE_SYSTEME_MAX, positionsPlanetes);
+    }
+
+    function fermerSysteme() {
+        fermerFeuille();
+        systemeOuvert = null;
+        calquePlanetes.classList.add(CLASSE_CACHEE);
+        monde.classList.remove(CLASSE_CACHEE);
+        boutonRetour.hidden = true;
+        vue = vueGalaxie;
+        appliquerVue();
+    }
+
+    function toucherPlanete(planeteId) {
+        const systeme = systemes[systemeOuvert];
+        ouvrirPlanete(systeme.planetes.find((planete) => planete.id === planeteId), systeme);
     }
 
     function nomDuSysteme(systemeId) {
@@ -627,7 +627,7 @@
     function ouvrirTrajets() {
         compteurs.length = 0;
         marquerSelection(null);
-        ouvrirFeuille('Flottes en route', DONNEES.enRoute.length + ' déplacement(s)', null);
+        ouvrirFeuille('Flottes en route', DONNEES.enRouteLibelle, null);
         DONNEES.enRoute.forEach((trajet) => {
             const duree = creer('span', {classe: 'carte__valeur'});
             compteurs.push({trajet: trajet, noeud: duree});
@@ -635,7 +635,7 @@
                 creer('div', {}, [
                     creer('strong', {texte: trajet.libelle}),
                     creer('br'),
-                    creer('span', {classe: 'md3-secondary', texte: 'de ' + nomDuSysteme(trajet.de) + ' vers ' + nomDuSysteme(trajet.vers)})
+                    creer('span', {classe: 'md3-secondary', texte: trajet.expedition ? 'en expédition dans l’inconnu depuis ' + nomDuSysteme(trajet.de) : 'de ' + nomDuSysteme(trajet.de) + ' vers ' + nomDuSysteme(trajet.vers)})
                 ]),
                 duree
             ]));
@@ -722,9 +722,12 @@
             }
             if (toucher) {
                 const cible = document.elementFromPoint(evenement.clientX, evenement.clientY);
-                const noeud = cible ? cible.closest('[data-systeme]') : null;
-                if (noeud) {
-                    toucherSysteme(Number(noeud.getAttribute('data-systeme')));
+                const noeudSysteme = cible ? cible.closest('[data-systeme]') : null;
+                const noeudPlanete = cible ? cible.closest('[data-planete]') : null;
+                if (noeudSysteme) {
+                    ouvrirSysteme(Number(noeudSysteme.getAttribute('data-systeme')));
+                } else if (noeudPlanete) {
+                    toucherPlanete(Number(noeudPlanete.getAttribute('data-planete')));
                 } else {
                     fermerFeuille();
                 }
@@ -759,29 +762,31 @@
     dessinerEtoiles();
     DONNEES.enRoute.forEach(dessinerTrajet);
     DONNEES.systemes.forEach(dessinerSysteme);
-    if (DONNEES.voisin) {
-        dessinerVoisin();
-    }
     installerGestes();
 
     document.getElementById('carte-zoom-avant').addEventListener('click', () => zoomerAuCentre(PAS_ZOOM));
     document.getElementById('carte-zoom-arriere').addEventListener('click', () => zoomerAuCentre(1 / PAS_ZOOM));
     document.getElementById('carte-base').addEventListener('click', () => {
+        if (systemeOuvert !== null) {
+            fermerSysteme();
+        }
         if (baseConnue()) {
             centrerSur(DONNEES.base, ECHELLE_BASE);
         } else {
             ajuster(toutesLesPositions(), ECHELLE_AJUSTEMENT_MAX);
         }
     });
+    boutonRetour.addEventListener('click', fermerSysteme);
     document.getElementById('carte-fermer').addEventListener('click', fermerFeuille);
     document.getElementById('carte-annuler').addEventListener('click', annulerOrdre);
-    boutonExplorer.addEventListener('click', explorer);
     document.addEventListener('keydown', (evenement) => {
         if (evenement.key !== TOUCHE_ECHAP) {
             return;
         }
         if (!feuille.hidden) {
             fermerFeuille();
+        } else if (systemeOuvert !== null) {
+            fermerSysteme();
         } else if (ordre) {
             annulerOrdre();
         }
@@ -808,7 +813,10 @@
     }
     if (DONNEES.focus !== null && systemes[DONNEES.focus]) {
         centrerSur(DONNEES.focus, ECHELLE_BASE);
-        ouvrirSysteme(DONNEES.focus);
+        marquerSelection(DONNEES.focus);
+    }
+    if (DONNEES.ordre !== null) {
+        reprendreOrdre(DONNEES.ordre);
     }
     tic();
     setInterval(tic, MILLISECONDES);

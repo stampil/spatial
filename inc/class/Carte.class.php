@@ -2,6 +2,10 @@
 
 class Carte {
 
+    const STATUT_MIEN = 'Votre colonie';
+    const STATUT_LIBRE = 'Libre';
+    const STATUT_OCCUPE = 'Occupée';
+
     public static function donnees(Joueur $joueur): array {
         $camps = array();
         foreach(Camp::liste() as $camp){
@@ -11,31 +15,55 @@ class Carte {
         foreach(Systeme::listeVisibles($joueur->id) as $systeme){
             $systemes[$systeme->id] = $systeme;
         }
-        $voisin = null;
-        $destinations = $systemes;
-        if($joueur->id_systeme_voisin !== null && !isset($systemes[$joueur->id_systeme_voisin])){
-            $voisin = new Systeme($joueur->id_systeme_voisin);
-            $destinations[$voisin->id] = $voisin;
-        }
-        $gouverneurs = self::nomsGouverneurs($systemes);
 
+        $analysees = Analyse::planetesAnalysees($joueur->id);
+        $enRoute = self::enRoute($joueur, $systemes);
         $donnees = array(
             'maintenant' => time(),
             'base' => self::systemeDeBase($joueur),
-            'peutExplorer' => count(Systeme::explorables($joueur->id)) > 0,
             'systemes' => array(),
-            'voisin' => null,
-            'stocks' => self::stocks($joueur, $systemes, $destinations),
-            'flottes' => self::flottes($joueur, $systemes, $destinations),
-            'enRoute' => self::enRoute($joueur, $destinations),
+            'stocks' => self::stocks($joueur, $systemes, $systemes),
+            'flottes' => self::flottes($joueur, $systemes, $systemes),
+            'enRoute' => $enRoute,
+            'enRouteLibelle' => count($enRoute).' '.__('deplacement','deplacements',count($enRoute)),
         );
         foreach($systemes as $systeme){
-            array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps, $gouverneurs));
-        }
-        if($voisin !== null){
-            $donnees['voisin'] = array('id' => $voisin->id, 'x' => $voisin->x, 'y' => $voisin->y, 'planete' => $voisin->planetes[0]->id);
+            array_push($donnees['systemes'], self::systeme($joueur, $systeme, $camps, $analysees));
         }
         return $donnees;
+    }
+
+    public static function ordreDeLaRequete(Joueur $joueur, array $requete): ?array {
+        if(!isset($requete['ordre'])){
+            return null;
+        }
+        $ordre = array('planete' => (int) $requete['ordre'], 'nombres' => array(), 'flottes' => array(), 'vaisseau' => null, 'libelle' => '');
+        if(isset($requete['vaisseau'])){
+            $query = "SELECT id, type, nom FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id=? AND id_joueur=? AND nom IS NOT NULL";
+            $lignes = MyPDO::getInstance()->query($query,(int) $requete['vaisseau'],$joueur->id);
+            if(count($lignes) === 0){
+                return null;
+            }
+            $ordre['vaisseau'] = (int) $lignes[0]->id;
+            $ordre['nombres'][$lignes[0]->type] = 1;
+            $ordre['libelle'] = $lignes[0]->nom;
+        }
+        elseif(isset($requete['flotte'])){
+            $flotte = new Flotte((int) $requete['flotte']);
+            if($flotte->id_joueur !== $joueur->id){
+                return null;
+            }
+            $ordre['flottes'] = array($flotte->id);
+            $ordre['libelle'] = $flotte->nom;
+        }
+        elseif(isset($requete['type']) && is_string($requete['type']) && isset(Vaisseau::CATALOGUE[$requete['type']])){
+            $ordre['nombres'][$requete['type']] = 1;
+            $ordre['libelle'] = Vaisseau::CATALOGUE[$requete['type']]['nom'];
+        }
+        else{
+            return null;
+        }
+        return $ordre;
     }
 
     private static function systemeDeBase(Joueur $joueur): ?int {
@@ -47,50 +75,25 @@ class Carte {
         return $planete === null ? null : $planete->id_systeme;
     }
 
-    private static function nomsGouverneurs(array $systemes): array {
-        $ids = array();
-        foreach($systemes as $systeme){
-            foreach($systeme->planetes as $planete){
-                if((int) $planete->gouverneur !== 0){
-                    $ids[(int) $planete->gouverneur] = (int) $planete->gouverneur;
-                }
-            }
-        }
-        if(count($ids) === 0){
-            return array();
-        }
-        $marques = implode(',', array_fill(0, count($ids), '?'));
-        $noms = array();
-        foreach(MyPDO::getInstance()->query("SELECT id, nom FROM " . MyPDO::DB_FLAG . "joueur WHERE id IN ($marques)", array_values($ids)) as $ligne){
-            $noms[$ligne->id] = $ligne->nom;
-        }
-        return $noms;
-    }
-
-    private static function systeme(Joueur $joueur, Systeme $systeme, array $camps, array $gouverneurs): array {
+    private static function systeme(Joueur $joueur, Systeme $systeme, array $camps, array $analysees): array {
         $idCamp = $systeme->getIdCamp();
         $planetes = array();
         $moi = false;
         foreach($systeme->planetes as $planete){
-            $estMoi = (int) $planete->gouverneur === $joueur->id;
-            $moi = $moi || $estMoi;
-            $bonus = null;
-            if($planete->bonus !== null){
-                $bonus = array('nom' => Bonus::libelle($planete->bonus), 'description' => Bonus::description($planete->bonus));
+            if((int) $planete->gouverneur === $joueur->id){
+                $moi = true;
             }
             array_push($planetes, array(
                 'id' => (int) $planete->id,
                 'nom' => $planete->nom,
-                'slot' => (int) $planete->slot,
-                'moi' => $estMoi,
-                'gouverneur' => $gouverneurs[(int) $planete->gouverneur] ?? null,
+                'x' => $planete->x,
+                'y' => $planete->y,
                 'couleur' => $planete->id_camp === null ? Camp::SANS_CAMP_COULEUR : $camps[$planete->id_camp]->couleur,
-                'camp' => $planete->id_camp === null ? Camp::SANS_CAMP_NOM : $camps[$planete->id_camp]->nom,
-                'bouclier' => (int) $planete->bouclier,
-                'canon' => (int) $planete->canon,
-                'troupes' => (int) $planete->troupes,
-                'revolte' => (int) $planete->perc_revolte,
-                'bonus' => $bonus,
+                'statut' => $planete->gouverneur === $joueur->id ? self::STATUT_MIEN : ($planete->gouverneur === 0 ? self::STATUT_LIBRE : self::STATUT_OCCUPE),
+                'moi' => $planete->gouverneur === $joueur->id,
+                'diametre' => Planete::diametreAffiche($planete->slot),
+                'texture' => Planete::cheminTextureDe($planete->id),
+                'exploree' => $planete->gouverneur === $joueur->id || isset($analysees[$planete->id]),
             ));
         }
         return array(
@@ -99,6 +102,7 @@ class Carte {
             'x' => $systeme->x,
             'y' => $systeme->y,
             'couleur' => $idCamp === null ? Camp::SANS_CAMP_COULEUR : $camps[$idCamp]->couleur,
+            'etoile' => $systeme->couleurEtoile(),
             'camp' => $idCamp === null ? Camp::SANS_CAMP_NOM : $camps[$idCamp]->nom,
             'moi' => $moi,
             'planetes' => $planetes,
@@ -109,13 +113,30 @@ class Carte {
         $reduction = $depart->reductionTrajet($joueur);
         $secondes = array();
         foreach($destinations as $destination){
-            $duree = 0;
-            foreach($types as $type){
-                $duree = max($duree, Vaisseau::dureeEntre($joueur, $type, $depart->systeme->distanceA($destination), $reduction));
+            if($destination->id !== $depart->id_systeme){
+                $secondes[$destination->id] = self::dureeMaximale($joueur, $types, $depart->systeme->distanceA($destination) * Vaisseau::TRAJET_SECONDES_PAR_UNITE, $reduction);
             }
-            $secondes[$destination->id] = $duree;
         }
         return $secondes;
+    }
+
+    private static function secondesLocales(Joueur $joueur, Planete $depart, array $types): array {
+        $reduction = $depart->reductionTrajet($joueur);
+        $secondes = array();
+        foreach($depart->systeme->planetes as $destination){
+            if($destination->id !== $depart->id){
+                $secondes[$destination->id] = self::dureeMaximale($joueur, $types, Planete::secondesEntre($depart->x, $depart->y, $destination->x, $destination->y), $reduction);
+            }
+        }
+        return $secondes;
+    }
+
+    private static function dureeMaximale(Joueur $joueur, array $types, int $baseSecondes, int $reduction): int {
+        $duree = 0;
+        foreach($types as $type){
+            $duree = max($duree, Vaisseau::dureeEntre($joueur, $type, $baseSecondes, $reduction));
+        }
+        return $duree;
     }
 
     private static function stocks(Joueur $joueur, array $systemes, array $destinations): array {
@@ -133,6 +154,7 @@ class Carte {
                     'nombre' => $nombre,
                     'combat' => in_array($type, Combat::ESCADRE, true),
                     'secondes' => self::secondes($joueur, $planete, array($type), $destinations),
+                    'secondesLocales' => self::secondesLocales($joueur, $planete, array($type)),
                 ));
             }
             array_push($stocks, array('planete' => $planete->id, 'systeme' => $planete->id_systeme, 'nom' => $planete->nom, 'vaisseaux' => $vaisseaux));
@@ -163,6 +185,7 @@ class Carte {
                 'systeme' => $planete->id_systeme,
                 'composition' => $composition,
                 'secondes' => self::secondes($joueur, $planete, array_keys($flotte->composition()), $destinations),
+                'secondesLocales' => self::secondesLocales($joueur, $planete, array_keys($flotte->composition())),
             ));
         }
         return $flottes;
@@ -177,23 +200,24 @@ class Carte {
                 $trajets[$cle]['libelle'] .= ', '.$libelle;
                 continue;
             }
-            $trajets[$cle] = self::trajet($destinations, $libelle, $ligne);
+            $trajets[$cle] = self::trajet($destinations, $libelle, $ligne, (bool) $ligne->exploration);
         }
         foreach(Flotte::liste($joueur->id) as $ligne){
             $flotte = new Flotte($ligne->id);
             $ligneFlotte = $flotte->enRoute();
             if($ligneFlotte !== null){
-                $trajets['flotte|'.$flotte->id] = self::trajet($destinations, 'Flotte '.$flotte->nom, $ligneFlotte);
+                $trajets['flotte|'.$flotte->id] = self::trajet($destinations, $flotte->nom, $ligneFlotte);
             }
         }
         return array_values($trajets);
     }
 
-    private static function trajet(array $destinations, string $libelle, object $ligne): array {
+    private static function trajet(array $destinations, string $libelle, object $ligne, bool $expedition = false): array {
         $de = (new Planete($ligne->id_planete))->id_systeme;
         $vers = (new Planete($ligne->id_destination))->id_systeme;
         return array(
             'libelle' => $libelle,
+            'expedition' => $expedition,
             'de' => $de,
             'vers' => isset($destinations[$vers]) ? $vers : null,
             'depart' => $ligne->depart === null ? null : strtotime($ligne->depart),

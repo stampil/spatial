@@ -9,8 +9,8 @@ class Systeme {
     const TENTATIVES_PAR_AGRANDISSEMENT = 20;
     const AGRANDISSEMENT = 100;
     const DEGRES_TOUR = 360;
-    const DISTANCE_MEME_SYSTEME = 0;
     const DISTANCE_MINIMUM = 1;
+    const COULEURS_ETOILES = array('#9BB0FF', '#CAD7FF', '#F8F7FF', '#FFE9A8', '#FFB56C', '#FF8A5B');
     const REQUETE_SYSTEMES_DES_ANCIENS = "SELECT p.id_systeme FROM " . MyPDO::DB_FLAG . "planete p JOIN " . MyPDO::DB_FLAG . "joueur j ON j.id=p.gouverneur WHERE j.fin_tuto<=?";
 
     private MyPDO $bdd;
@@ -50,17 +50,41 @@ class Systeme {
         return $visibles;
     }
 
-    public static function explorables(int $joueurId): array {
-        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "systeme
-                WHERE visible=1 OR id IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")";
-        $explorables = array();
+    public static function explorablesDeJoueurs(int $joueurId): array {
+        return self::nonDecouverts("id IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")", $joueurId);
+    }
+
+    public static function explorablesCaches(int $joueurId): array {
+        return self::nonDecouverts("visible=1 AND id NOT IN (" . self::REQUETE_SYSTEMES_DES_ANCIENS . ")", $joueurId);
+    }
+
+    private static function nonDecouverts(string $condition, int $joueurId): array {
+        $query = "SELECT id FROM " . MyPDO::DB_FLAG . "systeme WHERE " . $condition;
+        $nonDecouverts = array();
         foreach(MyPDO::getInstance()->query($query,self::limiteAnciens()) as $ligne){
             $systeme = new Systeme($ligne->id);
             if(!$systeme->estConnuDe($joueurId)){
-                array_push($explorables, $systeme);
+                array_push($nonDecouverts, $systeme);
             }
         }
-        return $explorables;
+        return $nonDecouverts;
+    }
+
+    public static function decouvrir(Joueur $joueur, Systeme $origine): Systeme {
+        $explorables = self::explorablesDeJoueurs($joueur->id);
+        if(count($explorables) === 0){
+            $explorables = self::explorablesCaches($joueur->id);
+        }
+        if(count($explorables) > 0){
+            $systeme = $explorables[random_int(0, count($explorables) - 1)];
+        }
+        else{
+            $systeme = new Systeme(self::create(true, self::positionLibre(array($origine->x, $origine->y))));
+            Planete::fillSystemeIA($systeme, Univers::CAMPS_DECOUVERTE, null, true);
+            $systeme = new Systeme($systeme->id);
+        }
+        Decouverte::ajouter($joueur->id, $systeme->id);
+        return $systeme;
     }
 
     /**
@@ -153,10 +177,11 @@ class Systeme {
         return true;
     }
 
+    public function couleurEtoile(): string {
+        return self::COULEURS_ETOILES[crc32('etoile'.$this->id) % count(self::COULEURS_ETOILES)];
+    }
+
     public function distanceA(Systeme $autre): int {
-        if($this->id === $autre->id){
-            return self::DISTANCE_MEME_SYSTEME;
-        }
         return max(self::DISTANCE_MINIMUM, (int) round(hypot($this->x - $autre->x, $this->y - $autre->y)));
     }
 
@@ -199,7 +224,7 @@ class Systeme {
     }
 
     public function getNom(): string {
-        return '<a href="?p=carte&systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->getIdCamp());
+        return '<a href="?p=afficheSysteme&id_systeme='.$this->id.'" class="nomSysteme">'.htmlspecialchars($this->nom).'</a> '.Camp::libelle($this->getIdCamp());
     }     
         
 }

@@ -25,7 +25,7 @@ foreach(Classement::joueurs() as $rang => $candidat){
         </div>
     </div>
     <p>Classement : <?= $position ?></p>
-    <p><?= $ligne['planetes'] ?> planète(s) · flotte <?= $ligne['force'] ?></p>
+    <p><?= $ligne['planetes'] ?> <?= __('planete', 'planetes', $ligne['planetes']) ?> · flotte <?= $ligne['force'] ?></p>
     <?php if($j->id === $Joueur->id){ ?>
     <p>Crédits : <?= number_format($j->credits, 0, ',', ' ') ?></p>
     <?php } ?>

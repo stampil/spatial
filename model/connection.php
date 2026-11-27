@@ -7,9 +7,9 @@
 
 <h1 class="titre-vue"><?= Icone::html('connexion') ?>Connexion</h1>
 
-<form class="formulaire" method="POST" action="index.php?p=connecter">
+<form class="formulaire" method="POST" action="index.php?p=connecter" data-navigation>
 
-<div class="md3-field"><label for="email">Email</label><input type="email" id="email" name="email" required /></div>
-<div class="md3-field"><label for="mdp">Mot de passe</label><input type="password" id="mdp" name="mdp" required minlength="<?= PASSWORD_MIN_LENGTH ?>"/></div>
-<input type="submit" value="Se connecter" name="go" />
+<div class="md3-field"><label for="nom">Nom du joueur</label><input type="text" id="nom" name="nom" required /></div>
+<div class="md3-field"><label for="mdp">Mot de passe</label><input type="password" id="mdp" name="mdp" required/></div>
+<input type="submit" class="md3-button md3-button--grand" value="Se connecter" name="go" />
 </form>

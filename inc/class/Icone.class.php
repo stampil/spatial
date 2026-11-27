@@ -4,12 +4,15 @@ class Icone {
 
     const VUE = 24;
     const TRAIT = 2;
+    const DOSSIER_IMAGES = 'icone';
     const DESSINS = array(
         'credits' => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
         'revenu' => '<polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/>',
         'planetes' => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18c-3-3-3-15 0-18"/>',
         'fusee' => '<path d="M12 3c3 2 5 6 5 10l-2 3H9l-2-3c0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 19l-1.5 3M15 19l1.5 3M12 19v3"/>',
         'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
+        'son' => '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9c1.5 1.5 1.5 4.5 0 6M19 6c3 3 3 9 0 12"/>',
+        'muet' => '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/>',
         'carte' => '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
         'persos' => '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.5 0 4 1.5 4 4"/>',
         'classement' => '<rect x="4" y="12" width="4" height="8"/><rect x="10" y="5" width="4" height="15"/><rect x="16" y="9" width="4" height="11"/>',
@@ -36,7 +39,20 @@ class Icone {
         'emplacements' => '<rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/>',
         'ajouter' => '<path d="M12 5v14M5 12h14"/>',
         'construire' => '<path d="M15 4a4 4 0 0 0-4 5l-7 7 3 3 7-7a4 4 0 0 0 5-4l-3 2-2-2 2-3z"/>',
-        'ancre' => '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M7 11h10M4 15c0 4 3.5 6 8 6s8-2 8-6"/>',
+        'saboter' => '<path d="M4 20l8-8"/><path d="M14 4l6 6-3 1-2 4-3-3 4-2z"/><path d="M3 6l3 3M6 3l3 3"/>',
+        'restrictor' => '<circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/>',
+        'attaque' => '<path d="M5 19l9-9"/><path d="M14 4l6 6-4 1-3-3z"/><path d="M8 14l-3 5"/>',
+        'debarquement' => '<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>',
+        'voyager' => '<path d="M5 19L19 5M9 5h10v10"/>',
+        'chercher' => '<circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/>',
+        'reconnaitre' => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3"/>',
+        'embarquer' => '<path d="M4 12h12M12 6l6 6-6 6"/><path d="M20 4v16"/>',
+        'decharger' => '<path d="M20 12H8M12 6l-6 6 6 6"/><path d="M4 4v16"/>',
+        'renommer' => '<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/>',
+        'dissoudre' => '<path d="M6 6l12 12M18 6L6 18"/>',
+        'combattre' => '<path d="M5 5l14 14M19 5L5 19"/><path d="M5 5h4M19 5h-4"/>',
+        'laisser' => '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+        'flotte' => '<path d="M7 3c1.5 1.5 3 4 3 8v7H4v-7c0-4 1.5-6.5 3-8z"/><path d="M17 3c1.5 1.5 3 4 3 8v7h-6v-7c0-4 1.5-6.5 3-8z"/>',
         'route' => '<path d="M3 12h14M13 6l6 6-6 6"/>',
         'info' => '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
         'actions' => '<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',
@@ -45,13 +61,28 @@ class Icone {
         'trophee' => '<path d="M8 4h8v5a4 4 0 0 1-8 0zM12 13v4M8 20h8M8 6H4v2a3 3 0 0 0 4 3M16 6h4v2a3 3 0 0 1-4 3"/>',
         'connexion' => '<path d="M10 4h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-8M4 12h10M10 8l4 4-4 4"/>',
         'inscription' => '<circle cx="10" cy="8" r="4"/><path d="M3 20c0-4 3-6 7-6M18 8v6M15 11h6"/>',
+        'negocier' => '<path d="M2 11l5-4 5 2 5-2 5 4"/><path d="M7 7l5 6 5-6M5 14l5 5 4-3 4 3"/>',
+        'apaiser' => '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.5-7 10-7 10z"/>',
+        'demolir' => '<path d="M4 20h16M6 20V10l6-5 6 5v10M9 13l6 5M15 13l-6 5"/>',
+        'recruter' => '<circle cx="10" cy="8" r="4"/><path d="M3 20c0-4 3-6 7-6M18 8v6M15 11h6"/>',
+        'produire' => '<path d="M3 20V9l6 4V9l6 4V5h6v15z"/>',
+        'resoudre' => '<path d="M8 5l11 7-11 7z"/>',
+        'passer' => '<path d="M5 5l9 7-9 7zM17 5v14"/>',
+        'creer_flotte' => '<path d="M5 19l4-9 4 9zM15 19l3-6 3 6zM17 3v6M14 6h6"/>',
+        'fermer' => '<path d="M6 6l12 12M18 6L6 18"/>',
+        'valider' => '<path d="M5 12l5 5 9-10"/>',
     );
 
-    public static function html(string $nom): string {
+    public static function html(string $nom, ?int $taille = null): string {
         if(!isset(self::DESSINS[$nom])){
             throw new UnexpectedValueException("Icône inconnue : ".$nom);
         }
-        return '<svg class="icone" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
+        $chemin = Vue::DOSSIER_IMAGES.'/'.self::DOSSIER_IMAGES.'/'.$nom.'.'.Vue::EXTENSION_OBJET;
+        if(is_file($chemin)){
+            return '<span class="icone icone--image" style="width:'.($taille ?? self::VUE).'px;height:'.($taille ?? self::VUE).'px;-webkit-mask-image:url('.$chemin.');mask-image:url('.$chemin.')" aria-hidden="true"></span>';
+        }
+        $style = $taille === null ? '' : ' style="width:'.$taille.'px;height:'.$taille.'px"';
+        return '<svg class="icone"'.$style.' width="'.self::VUE.'" height="'.self::VUE.'" viewBox="0 0 '.self::VUE.' '.self::VUE.'" fill="none" stroke="currentColor" stroke-width="'.self::TRAIT.'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.self::DESSINS[$nom].'</svg>';
     }
 
 }

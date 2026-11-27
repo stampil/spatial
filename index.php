@@ -50,34 +50,44 @@ if(!empty($_SESSION['Sid'])){
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500&display=swap">
-        <link rel="stylesheet" href="css/main.css" type="text/css">
-        <link rel="stylesheet" href="css/md3.css" type="text/css">
-        <link rel="stylesheet" href="css/jeu.css" type="text/css">
+        <link rel="stylesheet" href="<?= Vue::ressource('css/main.css') ?>" type="text/css">
+        <link rel="stylesheet" href="<?= Vue::ressource('css/md3.css') ?>" type="text/css">
+        <link rel="stylesheet" href="<?= Vue::ressource('css/jeu.css') ?>" type="text/css">
         <?php
         if(is_file('css/'.$p.'.css')){
         ?>
-            <link rel="stylesheet" href="css/<?=$p?>.css" type="text/css">
+            <link rel="stylesheet" href="<?= Vue::ressource('css/'.$p.'.css') ?>" type="text/css">
         <?php } ?>
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script src="js/jquery.countdown.min.js"></script>
-        <script src="js/main.js"></script>
-        <script src="js/rapport.js" defer></script>
+        <script src="<?= Vue::ressource('js/jquery.countdown.min.js') ?>"></script>
+        <script src="<?= Vue::ressource('js/main.js') ?>"></script>
+        <script src="<?= Vue::ressource('js/sante.js') ?>" data-adresse="<?= SANTE_ADRESSE ?>" defer></script>
+        <script src="<?= Vue::ressource('js/rapport.js') ?>" defer></script>
+        <?php if(isset($Joueur)){ ?>
+        <script src="<?= Vue::ressource('js/musique.js') ?>" defer></script>
+        <?php if($Joueur->enTuto()){ ?>
+        <script src="<?= Vue::ressource('js/tuto.js') ?>" defer></script>
+        <?php } ?>
+        <?php } else { ?>
+        <script src="<?= Vue::ressource('js/autoconnexion.js') ?>" data-cle="<?= CONNEXION_CLE_STOCKAGE ?>" data-reconnexion="?p=<?= RECONNEXION_PAGE ?>" data-accueil="?p=<?= HOME_PAGE ?>"></script>
+        <?php } ?>
                 <?php
         if(is_file('js/'.$p.'.js')){
         ?>
-            <script src="js/<?=$p?>.js" defer></script>
+            <script src="<?= Vue::ressource('js/'.$p.'.js') ?>" defer></script>
         <?php } ?>
         <title><?= htmlspecialchars(APP_TITLE.(isset(PAGES_TITRES[$p]) ? ' · '.PAGES_TITRES[$p] : '')) ?></title>
     </head>
-    <body<?= isset($Joueur) && $Joueur->etape_tuto != 0 ? ' class="md3-avec-barre"' : '' ?>>
+    <body<?= isset($Joueur) ? ' class="md3-avec-barre"' : '' ?>>
     <?php
     require 'inc/menu.php';
+    echo '<div class="sante-bandeau" id="sante-bandeau" role="alert" hidden></div>';
     if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE){
         require 'inc/hud.php';
     }
     ?>
-    <main class="md3-page">
+    <main class="md3-page"<?= isset($Joueur) ? Tuto::attributsFleche($Joueur, $p) : '' ?>>
     <?php
     if(isset($Joueur) && $Joueur->etape_tuto >= Tuto::ETAPE_USINE && $Joueur->enTuto()){
         require 'inc/tuto.php';
@@ -93,6 +103,10 @@ if(!empty($_SESSION['Sid'])){
     foreach(Tools::takeRapports() as $rapport){
         require 'inc/rapport.php';
     }
+    foreach(Tools::takeInfos() as $info){
+        require 'inc/info.php';
+    }
+    echo Vue::bandeau('page/'.$p);
 
     try{
         if(is_file('model/'.$p.'.php')){

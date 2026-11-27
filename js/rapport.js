@@ -4,7 +4,7 @@
     const DELAI_ETAPE = 1400;
     const POURCENT = 100;
     const TOUCHE_ECHAP = 'Escape';
-    const dialogues = Array.from(document.querySelectorAll('.md3-dialog'));
+    let dialogues = [];
     const mouvementReduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function creer(nom, classe, texte) {
@@ -27,10 +27,12 @@
         const journal = dialogue.querySelector('.rapport__journal');
         const bilan = dialogue.querySelector('.rapport__bilan');
         const passer = dialogue.querySelector('.rapport__passer');
+        const resoudre = dialogue.querySelector('.rapport__resoudre');
         const fermer = dialogue.querySelector('.rapport__fermer');
         const barres = {};
         const minuteurs = [];
         let termine = false;
+        let demarre = false;
 
         rapport.barres.forEach((barre) => {
             const remplissage = creer('div', 'rapport__remplissage rapport__remplissage--' + barre.cle);
@@ -71,6 +73,13 @@
             }
             bilan.textContent = rapport.bilan;
             bilan.hidden = false;
+            const camp = dialogue.querySelector('.rapport__camp');
+            if (camp) {
+                camp.hidden = false;
+            }
+            if (rapport.illustration_finale) {
+                dialogue.querySelector('.bandeau').style.backgroundImage = 'url(' + rapport.illustration_finale + ')';
+            }
             passer.hidden = true;
             fermer.hidden = false;
             fermer.focus();
@@ -82,9 +91,29 @@
             jouer(indice + 1);
         }
 
+        function demarrer() {
+            if (demarre) {
+                return;
+            }
+            demarre = true;
+            resoudre.hidden = true;
+            passer.hidden = false;
+            passer.focus();
+            if (mouvementReduit) {
+                conclure();
+                return;
+            }
+            rapport.etapes.forEach((etape, position) => {
+                minuteurs.push(setTimeout(() => montrerEtape(etape), DELAI_ETAPE * (position + 1)));
+            });
+            minuteurs.push(setTimeout(conclure, DELAI_ETAPE * (rapport.etapes.length + 1)));
+        }
+
         function surTouche(evenement) {
             if (evenement.key === TOUCHE_ECHAP) {
-                if (termine) {
+                if (!demarre) {
+                    demarrer();
+                } else if (termine) {
                     fermerDialogue();
                 } else {
                     conclure();
@@ -92,24 +121,22 @@
             }
         }
 
+        resoudre.addEventListener('click', demarrer);
         passer.addEventListener('click', conclure);
         fermer.addEventListener('click', fermerDialogue);
         document.addEventListener('keydown', surTouche);
         dialogue.hidden = false;
         document.body.classList.add('md3-dialog-ouvert');
-        passer.focus();
+        resoudre.focus();
+    }
 
-        if (mouvementReduit) {
-            conclure();
-            return;
+    function lancer() {
+        dialogues = Array.from(document.querySelectorAll('.md3-dialog'));
+        if (dialogues.length > 0) {
+            jouer(0);
         }
-        rapport.etapes.forEach((etape, position) => {
-            minuteurs.push(setTimeout(() => montrerEtape(etape), DELAI_ETAPE * (position + 1)));
-        });
-        minuteurs.push(setTimeout(conclure, DELAI_ETAPE * (rapport.etapes.length + 1)));
     }
 
-    if (dialogues.length > 0) {
-        jouer(0);
-    }
+    document.addEventListener('page-rafraichie', lancer);
+    lancer();
 })();

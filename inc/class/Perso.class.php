@@ -3,6 +3,9 @@
 class Perso {
 
     const MAX_STARS = 5;
+    const DEMIS_PAR_ETOILE = 2;
+    const NB_CARACTERISTIQUES = 3;
+    const POINTS_REPARTIS = 10;
     const DIPLOMATIE_SECONDS = 120;
     const ACTION_CONQUETE = 1;
     const ACTION_APAISER = 2;
@@ -22,6 +25,12 @@ class Perso {
         self::ROLE_HEROS => array('nom' => 'Héros', 'icone' => 'heros', 'prix' => 300),
         self::ROLE_ASSASSIN => array('nom' => 'Assassin', 'icone' => 'assassin', 'prix' => 200),
     );
+    const PRENOMS = array('Aldric', 'Maëlle', 'Soren', 'Ysolde', 'Corentin', 'Naëlle', 'Matthias', 'Liora', 'Evander', 'Thaïs', 'Kaelen', 'Ondine',
+        'Raphaël', 'Isaure', 'Dorian', 'Mirelle', 'Tancrède', 'Séléné', 'Lazare', 'Anouk', 'Baptiste', 'Cassia', 'Gaspard', 'Elowen',
+        'Ivar', 'Marguerite', 'Octave', 'Nolwenn', 'Valentin', 'Zoé', 'Hector', 'Calista', 'Orlan', 'Perrine', 'Silas', 'Tiphaine');
+    const NOMS = array('Valcourt', 'Marenne', 'Dorsay', 'Kestrel', 'Blanchefort', 'Orsini', 'Vasseur', 'Delorme', 'Thorne', 'Quenet', 'Ravel', 'Montclar',
+        'Sauvageot', 'Lemaire', 'Ashgrove', 'Varga', 'Beaulieu', 'Okafor', 'Reyes', 'Lindqvist', 'Petrov', 'Haddad', 'Castellane', 'Morvan',
+        'Aubrac', 'Delacroix-Ney', 'Faucheux', 'Grimaldi', 'Hallewyn', 'Ibarra', 'Jourdan', 'Kovacs', 'Lacombe', 'Maillard', 'Nerval', 'Tavernier');
     const ETAT_MORT = 'mort';
     const ETAT_PRISON = 'prison';
     const ETAT_VOYAGE = 'voyage';
@@ -43,6 +52,9 @@ class Perso {
     const ASSASSINAT_PER_STAR_PERCENT = 10;
     const ASSASSINAT_MIN_PERCENT = 10;
     const ASSASSINAT_MAX_PERCENT = 90;
+    const SABOTAGE_BASE_PERCENT = 40;
+    const PENALITE_ORBITE_PAR_VAISSEAU_POURCENT = 10;
+    const PENALITE_ORBITE_MAX_POURCENT = 50;
 
     private MyPDO $bdd;   
     
@@ -70,9 +82,24 @@ class Perso {
     
 
     
+    public static function demiEtoilesAleatoires(): array {
+        $demisParCaracteristique = self::MAX_STARS * self::DEMIS_PAR_ETOILE;
+        $places = range(0, self::NB_CARACTERISTIQUES * $demisParCaracteristique - 1);
+        shuffle($places);
+        $demiEtoiles = array_fill(0, self::NB_CARACTERISTIQUES, 0);
+        foreach(array_slice($places, 0, self::POINTS_REPARTIS * self::DEMIS_PAR_ETOILE) as $place){
+            $demiEtoiles[intdiv($place, $demisParCaracteristique)]++;
+        }
+        return $demiEtoiles;
+    }
+
+    public static function etoilesTexte(int $demiEtoiles): string {
+        return $demiEtoiles % self::DEMIS_PAR_ETOILE === 0 ? (string) intdiv($demiEtoiles, self::DEMIS_PAR_ETOILE) : number_format($demiEtoiles / self::DEMIS_PAR_ETOILE, 1, ',', '');
+    }
+
     public static function create(Joueur $Joueur): int {
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$Joueur->id,$Joueur->nom,rand(1,5),rand(1,5),rand(1,5),0);
+        MyPDO::getInstance()->query($query,...array_merge(array($Joueur->id,$Joueur->nom),self::demiEtoilesAleatoires(),array(0)));
 
         $id_perso =  MyPDO::getInstance()->lastInsertId();
         
@@ -84,10 +111,21 @@ class Perso {
 
         
     public static function recruter(Joueur $Joueur, Planete $Planete, string $role): int {
-        $nom = self::ROLES[$role]['nom'].' '.(count(self::liste($Joueur)) + 1);
+        $nom = self::nomAleatoire($Joueur);
         $query = "INSERT INTO " . MyPDO::DB_FLAG . "perso (id_joueur,nom,role,PV,FO,diplomatie,sur_planete,creato) VALUES(?,?,?,?,?,?,?,now()) ";
-        MyPDO::getInstance()->query($query,$Joueur->id,$nom,$role,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$Planete->id);
+        MyPDO::getInstance()->query($query,...array_merge(array($Joueur->id,$nom,$role),self::demiEtoilesAleatoires(),array($Planete->id)));
         return MyPDO::getInstance()->lastInsertId();
+    }
+
+    private static function nomAleatoire(Joueur $Joueur): string {
+        $pris = array($Joueur->nom);
+        foreach(self::liste($Joueur) as $ligne){
+            array_push($pris, $ligne->nom);
+        }
+        do{
+            $nom = self::PRENOMS[random_int(0, count(self::PRENOMS) - 1)].' '.self::NOMS[random_int(0, count(self::NOMS) - 1)];
+        }while(in_array($nom, $pris, true));
+        return $nom;
     }
 
     public static function liste(Joueur $Joueur): array {
@@ -152,13 +190,13 @@ class Perso {
         return self::ROLES[$this->role]['nom'];
     }
 
-    public static function boostHeros(Joueur $joueur, Planete $planete, string $caracteristique): int {
+    public static function boostHeros(Joueur $joueur, Planete $planete, string $caracteristique, int $pourcentParEtoile): int {
         $query = "SELECT id FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND sur_planete=? AND role=? AND fin_mort IS NULL AND embarque=0 AND arrivee IS NULL AND (fin_prison IS NULL OR fin_prison<=?)";
         $boost = 0;
         foreach(MyPDO::getInstance()->query($query,$joueur->id,$planete->id,self::ROLE_HEROS,Tools::now()) as $ligne){
             $boost = max($boost, (new Perso($ligne->id))->$caracteristique);
         }
-        return $boost;
+        return intdiv($boost * $pourcentParEtoile, self::DEMIS_PAR_ETOILE);
     }
 
     public static function ennemis(Joueur $joueur, Planete $planete): array {
@@ -167,7 +205,7 @@ class Perso {
     }
 
     public function chanceAssassinat(Perso $cible): int {
-        $chance = self::ASSASSINAT_BASE_PERCENT + self::ASSASSINAT_PER_STAR_PERCENT * ($this->FO - $cible->PV);
+        $chance = self::ASSASSINAT_BASE_PERCENT + intdiv(self::ASSASSINAT_PER_STAR_PERCENT * ($this->FO - $cible->PV), self::DEMIS_PAR_ETOILE);
         return max(self::ASSASSINAT_MIN_PERCENT, min($chance, self::ASSASSINAT_MAX_PERCENT));
     }
 
@@ -197,6 +235,74 @@ class Perso {
             return 'La cible a été tuée entre-temps.';
         }
         Tools::addMessage($this->nom.' a assassiné '.$cible->nom.' de '.$cible->joueur->nom.'.');
+        return null;
+    }
+
+    public function chanceAssassinatGouverneur(Planete $planete): int {
+        $chance = self::ASSASSINAT_BASE_PERCENT + intdiv(self::ASSASSINAT_PER_STAR_PERCENT * ($this->FO - $planete->pnj_endurance * self::DEMIS_PAR_ETOILE), self::DEMIS_PAR_ETOILE) - $planete->penaliteOrbite();
+        return max(self::ASSASSINAT_MIN_PERCENT, min($chance, self::ASSASSINAT_MAX_PERCENT));
+    }
+
+    public function assassinerGouverneur(): ?string {
+        $erreur = $this->verifierEspion();
+        if($erreur !== null){
+            return $erreur;
+        }
+        $planete = new Planete($this->sur_planete->id);
+        if($planete->pnj_endurance === null){
+            return "Cette planète n'a pas de gouverneur.";
+        }
+        if(random_int(1, self::MAX_PERCENT) > $this->chanceAssassinatGouverneur($planete)){
+            $this->fail();
+            return null;
+        }
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET pnj_endurance=NULL WHERE id=? AND pnj_endurance IS NOT NULL",$planete->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Le gouverneur a été éliminé entre-temps.';
+        }
+        Tools::addMessage($this->nom.' a assassiné le gouverneur de '.$planete->nom.' : la planète n\'a plus de gouverneur.');
+        return null;
+    }
+
+    public function chanceSabotage(Planete $planete): int {
+        $chance = self::SABOTAGE_BASE_PERCENT + intdiv(self::ASSASSINAT_PER_STAR_PERCENT * $this->FO, self::DEMIS_PAR_ETOILE) - $planete->penaliteOrbite();
+        return max(self::ASSASSINAT_MIN_PERCENT, min($chance, self::ASSASSINAT_MAX_PERCENT));
+    }
+
+    public function saboter(string $batiment): ?string {
+        $erreur = $this->verifierEspion();
+        if($erreur !== null){
+            return $erreur;
+        }
+        if(!isset(Batiment::CATALOGUE[$batiment])){
+            return 'Bâtiment inconnu.';
+        }
+        $planete = new Planete($this->sur_planete->id);
+        if($planete->gouverneur === $this->joueur->id){
+            return 'Impossible de saboter vos propres bâtiments.';
+        }
+        if($planete->nombre($batiment) < 1){
+            return "Ce bâtiment n'existe pas sur cette planète.";
+        }
+        if(random_int(1, self::MAX_PERCENT) > $this->chanceSabotage($planete)){
+            $this->fail();
+            return null;
+        }
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET $batiment=$batiment-1 WHERE id=? AND $batiment>0",$planete->id);
+        if($this->bdd->lastRowCount !== 1){
+            return 'Le bâtiment a été détruit entre-temps.';
+        }
+        Tools::addMessage($this->nom.' a saboté : '.Batiment::CATALOGUE[$batiment]['nom'].' détruit sur '.$planete->nom.'.');
+        return null;
+    }
+
+    private function verifierEspion(): ?string {
+        if($this->role !== self::ROLE_ASSASSIN){
+            return "Seul un assassin peut mener cette action.";
+        }
+        if(!$this->canAct()){
+            return 'Ce perso ne peut pas agir maintenant.';
+        }
         return null;
     }
 
@@ -274,15 +380,15 @@ class Perso {
     }
 
     public function dureeDiplomatie(): int {
-        return intdiv(self::DIPLOMATIE_SECONDS, $this->diplomatie);
+        return intdiv(self::DIPLOMATIE_SECONDS * self::DEMIS_PAR_ETOILE, $this->diplomatie);
     }
 
     public function chanceDeSucces(Joueur $joueur): int {
         if($joueur->etape_tuto < Joueur::TUTO_END_STEP){
             return self::MAX_PERCENT;
         }
-        $chance = self::SUCCESS_BASE_PERCENT + self::SUCCESS_PER_DIPLOMATIE_PERCENT * $this->diplomatie;
-        $chance += self::boostHeros($joueur, $this->sur_planete, self::CARACTERISTIQUE_DIPLOMATIE) * self::HEROS_SUCCESS_PER_STAR_PERCENT;
+        $chance = self::SUCCESS_BASE_PERCENT + intdiv(self::SUCCESS_PER_DIPLOMATIE_PERCENT * $this->diplomatie, self::DEMIS_PAR_ETOILE);
+        $chance += self::boostHeros($joueur, $this->sur_planete, self::CARACTERISTIQUE_DIPLOMATIE, self::HEROS_SUCCESS_PER_STAR_PERCENT);
         return min($chance, self::MAX_PERCENT);
     }
 
@@ -304,6 +410,9 @@ class Perso {
         }
         if($action === self::ACTION_CONQUETE && $this->sur_planete->gouverneur !== 0){
             return 'Cette planète a déjà un gouverneur.';
+        }
+        if($action === self::ACTION_CONQUETE && $this->sur_planete->pnj_endurance !== null){
+            return 'Un gouverneur est en place : un assassin doit d\'abord l\'éliminer.';
         }
         if($action === self::ACTION_CONQUETE && $this->sur_planete->id_camp !== null){
             return 'Cette planète est tenue par '.(new Camp($this->sur_planete->id_camp))->nom.'.';
@@ -348,7 +457,7 @@ class Perso {
         }
         $planete = $this->sur_planete;
         if($action === self::ACTION_APAISER){
-            $planete->apaiser($this->diplomatie * self::APAISER_PER_DIPLOMATIE);
+            $planete->apaiser(intdiv($this->diplomatie * self::APAISER_PER_DIPLOMATIE, self::DEMIS_PAR_ETOILE));
             Tools::addMessage($this->nom.' a apaisé la révolte sur '.$planete->nom.'.');
             return;
         }
@@ -360,7 +469,7 @@ class Perso {
             Tools::addMessage($planete->nom.' a déjà un gouverneur : la diplomatie de '.$this->nom.' est annulée.');
             return;
         }
-        Tools::addMessage('Vous gouvernez maintenant '.$planete->nom.'.');
+        Tools::addInfo('Une planète rejoint votre cause', $planete->nom.' rejoint votre camp : vous la gouvernez maintenant.', Planete::ILLUSTRATION_REJOINT, $joueur->id_camp);
         if($joueur->etape_tuto < Tuto::ETAPE_USINE){
             $joueur->etape_tuto = Tuto::ETAPE_USINE;
             $joueur->save();
@@ -372,18 +481,18 @@ class Perso {
         if(random_int(1, self::MAX_PERCENT) <= self::PRISON_SHARE_PERCENT){
             $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_prison=? WHERE id=?";
             $this->bdd->query($query,Tools::nowPlus(self::PRISON_SECONDS),$this->id);
-            Tools::addMessage($this->nom.' a échoué et a été emprisonné pendant '.intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE).' minutes.');
+            Tools::addMessage($this->nom.' a échoué et a été emprisonné pendant '.intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE).' '.__('minute', 'minutes', intdiv(self::PRISON_SECONDS, self::SECONDS_PER_MINUTE)).'.');
             return;
         }
         $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=? WHERE id=?";
         $this->bdd->query($query,Tools::nowPlus(self::RESPAWN_SECONDS),$this->id);
-        Tools::addMessage($this->nom.' a échoué et a été tué. Un nouveau perso arrivera dans '.intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE).' minutes.');
+        Tools::addMessage($this->nom.' a échoué et a été tué. Un nouveau perso arrivera dans '.intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE).' '.__('minute', 'minutes', intdiv(self::RESPAWN_SECONDS, self::SECONDS_PER_MINUTE)).'.');
     }
 
     private function respawn(): void {
         $planeteId = Planete::premiereGouvernee($this->joueur->id) ?? $this->sur_planete->id;
         $query = "UPDATE " . MyPDO::DB_FLAG . "perso SET fin_mort=NULL, fin_prison=NULL, embarque=0, PV=?, FO=?, diplomatie=?, sur_planete=? WHERE id=? AND fin_mort IS NOT NULL";
-        $this->bdd->query($query,rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),rand(1,self::MAX_STARS),$planeteId,$this->id);
+        $this->bdd->query($query,...array_merge(self::demiEtoilesAleatoires(),array($planeteId,$this->id)));
         if($this->bdd->lastRowCount === 1){
             Tools::addMessage('Un nouveau perso, '.$this->nom.', est arrivé.');
         }

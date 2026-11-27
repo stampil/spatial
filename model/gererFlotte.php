@@ -8,15 +8,9 @@ $action = giveInputString($_POST, 'action');
 if($flotte->id_joueur !== $Joueur->id){
     Tools::addMessage('Cette flotte ne vous appartient pas.');
 }
-elseif($action === 'envoyer'){
-    $erreur = $flotte->deplacer($Joueur, new Planete((int) ($_POST['destination'] ?? 0)));
-    if($erreur !== null){
-        Tools::addMessage($erreur);
-    }
-}
 elseif($action === 'dissoudre'){
     $flotte->dissoudre();
-    Tools::addMessage('Flotte '.$flotte->nom.' dissoute : ses vaisseaux redeviennent isolés.');
+    Tools::addMessage($flotte->nom.' dissoute : ses vaisseaux redeviennent isolés.');
 }
 else{
     Tools::addMessage('Action inconnue.');
