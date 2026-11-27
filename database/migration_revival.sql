@@ -22,7 +22,8 @@ ALTER TABLE `planete`
   ADD COLUMN `pnj_endurance` tinyint(1) DEFAULT NULL AFTER `nb_canon_orbital`,
   ADD COLUMN `occupee` tinyint(1) NOT NULL DEFAULT '0' AFTER `pnj_endurance`,
   ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `occupee`,
-  ADD COLUMN `y` int(11) NOT NULL DEFAULT '0' AFTER `x`;
+  ADD COLUMN `y` int(11) NOT NULL DEFAULT '0' AFTER `x`,
+  ADD COLUMN `nom_origine` varchar(255) DEFAULT NULL AFTER `y`;
 
 ALTER TABLE `systeme`
   ADD COLUMN `x` int(11) NOT NULL DEFAULT '0' AFTER `visible`,
@@ -166,7 +167,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('022_tuto_restrictor'),
 ('023_gouverneurs_structures_analyse'),
 ('024_perso_demi_etoiles'),
-('025_positions_planetes');
+('025_positions_planetes'),
+('026_planete_nom_origine');
 
 UPDATE `perso` SET `PV` = `PV` * 2, `FO` = `FO` * 2, `diplomatie` = `diplomatie` * 2;
 

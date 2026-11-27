@@ -27,6 +27,7 @@ class Planete {
     const REVOLTE_ALERTE = 40;
     const SEUIL_INDEPENDANCE = 51;
     const TEXTURES = 50;
+    const NOM_LONGUEUR_MAX = 32;
     const DOSSIER_TEXTURES = 'img/texture';
     const ORBITE_RAYON_MINIMUM = 24;
     const ORBITE_PAS = 14;
@@ -54,6 +55,7 @@ class Planete {
     public int $perc_revolte;
     public int $x;
     public int $y;
+    public ?string $nom_origine;
     public int $gouverneur;
     public int $id_systeme;
     public int $nb_usine_vaiss_leger;
@@ -310,6 +312,7 @@ class Planete {
         $this->id_systeme = $ret[0]->id_systeme;
         $this->x = (int) $ret[0]->x;
         $this->y = (int) $ret[0]->y;
+        $this->nom_origine = $ret[0]->nom_origine;
         $this->nb_usine_vaiss_leger = $ret[0]->nb_usine_vaiss_leger;
         $this->nb_usine_vaiss_moyen = $ret[0]->nb_usine_vaiss_moyen;
         $this->nb_usine_vaiss_lourd = $ret[0]->nb_usine_vaiss_lourd;
@@ -470,7 +473,7 @@ class Planete {
     }
 
     public function capturer(Joueur $joueur, int $troupes): bool {
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, defense_maj=?, detournement_fin=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, flotte_ia=0, occupee=1 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0 AND flotte_ia=0 AND pnj_endurance IS NULL AND nb_bouclier_planetaire=0";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET nom=COALESCE(nom_origine, nom), nom_origine=NULL, gouverneur=?, id_camp=?, troupes=?, bouclier=0, canon=0, perc_revolte=?, revolte_maj=?, defense_maj=?, detournement_fin=NULL, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, flotte_ia=0, occupee=1 WHERE id=? AND gouverneur=? AND bouclier=0 AND canon=0 AND flotte_ia=0 AND pnj_endurance IS NULL AND nb_bouclier_planetaire=0";
         $this->bdd->query($query,$joueur->id,$joueur->id_camp,$troupes,self::CAPTURE_REVOLTE,Tools::now(),Tools::now(),$this->id,$this->gouverneur);
         if($this->bdd->lastRowCount !== 1){
             return false;
@@ -493,6 +496,26 @@ class Planete {
         return self::TRAJET_LOCAL_MINIMUM_SECONDES + (int) round($distance * (self::TRAJET_LOCAL_MAXIMUM_SECONDES - self::TRAJET_LOCAL_MINIMUM_SECONDES) / self::DIAMETRE_ORBITES);
     }
 
+    public function peutEtreRenommee(Joueur $joueur): bool {
+        if($this->gouverneur !== $joueur->id){
+            return false;
+        }
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND sur_planete=? AND fin_mort IS NULL AND embarque=0 AND arrivee IS NULL AND (fin_prison IS NULL OR fin_prison<=?)";
+        return (int) $this->bdd->query($query,$joueur->id,$this->id,Tools::now())[0]->nombre > 0;
+    }
+
+    public function renommer(Joueur $joueur, string $nom): ?string {
+        $nom = trim($nom);
+        if($nom === '' || mb_strlen($nom) > self::NOM_LONGUEUR_MAX){
+            return 'Le nom de la planète doit faire entre 1 et '.self::NOM_LONGUEUR_MAX.' caractères.';
+        }
+        if(!$this->peutEtreRenommee($joueur)){
+            return 'Il faut gouverner la planète et y avoir un perso pour la renommer.';
+        }
+        $this->bdd->query("UPDATE " . MyPDO::DB_FLAG . "planete SET nom_origine=COALESCE(nom_origine, nom), nom=? WHERE id=? AND gouverneur=?",$nom,$this->id,$joueur->id);
+        return null;
+    }
+
     public function cheminTexture(): string {
         return self::DOSSIER_TEXTURES.'/'.($this->id % self::TEXTURES + 1).'.jpg';
     }
@@ -506,7 +529,7 @@ class Planete {
     }
 
     public function redevenirNeutre(): void {
-        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET gouverneur=0, id_camp=NULL, perc_revolte=?, revolte_maj=NULL, bouclier=0, canon=0, troupes=0, flotte_ia=0, occupee=0, defense_maj=?, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, pnj_endurance=? WHERE id=?";
+        $query = "UPDATE " . MyPDO::DB_FLAG . "planete SET nom=COALESCE(nom_origine, nom), nom_origine=NULL, gouverneur=0, id_camp=NULL, perc_revolte=?, revolte_maj=NULL, bouclier=0, canon=0, troupes=0, flotte_ia=0, occupee=0, defense_maj=?, nb_usine_vaiss_leger=0, nb_usine_vaiss_moyen=0, nb_usine_vaiss_lourd=0, nb_usine_ressource=0, nb_academie=0, nb_bouclier_planetaire=0, nb_canon_orbital=0, pnj_endurance=? WHERE id=?";
         $pnj = null;
         if(random_int(1, self::PERCENT) <= self::GOUVERNEUR_NEUTRE_POURCENT){
             $pnj = random_int(1, self::GOUVERNEUR_ETOILES_MAX);

@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `planete` (
   `occupee` tinyint(1) NOT NULL DEFAULT '0',
   `x` int(11) NOT NULL DEFAULT '0',
   `y` int(11) NOT NULL DEFAULT '0',
+  `nom_origine` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 
@@ -315,7 +316,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('022_tuto_restrictor'),
 ('023_gouverneurs_structures_analyse'),
 ('024_perso_demi_etoiles'),
-('025_positions_planetes');
+('025_positions_planetes'),
+('026_planete_nom_origine');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 

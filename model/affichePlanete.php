@@ -29,6 +29,23 @@ $defenseurs = Combat::defenseurs($p);
         <?php if($p->detournement_fin !== null && $p->detournement_fin > Tools::now()){ echo Vue::pastille('Revenus détournés', 'alerte'); } ?>
     </div>
     <p>Gouverneur : <?= $p->gouverneur === 0 ? 'voir la fiche de défense' : $p->getGouverneurNom() ?></p>
+    <?php if($p->peutEtreRenommee($Joueur)){ ?>
+    <div data-bloc>
+        <div class="actions-icones">
+            <?= Vue::basculeIcone('renommer', 'renommer', 'Renommer la planète', false, 'md3-button--tonal') ?>
+        </div>
+        <div class="panneau-action" data-panneau="renommer" hidden>
+            <form class="systeme-details__corps" method="POST" action="?p=renommerPlanete">
+                <input type="hidden" name="planete" value="<?= $p->id ?>" />
+                <?= csrfField() ?>
+                <div class="ligne-jeu">
+                    <input type="text" class="md3-text" name="nom" maxlength="<?= Planete::NOM_LONGUEUR_MAX ?>" value="<?= htmlspecialchars($p->nom) ?>" required aria-label="Nom de la planète" />
+                    <?= Vue::boutonIcone('valider', 'Renommer la planète', false, 'md3-button--tonal') ?>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php } ?>
     <?php if($p->bonus !== null){ ?>
     <div class="ligne-jeu__info">
         <?= Vue::visuel('bonus', $p->bonus) ?>
