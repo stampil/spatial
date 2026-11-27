@@ -32,7 +32,7 @@ class Vaisseau {
         'fregate' => array('icone' => 'fregate', 'nom' => 'Frégate', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 120, 'duree' => 90, 'vitesse' => 100, 'force' => 15, 'troupes' => 10, 'chasseurs' => 3, 'prefixe' => 'Frégate'),
         'barge' => array('icone' => 'barge', 'nom' => 'Barge de débarquement', 'usine' => Batiment::USINE_MOYENNE, 'prix' => 150, 'duree' => 120, 'vitesse' => 200, 'force' => 0, 'troupes' => 10, 'chasseurs' => 0, 'prefixe' => 'Barge'),
         'capital' => array('icone' => 'fusee', 'nom' => 'Vaisseau capital', 'usine' => Batiment::USINE_LOURDE, 'prix' => 400, 'duree' => 300, 'vitesse' => 150, 'force' => 50, 'troupes' => 20, 'chasseurs' => 6, 'prefixe' => 'Capital'),
-        'restrictor' => array('icone' => 'restrictor', 'nom' => 'Restrictor', 'usine' => Batiment::USINE_LOURDE, 'prix' => 500, 'duree' => 300, 'vitesse' => 120, 'force' => 20, 'troupes' => 0, 'chasseurs' => 0, 'prefixe' => 'Restrictor'),
+        'restrictor' => array('icone' => 'restrictor', 'nom' => 'Restrictor', 'usine' => Batiment::USINE_LOURDE, 'prix' => 500, 'duree' => 300, 'vitesse' => 120, 'force' => 20, 'troupes' => 1, 'chasseurs' => 2, 'prefixe' => 'Restrictor'),
         'troupe_assaut' => array('icone' => 'troupe', 'nom' => 'Troupe d\'assaut', 'usine' => Batiment::ACADEMIE, 'prix' => 60, 'duree' => 20, 'vitesse' => 200, 'force' => 10, 'troupes' => 0, 'chasseurs' => 0),
     );
 

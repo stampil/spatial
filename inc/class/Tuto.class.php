@@ -23,7 +23,7 @@ class Tuto {
     const PRIME_CREDITS = 800;
     const PRIME_ASSASSIN = 400;
     const PRIME_RESTRICTOR = 1000;
-    const FLOTTE_REDUITE = 5;
+    const FLOTTE_REDUITE = 2;
     const GOUVERNEUR_ETOILES = 1;
     const ORBITE_CHASSEURS = 1;
     const CHASSEURS_REQUIS = 3;
@@ -45,6 +45,9 @@ class Tuto {
         if($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && $joueur->id_systeme_voisin === null){
             $idPlanete = Planete::premiereGouvernee($joueur->id);
             Univers::creerVoisin($joueur, $idPlanete === null ? null : (new Planete($idPlanete))->systeme);
+        }
+        if($joueur->etape_tuto === self::ETAPE_RESTRICTOR && $joueur->enTuto()){
+            self::garnirPlaneteDeux($joueur);
         }
         while($joueur->etape_tuto >= self::ETAPE_USINE && $joueur->enTuto() && self::objectifAtteint($joueur)){
             self::passerALEtapeSuivante($joueur);
@@ -223,7 +226,38 @@ class Tuto {
         if(self::nombreDeVaisseaux($joueur, Vaisseau::RESTRICTOR, false) < 1){
             return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::RESTRICTOR);
         }
-        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte '.self::CLE_VOYAGER_FLOTTE)), self::planeteTrois($joueur));
+        $deux = self::planeteDeux($joueur);
+        if(!self::restrictorSur($joueur, $deux)){
+            return self::routeVersLaCarte(array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte '.self::CLE_VOYAGER_FLOTTE)), $deux);
+        }
+        if(self::chasseursSurRestrictor($joueur) < Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]){
+            return array(self::niveau('listeVaisseau', 'embarquer-'.Vaisseau::RESTRICTOR.' embarquer-valider-'.Vaisseau::RESTRICTOR.'-'.Vaisseau::CHASSEUR));
+        }
+        return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER_FLOTTE)), self::planeteTrois($joueur));
+    }
+
+    private static function restrictorSur(Joueur $joueur, ?Planete $planete): bool {
+        if($planete === null){
+            return false;
+        }
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND type=? AND id_planete=? AND arrivee IS NULL";
+        return (int) MyPDO::getInstance()->query($query,$joueur->id,Vaisseau::RESTRICTOR,$planete->id)[0]->nombre > 0;
+    }
+
+    private static function chasseursSurRestrictor(Joueur $joueur): int {
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau chasseur JOIN " . MyPDO::DB_FLAG . "vaisseau hote ON hote.id=chasseur.id_hote WHERE chasseur.id_joueur=? AND chasseur.type=? AND hote.type=?";
+        return (int) MyPDO::getInstance()->query($query,$joueur->id,Vaisseau::CHASSEUR,Vaisseau::RESTRICTOR)[0]->nombre;
+    }
+
+    private static function garnirPlaneteDeux(Joueur $joueur): void {
+        $deux = self::planeteDeux($joueur);
+        if(!self::restrictorSur($joueur, $deux)){
+            return;
+        }
+        $presents = (Vaisseau::stockLibre($deux->id, $joueur->id)[Vaisseau::CHASSEUR] ?? 0) + self::chasseursSurRestrictor($joueur);
+        for($i = $presents; $i < Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]; $i++){
+            MyPDO::getInstance()->query("INSERT INTO " . MyPDO::DB_FLAG . "vaisseau (id_joueur,id_planete,type,creato) VALUES (?,?,?,?)",$joueur->id,$deux->id,Vaisseau::CHASSEUR,Tools::now());
+        }
     }
 
     private static function planeteDeux(Joueur $joueur): ?Planete {
@@ -454,7 +488,8 @@ class Tuto {
                 return 'Une flotte pirate menace '.$planete->getNom().'. Allez dans le menu Flottes : '.self::action('combattre', 'Combattre').' l\'oppose à vos vaisseaux présents sur la planète (bonus des héros et de la citadelle) ; '.self::action('laisser', 'Laisser').' laisse les Pirates détourner '.Detournement::POURCENT.' % de '.Detournement::DUREE_HEURES.' h de revenus. Sans réponse sous '.intdiv(Menace::EXPIRATION_SECONDES, Planete::SECONDS_PER_HOUR).' h, ils détournent. Répondez pour continuer.';
             case self::ETAPE_RESTRICTOR:
                 $cible = self::planeteTrois($joueur);
-                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue qui a perdu l\'essentiel de ses vaisseaux s\'enfuit vers la planète alliée ou neutre la plus proche. Le Restrictor l\'en empêche : tant qu\'il vit dans votre flotte, l\'ennemi ne peut pas fuir. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr), regroupez-le avec votre frégate dans une flotte (embarquez-y vos chasseurs : ils protègent vos grands vaisseaux, car les chasseurs ennemis frappent doublement les capitaux), puis voyagez vers cette planète : l\'arrivée déclenche le combat, '.self::action('resoudre', 'Résoudre').' le joue.';
+                $deux = self::planeteDeux($joueur);
+                return 'Une flotte pirate réduite ('.self::FLOTTE_REDUITE.' '.__('chasseur', 'chasseurs', self::FLOTTE_REDUITE).') est stationnée sur '.($cible === null ? 'une planète voisine' : $cible->getNom()).'. Une flotte battue s\'enfuit vers la planète alliée ou neutre la plus proche : le Restrictor l\'en empêche, tant qu\'il vit dans votre flotte. Construisez une usine de vaisseaux lourds sur '.$planete->getNom().' et produisez un Restrictor ('.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR]['prix'].' cr) : il embarque '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' '.__('chasseur', 'chasseurs', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS]).' et '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES].' '.__('troupe', 'troupes', Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_TROUPES]).' d\'assaut. Menu Flottes : '.self::action('creer_flotte', 'Créer une flotte').' avec lui et '.self::action('voyager', 'Voyager').' sur '.($deux === null ? 'la planète voisine' : $deux->getNom()).', déjà nettoyée, où vos chasseurs vous attendent. Là, '.self::action('embarquer', 'Embarquer').' les '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].' chasseurs sur le Restrictor (curseur sur '.Vaisseau::CATALOGUE[Vaisseau::RESTRICTOR][Vaisseau::CAPACITE_CHASSEURS].', puis validez), et '.self::action('voyager', 'Voyager').' sur '.($cible === null ? 'la planète pirate' : $cible->getNom()).' : l\'arrivée déclenche le combat tout seul, et pendant le tutoriel vous le gagnez d\'avance.';
         }
         return '';
     }
