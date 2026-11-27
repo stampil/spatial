@@ -12,6 +12,8 @@ Lu : tu as raison. \`Planete::numeroTexture()\` fait \`id % 47 + 1\` et les plan
 
 Ce que je comprends : on garde un choix déterministe (la même planète a toujours la même texture), mais on casse la suite : \`(id × 19) % 47 + 1\`. 19 est premier avec 50, donc deux planètes consécutives d'un même système sont toujours à 19 textures d'écart, jamais voisines, et aucune des 48 textures ne manque (répartition toujours égale). Un système de 12 planètes reçoit 12 textures toutes différentes, mélangées entre les types.
 
+Désaccord du 27/11 : « je suis pa d'accord pour le 1 des melange » : tu refuses le pas de 19. Je ne l'applique pas. Le texte ci-dessus reste une proposition abandonnée tant que tu n'as pas dit ce que tu préfères.
+
 ## Questions en suspens
 
-1. Pas de 19 (premier avec 50, écart fort entre voisines). Une planète déjà affichée change de texture une fois de plus. Je recommande cela.
+1. Qu'est-ce qui ne te va pas dans le pas de 19, et que veux-tu à la place ? Pistes : (a) dans chaque système, des textures toutes différentes, choisies par un tirage au hasard fixé par le numéro du système ; (b) un type différent par planète d'un même système (gazeuse, rocheuse, glace…) ; (c) autre chose.
