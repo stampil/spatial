@@ -273,6 +273,7 @@
         const rayon = RAYON_NOEUD + systeme.planetes.length * RAYON_PAR_PLANETE;
         const groupe = creerSvg('g', {
             'class': 'carte__systeme',
+            'data-tuto': 'systeme-' + systeme.id,
             'data-systeme': systeme.id,
             role: 'button',
             tabindex: '0',

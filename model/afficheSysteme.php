@@ -38,7 +38,7 @@ foreach($systeme->planetes as $p){
         <div class="fiche__tete">
             <div class="avatar avatar--planete" style="background-image:url(<?= $p->cheminTexture() ?>)"></div>
             <div>
-                <h2 class="fiche__nom"><a href="?p=affichePlanete&id_planete=<?= $p->id ?>"><?= htmlspecialchars($p->nom) ?></a></h2>
+                <h2 class="fiche__nom"><a href="?p=affichePlanete&id_planete=<?= $p->id ?>" data-tuto="<?= Tuto::CLE_PLANETE.$p->id ?>"><?= htmlspecialchars($p->nom) ?></a></h2>
                 <p class="md3-secondary"><?= Camp::libelle($p->id_camp) ?> · <?= $p->gouverneur === $Joueur->id ? 'Votre colonie' : ($p->gouverneur === 0 ? 'Libre' : $p->getGouverneurNom()) ?></p>
             </div>
         </div>

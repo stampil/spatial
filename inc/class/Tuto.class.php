@@ -86,7 +86,7 @@ class Tuto {
         if(count($route) === 0){
             return '';
         }
-        $attributs = ' data-tuto-menu="'.$route[0]['page'].'"';
+        $attributs = isset(MENU_PLAYER[$route[0]['page']]) ? ' data-tuto-menu="'.$route[0]['page'].'"' : '';
         foreach(array_reverse($route) as $niveau){
             if($niveau['page'] === $page){
                 return $attributs.($niveau['cle'] === null ? '' : ' data-tuto-cible="'.$niveau['cle'].'"');
