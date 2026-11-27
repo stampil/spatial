@@ -21,11 +21,8 @@ Ce que je comprends : on ajoute des étapes à la fin du tuto, dans cet ordre :
 
 ## Questions en suspens
 
-1. Conquête : une étape « Prendre les deux planètes restantes » : le joueur produit les troupes nécessaires, les embarque dans la barge, envoie la flotte sur la planète 2 puis sur la planète 3 et débarque, comme à l'étape 8. Je recommande une seule étape pour les deux, avec la flèche guidant chaque débarquement.
-2. Troupes : j'ajuste la garnison de la planète 2 et de la planète 3 dans le tuto pour qu'une barge de troupes suffise, et le débarquement du tuto est gagné d'avance (comme le combat du Restrictor). Je recommande cela.
-3. Renommage : une étape « Nommer une planète » : le joueur renomme l'une des 3 planètes où il a un perso (l'assassin sur la planète 2 convient). Je recommande cela, objectif atteint dès qu'une des 3 est renommée.
-4. Fermes : deux fermes par planète sur les 3 planètes (ou une seule s'il n'y a qu'un emplacement), soit 6 fermes au plus : 900 cr de construction, et environ +160 cr/h au total, soit près de +2,7 par minute. Une seule ferme par planète donnerait +96 cr/h (+1,6 par minute). Je recommande deux. L'objectif de l'étape : au moins une ferme sur chacune des 3 planètes.
-5. Crédits : une prime à l'entrée de chaque étape, calculée sur les prix du jeu (troupes manquantes × prix, fermes × 150 cr, +20 % de marge), pas un chiffre fixe. Je recommande cela.
-6. Numérotation : la fin du tuto passe de 18 à 21 (trois étapes ajoutées) ; une migration met les joueurs qui ont déjà fini le tuto à la nouvelle fin pour qu'ils ne soient pas renvoyés dedans. Je recommande cela.
+Décidé le 27/11 (« tout recommandé sauf 4 : non sa doit etre full fermes ») : conquête en une étape avec flèches à chaque débarquement ; garnisons ajustées et débarquement du tuto gagné d'avance ; renommage d'une des 3 planètes où le joueur a un perso, validé dès qu'une est renommée ; primes calculées sur les prix du jeu avec 20 % de marge ; fin du tuto de 18 à 21 avec migration des joueurs qui ont fini. Fermes : full fermes, tous les emplacements des 3 planètes en fermes (jusqu'à 16 par planète, donc jusqu'à 7 200 cr de construction pour les 3 planètes, prime calculée en conséquence) ; l'étape est validée quand chacune des 3 planètes n'a plus que des fermes sur tous ses emplacements.
+
+1. Logistique de la conquête (bloquant) : une barge débarque toutes les troupes qu'elle porte sur une seule planète, donc deux planètes demandent deux chargements, et seules les barges débarquent. Comment faire ? Voir la question posée.
 
 À ne coder qu'à ton « go ».
