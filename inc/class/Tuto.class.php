@@ -128,8 +128,20 @@ class Tuto {
         return (int) MyPDO::getInstance()->query($query,$joueur->id)[0]->nombre > 0;
     }
 
-    public static function transitAExpliquer(Joueur $joueur): bool {
-        return $joueur->enTuto() && $joueur->etape_tuto === self::ETAPE_EXPLORATION && !$joueur->tuto_transit_lu && self::explorationEnCours($joueur);
+    private static function trajetVersLaCibleEnCours(Joueur $joueur): bool {
+        $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND id_destination=? AND exploration=0 AND arrivee IS NOT NULL";
+        return (int) MyPDO::getInstance()->query($query,$joueur->id,self::planeteCible($joueur)->id)[0]->nombre > 0;
+    }
+
+    private static function attendUneExplication(Joueur $joueur): bool {
+        if($joueur->etape_tuto === self::ETAPE_EXPLORATION){
+            return self::explorationEnCours($joueur);
+        }
+        return $joueur->etape_tuto === self::ETAPE_ENVOI && self::trajetVersLaCibleEnCours($joueur);
+    }
+
+    public static function explicationEnAttente(Joueur $joueur): bool {
+        return $joueur->enTuto() && $joueur->tuto_explication_lue !== $joueur->etape_tuto && self::attendUneExplication($joueur);
     }
 
     private static function routeDeProduction(Planete $mere, string $type): array {
@@ -177,7 +189,7 @@ class Tuto {
                 return self::routeDeProduction($mere, Vaisseau::RECONNAISSANCE);
             case self::ETAPE_EXPLORATION:
                 if(self::explorationEnCours($joueur)){
-                    return $joueur->tuto_transit_lu ? array() : array(self::niveau($page, self::CLE_EN_ROUTE));
+                    return self::explicationEnAttente($joueur) ? array(self::niveau($page, self::CLE_EN_ROUTE)) : array();
                 }
                 return array(self::niveau('listeVaisseau', 'chercher'));
             case self::ETAPE_PREPARATION:
@@ -186,6 +198,9 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 return array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte'));
             case self::ETAPE_ENVOI:
+                if(self::trajetVersLaCibleEnCours($joueur)){
+                    return array();
+                }
                 $cle = self::cleDEnvoi($joueur);
                 return self::routeVersLaCarte(array(self::niveau('listeVaisseau', $cle)), $cle === self::CLE_VOYAGER_FLOTTE ? self::planeteCible($joueur) : null);
             case self::ETAPE_ASSAUT:
@@ -640,7 +655,7 @@ class Tuto {
             case self::ETAPE_RECONNAISSANCE:
                 return 'Sur la fiche de '.$planete->getNom().', l\'usine de vaisseaux légers peut produire un vaisseau de reconnaissance. Lancez sa production : pendant le tutoriel, les durées sont divisées par '.Joueur::TUTO_DIVISEUR_DUREES.'.';
             case self::ETAPE_EXPLORATION:
-                if(self::explorationEnCours($joueur)){
+                if(self::explicationEnAttente($joueur)){
                     return 'Votre vaisseau de reconnaissance est parti dans l\'inconnu : il est en transit. Le compteur « en route » en haut de l\'écran, à côté de la fusée, compte les déplacements de vaisseaux en cours. Quand le vaisseau reviendra avec ce qu\'il a trouvé, le tutoriel continuera.';
                 }
                 return 'Un système voisin, encore inconnu, existe près du vôtre. Allez dans le menu Flottes : sur '.$planete->getNom().', '.self::action('chercher', 'Chercher').' envoie votre vaisseau de reconnaissance chercher un système dans l\'inconnu, et il revient avec ce qu\'il a trouvé. Pendant le tutoriel il réussit à coup sûr ; plus tard il peut ne rien trouver, voire ne pas revenir.';
@@ -649,6 +664,9 @@ class Tuto {
             case self::ETAPE_FLOTTE:
                 return 'Une flotte regroupe vos vaisseaux moyens et lourds (frégate, barge, capital). Allez dans le menu Flottes : sur l\'encart de '.$planete->getNom().', '.self::action('creer_flotte', 'Créer une flotte').' (en haut à droite) vous laisse cocher la frégate et la barge, puis '.self::action('valider', 'Enregistrer').'.';
             case self::ETAPE_ENVOI:
+                if(self::explicationEnAttente($joueur)){
+                    return 'Le trajet vers '.self::planeteCible($joueur)->getNom().' est long. En attendant : sans analyse par un vaisseau de reconnaissance ('.self::action('reconnaitre', 'Reconnaître').'), on ne sait pas si une planète est protégée par un bouclier et un canon, ni si des flottes la gardent en orbite. Si elle en a, vous devrez les combattre avant de pouvoir débarquer.';
+                }
                 return 'Dans le menu Flottes, ouvrez '.self::action('embarquer', 'Embarquer').' sur la barge de votre flotte : réglez le curseur des troupes sur '.self::TROUPES_REQUISES.' '.__('troupe', 'troupes', self::TROUPES_REQUISES).' et validez ; sur la frégate, réglez celui des chasseurs sur '.self::CHASSEURS_REQUIS.' et validez. Un seul bouton valide tous les curseurs du panneau, et un curseur laissé à 0 n\'embarque rien. Ensuite '.self::action('voyager', 'Voyager').' sur votre flotte : touchez le système voisin, puis la planète '.self::planeteCible($joueur)->getNom().', et '.self::action('voyager', 'Voyager ici').'. À l\'arrivée, la défense de la planète engage votre flotte automatiquement : le combat spatial n\'est plus un choix.';
             case self::ETAPE_ASSAUT:
                 return 'Votre flotte est arrivée : le combat contre la défense de '.self::planeteCible($joueur)->getNom().' s\'est déclenché tout seul, les chasseurs embarqués sur la frégate combattent avec elle. Le rapport de bataille s\'ouvre à l\'arrivée : "Résoudre" le déroule en direct. Pendant le tutoriel vous le gagnez d\'avance. Une fois la défense détruite, ouvrez la fiche de la planète ('.self::action('info', 'Fiche').' sur la carte) et '.self::action('debarquement', 'Débarquer').' les troupes de vos barges. Les troupes débarquées deviennent l\'armée d\'occupation : tant qu\'elles sont présentes, la révolte de la planète ne progresse plus. Si l\'assaut échoue, produisez de nouvelles troupes et recommencez.';

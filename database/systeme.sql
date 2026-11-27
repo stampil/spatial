@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `joueur` (
   `aide_icones_masquee` tinyint(1) NOT NULL DEFAULT '0',
   `tuto_aneantie` tinyint(1) NOT NULL DEFAULT '0',
   `credits_reste` int(11) NOT NULL DEFAULT '0',
-  `tuto_transit_lu` tinyint(1) NOT NULL DEFAULT '0',
+  `tuto_explication_lue` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `nom` (`nom`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
@@ -323,7 +323,8 @@ INSERT INTO `schema_migrations` (`version`) VALUES
 ('027_orbites_ecartees'),
 ('028_credits_reste'),
 ('029_tuto_fin_etapes_ajoutees'),
-('030_tuto_transit_lu');
+('030_tuto_transit_lu'),
+('031_tuto_explication_lue');
 
 UPDATE `systeme` SET `x` = 500 + ROUND(60 * SQRT(`id`) * COS(`id` * 2.39996323)), `y` = 500 + ROUND(60 * SQRT(`id`) * SIN(`id` * 2.39996323));
 
