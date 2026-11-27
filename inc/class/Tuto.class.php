@@ -122,6 +122,27 @@ class Tuto {
         return array(self::niveau('listePlanete', self::CLE_PLANETE.$mere->id), self::niveau('affichePlanete', $cle));
     }
 
+    private static function routeDeProduction(Planete $mere, string $type): array {
+        if(self::nombreEnProduction($mere, $type) > 0){
+            return array();
+        }
+        return self::routeVersPlanete($mere, self::CLE_PRODUIRE.$type);
+    }
+
+    private static function nombreEnProduction(Planete $planete, string $type): int {
+        $nombre = 0;
+        foreach(Vaisseau::enProduction($planete->id) as $ligne){
+            if($ligne->type === $type){
+                $nombre++;
+            }
+        }
+        return $nombre;
+    }
+
+    private static function enProductionQuelconque(Planete $planete): bool {
+        return count(Vaisseau::enProduction($planete->id)) > 0;
+    }
+
     private static function nombreDeVaisseaux(Joueur $joueur, string $type, bool $embarques): int {
         $query = "SELECT COUNT(*) AS nombre FROM " . MyPDO::DB_FLAG . "vaisseau WHERE id_joueur=? AND type=? AND id_hote IS " . ($embarques ? 'NOT ' : '') . "NULL";
         return (int) MyPDO::getInstance()->query($query,$joueur->id,$type)[0]->nombre;
@@ -143,11 +164,12 @@ class Tuto {
             case self::ETAPE_USINE:
                 return self::routeVersPlanete($mere, self::CLE_CONSTRUIRE.Batiment::USINE_LEGERE);
             case self::ETAPE_RECONNAISSANCE:
-                return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::RECONNAISSANCE);
+                return self::routeDeProduction($mere, Vaisseau::RECONNAISSANCE);
             case self::ETAPE_EXPLORATION:
                 return array(self::niveau('listeVaisseau', 'chercher'));
             case self::ETAPE_PREPARATION:
-                return self::routeVersPlanete($mere, self::cleDePreparation($joueur, $mere));
+                $cle = self::cleDePreparation($joueur, $mere);
+                return $cle === null ? array() : self::routeVersPlanete($mere, $cle);
             case self::ETAPE_FLOTTE:
                 return array(self::niveau('listeVaisseau', 'creer-flotte enregistrer-flotte'));
             case self::ETAPE_ENVOI:
@@ -190,7 +212,7 @@ class Tuto {
         return $route;
     }
 
-    private static function cleDePreparation(Joueur $joueur, Planete $mere): string {
+    private static function cleDePreparation(Joueur $joueur, Planete $mere): ?string {
         if($mere->nombre(Batiment::USINE_MOYENNE) < 1){
             return self::CLE_CONSTRUIRE.Batiment::USINE_MOYENNE;
         }
@@ -199,11 +221,11 @@ class Tuto {
         }
         $stock = Vaisseau::stock($mere->id, $joueur->id);
         foreach(self::requis() as $type => $minimum){
-            if(($stock[$type] ?? 0) < $minimum){
+            if(($stock[$type] ?? 0) + self::nombreEnProduction($mere, $type) < $minimum){
                 return self::CLE_PRODUIRE.$type;
             }
         }
-        return self::CLE_PRODUIRE.Vaisseau::TROUPE;
+        return self::enProductionQuelconque($mere) ? null : self::CLE_PRODUIRE.Vaisseau::TROUPE;
     }
 
     private static function routeDAssassin(Joueur $joueur, Planete $mere): array {
@@ -211,7 +233,7 @@ class Tuto {
             return self::routeVersPlanete($mere, self::CLE_RECRUTER.Perso::ROLE_ASSASSIN);
         }
         if(self::nombreDeVaisseaux($joueur, Vaisseau::TRANSPORT_PERSO, false) < 1){
-            return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::TRANSPORT_PERSO);
+            return self::routeDeProduction($mere, Vaisseau::TRANSPORT_PERSO);
         }
         $assassin = MyPDO::getInstance()->query("SELECT embarque, arrivee, sur_planete FROM " . MyPDO::DB_FLAG . "perso WHERE id_joueur=? AND role=? AND fin_mort IS NULL ORDER BY id LIMIT 1",$joueur->id,Perso::ROLE_ASSASSIN)[0];
         if((int) $assassin->embarque === 1){
@@ -241,7 +263,7 @@ class Tuto {
             return self::routeVersPlanete($mere, self::CLE_CONSTRUIRE.Batiment::USINE_LOURDE);
         }
         if(self::nombreDeVaisseaux($joueur, Vaisseau::RESTRICTOR, false) < 1){
-            return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::RESTRICTOR);
+            return self::routeDeProduction($mere, Vaisseau::RESTRICTOR);
         }
         $deux = self::planeteDeux($joueur);
         if(!self::restrictorSur($joueur, $deux)){
@@ -296,13 +318,13 @@ class Tuto {
         }
         $barge = self::bargeSur($joueur, $depart);
         if($barge === null){
-            return self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::BARGE);
+            return self::routeDeProduction($mere, Vaisseau::BARGE);
         }
         if(Vaisseau::troupesEnBarge($depart->id, $joueur->id) < 1){
             if((Vaisseau::stockLibre($depart->id, $joueur->id)[Vaisseau::TROUPE] ?? 0) > 0){
                 return array(self::niveau('listeVaisseau', 'embarquer-valider-'.Vaisseau::BARGE.' embarquer-'.Vaisseau::BARGE));
             }
-            return $depart->id === $mere->id ? self::routeVersPlanete($mere, self::CLE_PRODUIRE.Vaisseau::TROUPE) : array();
+            return $depart->id === $mere->id ? self::routeDeProduction($mere, Vaisseau::TROUPE) : array();
         }
         return self::routeVersLaCarte(array(self::niveau('listeVaisseau', self::CLE_VOYAGER.Vaisseau::BARGE)), $cible);
     }
